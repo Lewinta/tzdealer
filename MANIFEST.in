@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include tzdealer *.css
+recursive-include tzdealer *.csv
+recursive-include tzdealer *.html
+recursive-include tzdealer *.ico
+recursive-include tzdealer *.js
+recursive-include tzdealer *.json
+recursive-include tzdealer *.md
+recursive-include tzdealer *.png
+recursive-include tzdealer *.py
+recursive-include tzdealer *.svg
+recursive-include tzdealer *.txt
+recursive-exclude tzdealer *.pyc
