@@ -27,10 +27,15 @@ app_license = "MIT"
 
 # include js in doctype views
 # doctype_js = {"doctype" : "public/js/doctype.js"}
-# doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
+doctype_list_js = {
+	"Item" : "public/js/item_list.js"
+}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
-
+doctype_js = {
+	"Item" : "public/js/item.js",
+	"Landed Cost Voucher" : "public/js/landed_cost_voucher.js",
+}
 # Home Pages
 # ----------
 
@@ -119,4 +124,4 @@ app_license = "MIT"
 # override_whitelisted_methods = {
 # 	"frappe.desk.doctype.event.event.get_events": "tzdealer.event.get_events"
 # }
-
+boot_session = "tzdealer.boot.boot_session"
