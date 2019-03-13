@@ -34,6 +34,9 @@ doctype_list_js = {
 # doctype_calendar_js = {"doctype" : "public/js/doctype_calendar.js"}
 doctype_js = {
 	"Item" : "public/js/item.js",
+	"Payment Entry" : "public/js/payment_entry.js",
+	"Purchase Invoice" : "public/js/purchase_invoice.js",
+	"Sales Invoice" : "public/js/sales_invoice.js",
 	"Landed Cost Voucher" : "public/js/landed_cost_voucher.js",
 }
 # Home Pages
@@ -84,13 +87,11 @@ doctype_js = {
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-# 	"*": {
-# 		"on_update": "method",
-# 		"on_cancel": "method",
-# 		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Item": {
+		"before_insert": "tzdealer.hook.item.before_insert",
+	}
+}
 
 # Scheduled Tasks
 # ---------------
