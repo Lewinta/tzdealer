@@ -37,6 +37,7 @@ doctype_js = {
 	"Payment Entry" : "public/js/payment_entry.js",
 	"Purchase Invoice" : "public/js/purchase_invoice.js",
 	"Sales Invoice" : "public/js/sales_invoice.js",
+	"Contact" : "public/js/contact.js",
 	"Landed Cost Voucher" : "public/js/landed_cost_voucher.js",
 }
 # Home Pages

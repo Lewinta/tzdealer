@@ -86,10 +86,7 @@ def get_data(filters):
 			`tabItem`
 			On
 				`tabSales Invoice Item`.item_code = `tabItem`.item_code
-		Inner Join
-			`tabSales Order`
-			On
-				`tabSales Invoice Item`.sales_order = `tabSales Order`.name
+
 		Where
 			{conditions}
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
@@ -112,7 +109,7 @@ def get_columns(filters):
 		("Sales Price", "sales_price", "Currency", 100),
 		("Sold Date", "posting_date", "Date", 100),
 		("Customer", "customer", "Link/Customer", 200),
-		("Sales Order", "sales_order", "Link/Sales Order", 100),
+		# ("Sales Order", "sales_order", "Link/Sales Order", 100),
 		("Billing Status", "billing_status", "Data", 100),
 		("Sales Inv.", "sales_name", "Link/Sales Invoice", 100),
 		("Purchase Inv.", "purchase_name", "Link/Purchase Invoice", 100),
@@ -150,7 +147,7 @@ def get_fields(filters):
 		("Sales Invoice", "posting_date"),
 		("Sales Invoice", "customer"),
 		("Sales Invoice Item", "sales_order"),
-		("Sales Order", "billing_status"),
+		# ("Sales Order", "billing_status"),
 		("Sales Invoice", "name"),
 		("Purchase Invoice", "name"),
 		("Purchase Invoice", "posting_date"),

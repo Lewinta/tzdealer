@@ -62,7 +62,8 @@ def get_data(filters):
 
 	return frappe.db.sql("""
 		Select
-			{fields}
+			{fields},
+			(Select Sum(actual_qty) from `tabStock Ledger Entry` where item_code = `tabPurchase Invoice Item`.item_code) as qty
 		From
 			`tabPurchase Invoice`
 		Inner Join
@@ -103,6 +104,8 @@ def get_data(filters):
 			) As `tabSales Price`
 		Where
 			{conditions}
+			Having 
+			qty > 0
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
 	filters, debug=True)
 
