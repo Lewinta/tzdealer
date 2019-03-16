@@ -162,7 +162,7 @@ frappe.ui.form.on("Item", {
 		let clear_enabled = [];
 		let reqd = {
 			"vehicles" : ["make", "model", "year", "vim_number"],
-			"containers" : ["container_no", "booking_no", "seal_no", "shipping_line"],
+			"containers" : ["container_no", "booking_no"],
 			"vehicle_parts" : ["part_type"],
 			"services" : ["item_code"],
 		}
@@ -192,6 +192,9 @@ frappe.ui.form.on("Item", {
 
 		//Let's add all custom enabled fields
 		frm.toggle_enable(disable[selection], false);
+
+		frm.toggle_display("item_code", selection == "vehicle_parts");
+
 
 	}
 });
