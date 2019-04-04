@@ -3,6 +3,11 @@ frappe.ui.form.on("Purchase Invoice", {
 		if(frm.is_new())
 			frm.trigger("invoice_type");
 
+		if (frappe.user.has_role("Sales User"))
+			frappe.show_not_permitted();
+		
+		frm.trigger("reqd_transaction_group");
+
 		frm.set_query("transaction_group",  event => {
 			return{
 				filters:{
@@ -30,6 +35,7 @@ frappe.ui.form.on("Purchase Invoice", {
 		$.map(items, item => {
 			item.expense_account = account;
 		});
+
 	},
 	validate: frm => {
 		frm.trigger("invoice_type");
@@ -46,6 +52,12 @@ frappe.ui.form.on("Purchase Invoice", {
 		});
 		
 
+	},
+	is_opening: frm => {
+		frm.trigger("reqd_transaction_group");
+	},
+	reqd_transaction_group: frm => {
+		frm.toggle_reqd("transaction_group", frm.doc.is_opening == "No");
 	},
 	invoice_type: frm => {
 		let check = frm.doc.invoice_type != "Services" ? true : false;

@@ -73,14 +73,16 @@ def get_data(filters):
 				`tabSales Order`.docstatus = 1
 			And
 				`tabSales Order`.status in ('Not Billed', 'Partly Billed', 'To Deliver and Bill')
-		Inner Join 
+		Inner Join
 				`tabPurchase Invoice Item`
 			On
 				`tabPurchase Invoice Item`.item_code = 	`tabSales Order Item`.item_code
-		Inner Join 
+		Inner Join
 				`tabPurchase Invoice`
 			On
 				`tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
+			And
+				`tabPurchase Invoice`.docstatus = 1
 		Inner Join
 			`tabItem`
 			On
@@ -133,7 +135,7 @@ def get_columns(filters):
 
 def get_fields(filters):
 	"""
-	Return sql fields ready to be used on query
+	Return SQL fields ready to be used on query
 	"""
 
 	fields = (

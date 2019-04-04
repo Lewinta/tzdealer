@@ -39,6 +39,7 @@ doctype_js = {
 	"Sales Invoice" : "public/js/sales_invoice.js",
 	"Contact" : "public/js/contact.js",
 	"Landed Cost Voucher" : "public/js/landed_cost_voucher.js",
+	"Address" : "public/js/address.js",
 }
 # Home Pages
 # ----------
@@ -91,6 +92,12 @@ doctype_js = {
 doc_events = {
 	"Item": {
 		"before_insert": "tzdealer.hook.item.before_insert",
+	},
+	"Sales Invoice": {
+		"validate": "tzdealer.hook.sales_invoice.validate",
+	},
+	"Sales Order": {
+		"validate": "tzdealer.hook.sales_order.validate",
 	}
 }
 

@@ -164,7 +164,7 @@ def get_fields(filters):
 		("""
 			(
 				Select
-					(((`tabSingles`.value / 100) + 1) * `tabBin`.valuation_rate) As p
+					(((`tabSingles`.value / 100) + 1) * (`tabBin`.valuation_rate + `tabPurchase Invoice`.total - `tabPurchase Invoice Item`.rate)) As p
 				From
 					`tabSingles`
 				Where

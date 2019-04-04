@@ -3,6 +3,2366 @@ from __future__ import unicode_literals
 
 __version__ = '0.0.1'
 
+item_extra_details = [
+ {
+   "date": "2019-01-31",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102045,
+   "vim": " 1FMCU0D77BKB81223"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101864,
+   "vim": " 1FMCU0D79BKA10506"
+ },
+ {
+   "date": "2018-11-30",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101957,
+   "vim": " 1FMCU0G93DUD05718"
+ },
+ {
+   "date": "2018-09-18",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101850,
+   "vim": " 1FMCU0GX5EUC70907"
+ },
+ {
+   "date": "2018-10-24",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101893,
+   "vim": " 1G1PG5S92B7209312"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101865,
+   "vim": " 2CNALPEC9B6215356"
+ },
+ {
+   "date": "2018-12-04",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101960,
+   "vim": " 2HKRM3H37EH000552"
+ },
+ {
+   "date": "2019-02-08",
+   "vendor": "IMPACT QUEBEC",
+   "item_number": 102059,
+   "vim": " 2T1BURHE2JC076781"
+ },
+ {
+   "date": "2018-12-04",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101959,
+   "vim": " 2T3BF4DV2AW033065"
+ },
+ {
+   "date": "2018-11-15",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101933,
+   "vim": " 5XYKT3A64CG260422"
+ },
+ {
+   "date": "2019-03-05",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102115,
+   "vim": " 5XYKTCA6XEG444024"
+ },
+ {
+   "date": "2019-02-20",
+   "vendor": "IMPACT HALIFAX",
+   "item_number": 102096,
+   "vim": " JN8AS5MV5CW402216"
+ },
+ {
+   "date": "2019-01-16",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102014,
+   "vim": " JTDKT4K30B5339944"
+ },
+ {
+   "date": "2019-03-07",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102128,
+   "vim": "1C4NJDAB0ED835106"
+ },
+ {
+   "date": "2019-02-14",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102082,
+   "vim": "1C4PJLAB0EW287213"
+ },
+ {
+   "date": "2018-10-09",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101889,
+   "vim": "1FADP3F22EL290177"
+ },
+ {
+   "date": "2018-09-06",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101835,
+   "vim": "1FADP3F26DL281206"
+ },
+ {
+   "date": "2019-02-13",
+   "vendor": "ADESA TORONTO",
+   "item_number": 102075,
+   "vim": "1FADP3K20EL256860"
+ },
+ {
+   "date": "2018-10-01",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 101874,
+   "vim": "1FADP3K21DL134166"
+ },
+ {
+   "date": "2019-03-07",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 102129,
+   "vim": "1FAHP3H21CL401135"
+ },
+ {
+   "date": "2018-11-19",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 101934,
+   "vim": "1FAHP3H23CL198216"
+ },
+ {
+   "date": "2018-11-27",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101945,
+   "vim": "1FAHP3H27CL180687"
+ },
+ {
+   "date": "2019-03-05",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102119,
+   "vim": "1FAHP3J21CL133648"
+ },
+ {
+   "date": "2018-08-09",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101802,
+   "vim": "1FAHP3J21CL296090"
+ },
+ {
+   "date": "2019-01-24",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 102034,
+   "vim": "1FAHP3M20CL192492"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101952,
+   "vim": "1FAHP3N2XCL181496"
+ },
+ {
+   "date": "2019-03-06",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102122,
+   "vim": "1FM5K7D80DGA02610"
+ },
+ {
+   "date": "2018-01-16",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101346,
+   "vim": "1FM5K7D83HGA71605"
+ },
+ {
+   "date": "2019-01-30",
+   "vendor": "ADESA TORONTO",
+   "item_number": 102042,
+   "vim": "1FM5K7D9XDGA51709"
+ },
+ {
+   "date": "2018-10-03",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101880,
+   "vim": "1FM5K8D88DGB85163"
+ },
+ {
+   "date": "2019-03-07",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102126,
+   "vim": "1FM5K8F82EGC29074"
+ },
+ {
+   "date": "2019-02-20",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102094,
+   "vim": "1FM5K8F85JGC01375"
+ },
+ {
+   "date": "2019-01-23",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 102031,
+   "vim": "1FMCU0D70BKA70092"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101956,
+   "vim": "1FMCU0D70BKB41890"
+ },
+ {
+   "date": "2018-08-27",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 101818,
+   "vim": "1FMCU0D71AKC39194"
+ },
+ {
+   "date": "2019-03-13",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102141,
+   "vim": "1FMCU0D71BKC32800"
+ },
+ {
+   "date": "2018-08-02",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101795,
+   "vim": "1FMCU0D71CKC49534"
+ },
+ {
+   "date": "2018-09-19",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101854,
+   "vim": "1FMCU0D72AKC92602"
+ },
+ {
+   "date": "2018-09-19",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101852,
+   "vim": "1FMCU0D72BKA88447"
+ },
+ {
+   "date": "2018-08-01",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101793,
+   "vim": "1FMCU0D74AKD22683"
+ },
+ {
+   "date": "2018-09-05",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101829,
+   "vim": "1FMCU0D74BKA71052"
+ },
+ {
+   "date": "2018-09-11",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101839,
+   "vim": "1FMCU0D74BKB80370"
+ },
+ {
+   "date": "2018-08-09",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101803,
+   "vim": "1FMCU0D75AKA50760"
+ },
+ {
+   "date": "2018-11-22",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101939,
+   "vim": "1FMCU0D75BKA23270"
+ },
+ {
+   "date": "2019-03-07",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102127,
+   "vim": "1FMCU0D75CKC71651"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101863,
+   "vim": "1FMCU0D76BKB05685"
+ },
+ {
+   "date": "2018-12-11",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101975,
+   "vim": "1FMCU0D76CKB58680"
+ },
+ {
+   "date": "2019-03-07",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102125,
+   "vim": "1FMCU0D76CKC71609"
+ },
+ {
+   "date": "2018-11-08",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 101922,
+   "vim": "1FMCU0D77AKD22841"
+ },
+ {
+   "date": "2018-09-12",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101842,
+   "vim": "1FMCU0D77BKB62171"
+ },
+ {
+   "date": "2018-12-05",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101969,
+   "vim": "1FMCU0D78BKA00517 "
+ },
+ {
+   "date": "2018-11-02",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101917,
+   "vim": "1FMCU0D78BKB75981"
+ },
+ {
+   "date": "2018-09-13",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 101849,
+   "vim": "1FMCU0D78BKB86432"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102062,
+   "vim": "1FMCU0D78CKB58681"
+ },
+ {
+   "date": "2018-10-17",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101892,
+   "vim": "1FMCU0D79CKA52286"
+ },
+ {
+   "date": "2018-12-18",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101984,
+   "vim": "1FMCU0D79CKB58673"
+ },
+ {
+   "date": "2018-10-31",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101912,
+   "vim": "1FMCU0D7XBKC26851"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102068,
+   "vim": "1FMCU0G91DUA88735"
+ },
+ {
+   "date": "2018-09-05",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101828,
+   "vim": "1FMCU0G92EUC62989"
+ },
+ {
+   "date": "2018-11-07",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101920,
+   "vim": "1FMCU0G93EUC86850"
+ },
+ {
+   "date": "2018-11-01",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101913,
+   "vim": "1FMCU0G94DUD20356"
+ },
+ {
+   "date": "2018-09-06",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101833,
+   "vim": "1FMCU0G94EUD47378"
+ },
+ {
+   "date": "2019-02-21",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 102099,
+   "vim": "1FMCU0G95DUB03169"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 101862,
+   "vim": "1FMCU0G95DUB03236"
+ },
+ {
+   "date": "2019-02-13",
+   "vendor": "IMPACT HALIFAX",
+   "item_number": 102074,
+   "vim": "1FMCU0G97DUD89851"
+ },
+ {
+   "date": "2018-10-31",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101910,
+   "vim": "1FMCU0G97FUB14581"
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102133,
+   "vim": "1FMCU0G98DUB72664"
+ },
+ {
+   "date": "2018-09-26",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101869,
+   "vim": "1FMCU0G98EUB02759"
+ },
+ {
+   "date": "2018-12-13",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101979,
+   "vim": "1FMCU0G98EUC24991"
+ },
+ {
+   "date": "2018-10-03",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101879,
+   "vim": "1FMCU0G98FUB98815"
+ },
+ {
+   "date": "2019-03-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102161,
+   "vim": "1FMCU0G99FUA84273"
+ },
+ {
+   "date": "2019-01-03",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 101992,
+   "vim": "1FMCU0GD0JUB56832 "
+ },
+ {
+   "date": "2018-02-08",
+   "vendor": "IMPACT LONDON",
+   "item_number": 101398,
+   "vim": "1FMCU0GD2HUA06666 "
+ },
+ {
+   "date": "2019-01-15",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 102011,
+   "vim": "1FMCU0GX0DUB18578"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101942,
+   "vim": "1FMCU0GX0EUD46050"
+ },
+ {
+   "date": "2018-11-01",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101916,
+   "vim": "1FMCU0GX5DUD05721"
+ },
+ {
+   "date": "2019-01-16",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 102012,
+   "vim": "1FMCU0GX6DUC05708"
+ },
+ {
+   "date": "2019-03-13",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102139,
+   "vim": "1FMCU0GX6DUC74107"
+ },
+ {
+   "date": "2018-08-09",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101801,
+   "vim": "1FMCU0GX9FUC68322"
+ },
+ {
+   "date": "2018-09-06",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101832,
+   "vim": "1FMCU0GXXDUA36843"
+ },
+ {
+   "date": "2019-03-04",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102114,
+   "vim": "1FMCU0H91DUB47944"
+ },
+ {
+   "date": "2018-11-01",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101914,
+   "vim": "1FMCU0H93DUB47766"
+ },
+ {
+   "date": "2019-03-14",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102145,
+   "vim": "1FMCU0H97DUC57722"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 101859,
+   "vim": "1FMCU9D70BKA83865"
+ },
+ {
+   "date": "2018-12-11",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101976,
+   "vim": "1FMCU9D70BKB15777"
+ },
+ {
+   "date": "2018-09-12",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101843,
+   "vim": "1FMCU9D71BKB41417"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101858,
+   "vim": "1FMCU9D71CKA24776"
+ },
+ {
+   "date": "2018-11-27",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101946,
+   "vim": "1FMCU9D72BKA29824"
+ },
+ {
+   "date": "2018-12-04",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101964,
+   "vim": "1FMCU9D72BKB55407"
+ },
+ {
+   "date": "2018-12-04",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101962,
+   "vim": "1FMCU9D72BKB68352"
+ },
+ {
+   "date": "2018-09-18",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101851,
+   "vim": "1FMCU9D77AKA50585"
+ },
+ {
+   "date": "2018-09-12",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101841,
+   "vim": "1FMCU9D78BKA10615"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102070,
+   "vim": "1FMCU9D78BKB04929"
+ },
+ {
+   "date": "2018-08-01",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101791,
+   "vim": "1FMCU9D78BKB41477"
+ },
+ {
+   "date": "2018-12-05",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101968,
+   "vim": "1FMCU9G90DUB10986"
+ },
+ {
+   "date": "2018-09-06",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101834,
+   "vim": "1FMCU9G91EUA16309"
+ },
+ {
+   "date": "2018-08-02",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101794,
+   "vim": "1FMCU9G91FUB66356"
+ },
+ {
+   "date": "2019-02-28",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102111,
+   "vim": "1FMCU9G92EUC32475"
+ },
+ {
+   "date": "2019-01-31",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 102044,
+   "vim": "1FMCU9G97DUD26222"
+ },
+ {
+   "date": "2017-05-05",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 101032,
+   "vim": "1FMCU9GD6HUA55745"
+ },
+ {
+   "date": "2019-03-19",
+   "vendor": "MANHEIM MONTREAL",
+   "item_number": 102150,
+   "vim": "1FMCU9GX0FUB75595"
+ },
+ {
+   "date": "2019-02-15",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102086,
+   "vim": "1FMCU9GX2EUB82594"
+ },
+ {
+   "date": "2018-12-19",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101990,
+   "vim": "1FMCU9GX2EUD26855"
+ },
+ {
+   "date": "2019-03-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102164,
+   "vim": "1FMCU9GX3DUD28371"
+ },
+ {
+   "date": "2018-12-11",
+   "vendor": "MANHEIM MONTREAL",
+   "item_number": 101973,
+   "vim": "1FMCU9GX4EUC47722"
+ },
+ {
+   "date": "2019-03-20",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102156,
+   "vim": "1FMCU9GX4EUD03559"
+ },
+ {
+   "date": "2018-11-21",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101938,
+   "vim": "1FMCU9GX5EUC39676"
+ },
+ {
+   "date": "2018-12-11",
+   "vendor": "401 KINGSTON",
+   "item_number": 101977,
+   "vim": "1FMCU9GX7EUB66942"
+ },
+ {
+   "date": "2018-11-07",
+   "vendor": "IMPACT LONDON",
+   "item_number": 101921,
+   "vim": "1FMCU9GX8DUA31922 "
+ },
+ {
+   "date": "2019-02-20",
+   "vendor": "ADESA TORONTO",
+   "item_number": 102093,
+   "vim": "1FMCU9GXXDUC96180"
+ },
+ {
+   "date": "2018-10-03",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101881,
+   "vim": "1FMCU9GXXFUB51174"
+ },
+ {
+   "date": "2018-12-11",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101974,
+   "vim": "1FMCU9H93DUD59202"
+ },
+ {
+   "date": "2019-03-14",
+   "vendor": "IMPACT SUDBURY",
+   "item_number": 102148,
+   "vim": "1FMCU9H94DUA31321"
+ },
+ {
+   "date": "2019-02-22",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 102101,
+   "vim": "1FMCU9H94DUC81612"
+ },
+ {
+   "date": "2018-08-28",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101820,
+   "vim": "1FMCU9H96DUB66770"
+ },
+ {
+   "date": "2019-03-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102163,
+   "vim": "1FMCU9H9XDUD59746"
+ },
+ {
+   "date": "2019-02-19",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102089,
+   "vim": "1FMCU9HD3JUC21658"
+ },
+ {
+   "date": "2019-02-20",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102095,
+   "vim": "1FMCU9HD3JUC93900"
+ },
+ {
+   "date": "2019-01-23",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102030,
+   "vim": "1FMCU9HD5JUC20933"
+ },
+ {
+   "date": "2018-09-13",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 101846,
+   "vim": "1FMCU9J95FUC15373"
+ },
+ {
+   "date": "2018-08-02",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101796,
+   "vim": "1FMCU9J96DUA26602"
+ },
+ {
+   "date": "2019-01-11",
+   "vendor": "ADESA WINDSOR",
+   "item_number": 102004,
+   "vim": "1FMCU9J97EUD60767"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 102018,
+   "vim": "1FMCU9J99DUA22169"
+ },
+ {
+   "date": "2019-03-20",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102155,
+   "vim": "1FMHK7F85CGA53528"
+ },
+ {
+   "date": "2018-02-28",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101483,
+   "vim": "1FTSS3EL0BDA27413"
+ },
+ {
+   "date": "2018-12-11",
+   "vendor": "401 KINGSTON",
+   "item_number": 101978,
+   "vim": "1G1PC5SB3E7204848"
+ },
+ {
+   "date": "2019-02-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102105,
+   "vim": "1G1PC5SH2C7331236"
+ },
+ {
+   "date": "2018-09-06",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101836,
+   "vim": "1G1PC5SHXC7341271"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "401 KINGSTON",
+   "item_number": 102064,
+   "vim": "1G1PF5S90B7286327"
+ },
+ {
+   "date": "2018-09-13",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 101848,
+   "vim": "1G1PF5S91B7220305"
+ },
+ {
+   "date": "2019-03-13",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102142,
+   "vim": "1G1PF5S93B7136440"
+ },
+ {
+   "date": "2019-03-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102160,
+   "vim": "1G1PF5S98B7121108"
+ },
+ {
+   "date": "2018-10-02",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101878,
+   "vim": "1G1PF5S9XB7224126"
+ },
+ {
+   "date": "2019-02-07",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102054,
+   "vim": "1G1PF5SC1C7216221"
+ },
+ {
+   "date": "2019-03-05",
+   "vendor": "ADESA TORONTO",
+   "item_number": 102120,
+   "vim": "1G1PF5SC4C7330018"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101856,
+   "vim": "1G1PF5SC4C7382099"
+ },
+ {
+   "date": "2018-12-05",
+   "vendor": "IMPACT LONDON",
+   "item_number": 101966,
+   "vim": "1G1PG5S96B7228879 "
+ },
+ {
+   "date": "2019-02-14",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102083,
+   "vim": "1G1PG5S98B7133076"
+ },
+ {
+   "date": "2018-12-05",
+   "vendor": "IMPACT LONDON",
+   "item_number": 101967,
+   "vim": "1G1PG5S9XB7190816"
+ },
+ {
+   "date": "2018-10-02",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101882,
+   "vim": "1G1PG5SC4C7339606"
+ },
+ {
+   "date": "2019-02-28",
+   "vendor": "IMPACT SUDBURY",
+   "item_number": 102109,
+   "vim": "1G1PH5S9XB7168618"
+ },
+ {
+   "date": "2019-02-20",
+   "vendor": "IMPACT HALIFAX",
+   "item_number": 102097,
+   "vim": "1N6AD0EV9JN756425"
+ },
+ {
+   "date": "2019-01-10",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 102002,
+   "vim": "2CNALDEC8B6391118"
+ },
+ {
+   "date": "2018-08-30",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101826,
+   "vim": "2CNALDEC9B6330845"
+ },
+ {
+   "date": "2018-08-30",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101824,
+   "vim": "2CNALDEW4A6321124"
+ },
+ {
+   "date": "2019-02-28",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102112,
+   "vim": "2CNALPEC3B6218091"
+ },
+ {
+   "date": "2018-10-09",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101890,
+   "vim": "2CNFLEEC3B6226959"
+ },
+ {
+   "date": "2019-02-07",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102056,
+   "vim": "2CNFLNEC0B6340014"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102024,
+   "vim": "2CNFLNEC8B6449157"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101857,
+   "vim": "2CTALFEW6A6341167"
+ },
+ {
+   "date": "2019-02-13",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102078,
+   "vim": "2CTALMEC7B6376926"
+ },
+ {
+   "date": "2019-02-13",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102073,
+   "vim": "2CTALUEC5B6243629"
+ },
+ {
+   "date": "2018-10-31",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101911,
+   "vim": "2CTFLREC0B6202036  "
+ },
+ {
+   "date": "2019-02-28",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102110,
+   "vim": "2CTFLRECXB6232774"
+ },
+ {
+   "date": "2019-01-08",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101997,
+   "vim": "2FMDK3J91DBA11261"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101896,
+   "vim": "2FMDK3J92DBA38355"
+ },
+ {
+   "date": "2018-11-13",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101932,
+   "vim": "2FMDK3J92DBA54068"
+ },
+ {
+   "date": "2019-02-07",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102055,
+   "vim": "2FMDK3J96DBA54073"
+ },
+ {
+   "date": "2018-11-12",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 101926,
+   "vim": "2FMDK3K91DBA11405"
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102137,
+   "vim": "2FMDK4JC3BBA07050"
+ },
+ {
+   "date": "2018-08-08",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101799,
+   "vim": "2FMDK4KC8CBA54137"
+ },
+ {
+   "date": "2018-12-05",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101970,
+   "vim": "2FMTK3G91FBB83330"
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102132,
+   "vim": "2GKALMEK5C6363214"
+ },
+ {
+   "date": "2019-03-19",
+   "vendor": "401 KINGSTON",
+   "item_number": 102154,
+   "vim": "2GKALMEK8C6158616"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 101861,
+   "vim": "2GKALSEK7C6214291"
+ },
+ {
+   "date": "2019-01-14",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102010,
+   "vim": "2GKALUEK0C6296442"
+ },
+ {
+   "date": "2018-10-09",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101886,
+   "vim": "2GKFLREK2C6196541"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101955,
+   "vim": "2GKFLREK7C6105649"
+ },
+ {
+   "date": "2018-08-21",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101813,
+   "vim": "2GKFLTEK9C6241956"
+ },
+ {
+   "date": "2018-08-24",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101817,
+   "vim": "2GKFLVEK6C6324899"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101906,
+   "vim": "2GKFLVEK8E6114422"
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102136,
+   "vim": "2GNALAEK0E6320257"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102016,
+   "vim": "2GNALBEC0B1211157"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102017,
+   "vim": "2GNALBEK0C1121046"
+ },
+ {
+   "date": "2018-12-04",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101963,
+   "vim": "2GNALBEKXC1195994"
+ },
+ {
+   "date": "2018-12-06",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101971,
+   "vim": "2GNALDEK2C6103100"
+ },
+ {
+   "date": "2019-03-04",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102113,
+   "vim": "2GNALDEK3D6170998"
+ },
+ {
+   "date": "2019-02-14",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102080,
+   "vim": "2GNALDEK5C6256098"
+ },
+ {
+   "date": "2019-03-11",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102130,
+   "vim": "2GNALDEK5C6323881"
+ },
+ {
+   "date": "2018-09-25",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101867,
+   "vim": "2GNALDEK7C6150221"
+ },
+ {
+   "date": "2019-03-07",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102124,
+   "vim": "2GNALDEK9C6302130"
+ },
+ {
+   "date": "2018-11-27",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101943,
+   "vim": "2GNALDEKXC6214851"
+ },
+ {
+   "date": "2019-01-08",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101996,
+   "vim": "2GNALPEK1C1255934"
+ },
+ {
+   "date": "2018-12-19",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101988,
+   "vim": "2GNFLEEK1D6333577"
+ },
+ {
+   "date": "2018-09-05",
+   "vendor": "IMPACT LONDON",
+   "item_number": 101831,
+   "vim": "2GNFLNEK3C6349617 "
+ },
+ {
+   "date": "2018-06-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101726,
+   "vim": "2HGFB2F48DH017223"
+ },
+ {
+   "date": "2018-11-13",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101928,
+   "vim": "2HGFB2F48EH045492"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 102019,
+   "vim": "2HGFB2F54DH004137"
+ },
+ {
+   "date": "2019-01-29",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102040,
+   "vim": "2HGFB2F56DH014040"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102020,
+   "vim": "2HGFB2F76EH017684"
+ },
+ {
+   "date": "2018-08-21",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101814,
+   "vim": "2HKRM3H53EH003708"
+ },
+ {
+   "date": "2019-01-24",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102036,
+   "vim": "2HKRM3H5XDH003350"
+ },
+ {
+   "date": "2019-01-23",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 102032,
+   "vim": "2HKRM4H43FH110921"
+ },
+ {
+   "date": "2019-02-26",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 102106,
+   "vim": "2HKRM4H52EH113347"
+ },
+ {
+   "date": "2019-03-28",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102166,
+   "vim": "2T1BR32E04C819966"
+ },
+ {
+   "date": "2018-03-20",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101513,
+   "vim": "2T1BR32E55C903072 "
+ },
+ {
+   "date": "2019-03-29",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 102168,
+   "vim": "2T1BU40E09C081181"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101902,
+   "vim": "2T1BU40E09C134705"
+ },
+ {
+   "date": "2018-08-22",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101815,
+   "vim": "2T1BU4EE0BC617058"
+ },
+ {
+   "date": "2018-08-16",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101806,
+   "vim": "2T1BU4EE2BC635173"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101949,
+   "vim": "2T1BU4EE7BC675118"
+ },
+ {
+   "date": "2019-02-05",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102049,
+   "vim": "2T1BU4EE7DC004406 "
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "401 KINGSTON",
+   "item_number": 101908,
+   "vim": "2T1BU4EE8CC807210"
+ },
+ {
+   "date": "2019-02-21",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102098,
+   "vim": "2T1BURHE0JC044847"
+ },
+ {
+   "date": "2019-03-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102162,
+   "vim": "2T1BURHE2EC164025"
+ },
+ {
+   "date": "2018-08-28",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101819,
+   "vim": "2T1BURHE2JC086789"
+ },
+ {
+   "date": "2018-08-20",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 101812,
+   "vim": "2T1BURHE3JC973494"
+ },
+ {
+   "date": "2018-09-27",
+   "vendor": "AUTO RECYCLAGE P.A INC",
+   "item_number": 101866,
+   "vim": "2T1BURHE4JC024102"
+ },
+ {
+   "date": "2019-02-05",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102048,
+   "vim": "2T1BURHE8JC121299"
+ },
+ {
+   "date": "2018-09-20",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 101860,
+   "vim": "2T1BURHE8JC121478"
+ },
+ {
+   "date": "2019-02-19",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102091,
+   "vim": "2T1BURHE9JC091715"
+ },
+ {
+   "date": "2019-01-11",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102005,
+   "vim": "2T1BURHEXEC074539"
+ },
+ {
+   "date": "2018-08-17",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101810,
+   "vim": "2T1BURHEXEC085900"
+ },
+ {
+   "date": "2018-12-05",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101965,
+   "vim": "2T1KE4EE0AC035232"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "ADESA TORONTO",
+   "item_number": 102063,
+   "vim": "2T1KU4EE1EC130441"
+ },
+ {
+   "date": "2018-09-07",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 101838,
+   "vim": "2T1KU4EE5AC372014"
+ },
+ {
+   "date": "2018-08-30",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101823,
+   "vim": "2T1LE4EE8AC017162"
+ },
+ {
+   "date": "2019-02-07",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102058,
+   "vim": "2T3BF4DV1CW178553"
+ },
+ {
+   "date": "2019-03-05",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102118,
+   "vim": "2T3BF4DV1CW183266"
+ },
+ {
+   "date": "2019-03-05",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102117,
+   "vim": "2T3BF4DV3CW206742"
+ },
+ {
+   "date": "2018-11-20",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101936,
+   "vim": "2T3BF4DV4BW127367"
+ },
+ {
+   "date": "2018-04-10",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101564,
+   "vim": "2T3BF4DV9AW050722 "
+ },
+ {
+   "date": "2019-01-18",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102026,
+   "vim": "2T3BFREV1FW264137"
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102138,
+   "vim": "2T3BFREV1FW303602"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102022,
+   "vim": "2T3BFREV4DW004473"
+ },
+ {
+   "date": "2019-02-11",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102061,
+   "vim": "2T3BFREV4EW151443"
+ },
+ {
+   "date": "2018-09-19",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101855,
+   "vim": "2T3BFREV4FW247476"
+ },
+ {
+   "date": "2019-03-05",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102116,
+   "vim": "2T3BFREV9FW348383"
+ },
+ {
+   "date": "2018-11-22",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101940,
+   "vim": "2T3BFREVXEW135294"
+ },
+ {
+   "date": "2019-02-22",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 102100,
+   "vim": "2T3DFREV2DW003279"
+ },
+ {
+   "date": "2019-02-06",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102051,
+   "vim": "2T3RF4DVXAW027836"
+ },
+ {
+   "date": "2018-06-06",
+   "vendor": "IMPACT LONDON",
+   "item_number": 101681,
+   "vim": "2T3RFREV3HW627751"
+ },
+ {
+   "date": "2019-01-31",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102046,
+   "vim": "2T3RFREV7DW048899"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101905,
+   "vim": "2T3ZF4DV5CW148292"
+ },
+ {
+   "date": "2019-02-19",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102090,
+   "vim": "2T3ZFREV1GW249797"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102065,
+   "vim": "2T3ZFREV6JW408742"
+ },
+ {
+   "date": "2019-02-22",
+   "vendor": "IMPACT QUEBEC",
+   "item_number": 102103,
+   "vim": "2T3ZFREVXFW232253"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101899,
+   "vim": "3CZRU5H58GM103306 "
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102135,
+   "vim": "3FA6P0D96DR172432"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102015,
+   "vim": "3FADP4BJ0BM215667"
+ },
+ {
+   "date": "2019-03-07",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102123,
+   "vim": "3FADP4BJ8CM100185"
+ },
+ {
+   "date": "2019-01-08",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101994,
+   "vim": "3FADP4BJ8EM230633"
+ },
+ {
+   "date": "2018-11-01",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101915,
+   "vim": "3FADP4BJ9BM126230"
+ },
+ {
+   "date": "2018-11-13",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101927,
+   "vim": "3FADP4EJ1BM141333"
+ },
+ {
+   "date": "2018-09-13",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 101847,
+   "vim": "3FADP4EJXEM105483"
+ },
+ {
+   "date": "2018-11-08",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101925,
+   "vim": "3FADP4FJ1BM163282"
+ },
+ {
+   "date": "2019-01-21",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102028,
+   "vim": "3FADP4FJ7BM123210"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102069,
+   "vim": "3GNCJKEB7EL157705"
+ },
+ {
+   "date": "2019-03-19",
+   "vendor": "ADESA TORONTO",
+   "item_number": 102151,
+   "vim": "3GNCJNSB5DL185703"
+ },
+ {
+   "date": "2019-03-14",
+   "vendor": "IMPACT SUDBURY",
+   "item_number": 102147,
+   "vim": "3GNCJSSB3DL198223"
+ },
+ {
+   "date": "2018-09-26",
+   "vendor": "LKQ",
+   "item_number": 101872,
+   "vim": "3MYDLBYV8JY301158"
+ },
+ {
+   "date": "2014-08-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 5,
+   "vim": "3N1BC13E79L492106"
+ },
+ {
+   "date": "2019-01-24",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102038,
+   "vim": "3N1CE2CP0JL365157"
+ },
+ {
+   "date": "2019-02-06",
+   "vendor": "IMPACT HALIFAX",
+   "item_number": 102050,
+   "vim": "3N1CE2CP6JL356060"
+ },
+ {
+   "date": "2019-01-02",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101991,
+   "vim": "3N1CE2CP8JL358750"
+ },
+ {
+   "date": "2018-09-26",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101870,
+   "vim": "3TMMU4FN1CM040251"
+ },
+ {
+   "date": "2019-01-11",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102006,
+   "vim": "4A4AH3AUXDE603183"
+ },
+ {
+   "date": "2019-02-25",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102104,
+   "vim": "4A4AJ3AU3DE601943"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102023,
+   "vim": "4A4AJ3AU6DE604514"
+ },
+ {
+   "date": "2019-03-13",
+   "vendor": "IMPACT LONDON",
+   "item_number": 102140,
+   "vim": "4A4AJ4AU1EE605156"
+ },
+ {
+   "date": "2018-08-01",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101790,
+   "vim": "4F2CY9C73AKM04855"
+ },
+ {
+   "date": "2018-08-16",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101805,
+   "vim": "4F2CY9C74BKM01822"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101954,
+   "vim": "4F2CY9C78BKM01953"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "MANHEIM MONTREAL",
+   "item_number": 101901,
+   "vim": "4F2CY9C78BKM04500"
+ },
+ {
+   "date": "2019-02-07",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 102053,
+   "vim": "4JGDA2EB0CA036236"
+ },
+ {
+   "date": "2018-10-05",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101885,
+   "vim": "4T1BF1FK1CU122901"
+ },
+ {
+   "date": "2018-10-05",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101884,
+   "vim": "4T1BF1FK2CU604003"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101951,
+   "vim": "4T3BA3BB4BU022636"
+ },
+ {
+   "date": "2017-12-11",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101325,
+   "vim": "4T3BE11A79U001792"
+ },
+ {
+   "date": "2018-02-09",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101402,
+   "vim": "5N1AT2MM7EC760125"
+ },
+ {
+   "date": "2018-11-15",
+   "vendor": "LES AUTOS ALEX ",
+   "item_number": 101941,
+   "vim": "5N1AT2MV7FC831026"
+ },
+ {
+   "date": "2018-03-27",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101527,
+   "vim": "5NPDH4AE0BH043240 "
+ },
+ {
+   "date": "2019-01-30",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102041,
+   "vim": "5NPDH4AE1CH112843"
+ },
+ {
+   "date": "2018-10-02",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101876,
+   "vim": "5NPDH4AE1DH386920"
+ },
+ {
+   "date": "2018-08-17",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101811,
+   "vim": "5NPDH4AE3DH208247"
+ },
+ {
+   "date": "2018-11-08",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101924,
+   "vim": "5NPDH4AEXCH086145"
+ },
+ {
+   "date": "2018-09-11",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101840,
+   "vim": "5NPDH4AEXCH105986"
+ },
+ {
+   "date": "2019-01-18",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102027,
+   "vim": "5NPEB4AC1BH203016"
+ },
+ {
+   "date": "2018-10-01",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101875,
+   "vim": "5NPEB4AC4CH339643"
+ },
+ {
+   "date": "2018-04-17",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101590,
+   "vim": "5NPEB4AC5BH243180"
+ },
+ {
+   "date": "2019-03-19",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 102153,
+   "vim": "5NPEC4AC1BH033110"
+ },
+ {
+   "date": "2018-12-19",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101989,
+   "vim": "5TDBKRFH8ES023759"
+ },
+ {
+   "date": "2018-09-13",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101845,
+   "vim": "5TDZKRFH5FS077973"
+ },
+ {
+   "date": "2018-04-25",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101612,
+   "vim": "5TEUU4EN9AZ735532"
+ },
+ {
+   "date": "2018-09-19",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101853,
+   "vim": "5UXWX9C52DL873804"
+ },
+ {
+   "date": "2019-02-13",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 102077,
+   "vim": "5XYKT3A14BG181464"
+ },
+ {
+   "date": "2019-01-11",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102008,
+   "vim": "5XYKT3A14BG187300"
+ },
+ {
+   "date": "2018-08-17",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101809,
+   "vim": "5XYKT3A65EG428569"
+ },
+ {
+   "date": "2018-12-14",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 101983,
+   "vim": "5XYKTCA10BG029729"
+ },
+ {
+   "date": "2018-08-30",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101825,
+   "vim": "5XYKTCA14BG182047"
+ },
+ {
+   "date": "2018-11-30",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101958,
+   "vim": "5XYKTCA17BG161676"
+ },
+ {
+   "date": "2019-01-24",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 102033,
+   "vim": "5XYKTCA68DG333650"
+ },
+ {
+   "date": "2019-01-10",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 102003,
+   "vim": "5XYKTCA68EG521599"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101948,
+   "vim": "5XYKTCA69EG436125"
+ },
+ {
+   "date": "2018-10-02",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101877,
+   "vim": "5XYKU3A17BG043737"
+ },
+ {
+   "date": "2019-01-08",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101995,
+   "vim": "5XYKUCA1XBG025362"
+ },
+ {
+   "date": "2018-08-31",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101827,
+   "vim": "5XYKUCA69CG212105"
+ },
+ {
+   "date": "2018-10-09",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101888,
+   "vim": "5XYZG3AB3CG092336"
+ },
+ {
+   "date": "2018-09-05",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101830,
+   "vim": "5XYZT3LB5DG088265"
+ },
+ {
+   "date": "2018-10-24",
+   "vendor": "GLOBAL SERVICES CANADA",
+   "item_number": 101894,
+   "vim": "5XYZU3LA3DGO018266"
+ },
+ {
+   "date": "2018-09-25",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101868,
+   "vim": "5XYZU3LB1DG019439"
+ },
+ {
+   "date": "2019-02-15",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 102084,
+   "vim": "5XYZU3LB7DG082304"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101897,
+   "vim": "5XYZUDLA2DG117294"
+ },
+ {
+   "date": "2019-01-11",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102007,
+   "vim": "5XYZUDLA2EG159465"
+ },
+ {
+   "date": "2019-03-26",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102159,
+   "vim": "5XYZUDLA3FG290468"
+ },
+ {
+   "date": "2018-09-13",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101844,
+   "vim": "5XYZUDLA7DG067816"
+ },
+ {
+   "date": "2018-12-18",
+   "vendor": "401 KINGSTON",
+   "item_number": 101985,
+   "vim": "5XYZUDLAXDG006685"
+ },
+ {
+   "date": "2019-01-24",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102035,
+   "vim": "5XYZUDLB2DG069255"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102067,
+   "vim": "5XYZUDLB3DG065327"
+ },
+ {
+   "date": "2018-11-20",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101937,
+   "vim": "5XYZUDLB4DG023605"
+ },
+ {
+   "date": "2018-11-08",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101923,
+   "vim": "5XYZUDLB5DG002441"
+ },
+ {
+   "date": "2018-11-27",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101944,
+   "vim": "5XYZUDLB9DG071441"
+ },
+ {
+   "date": "2018-11-02",
+   "vendor": "IMPACT QUEBEC",
+   "item_number": 101918,
+   "vim": "JA4AH3AU9CZ601689"
+ },
+ {
+   "date": "2018-11-06",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101919,
+   "vim": "JA4AJ3AU3BZ601383"
+ },
+ {
+   "date": "2017-11-21",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101307,
+   "vim": "JA4AJ3AU7HZ610483 "
+ },
+ {
+   "date": "2019-02-15",
+   "vendor": "IMPACT MONCTON",
+   "item_number": 102085,
+   "vim": "JA4AJ4AU0BZ600133"
+ },
+ {
+   "date": "2019-01-10",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102001,
+   "vim": "JA4AJ4AU2BZ600361"
+ },
+ {
+   "date": "2019-02-08",
+   "vendor": "IMPACT QUEBEC",
+   "item_number": 102060,
+   "vim": "JA4AJ4AU5CZ603076"
+ },
+ {
+   "date": "2019-03-21",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102157,
+   "vim": "JA4AT2AWXBU609029"
+ },
+ {
+   "date": "2019-02-14",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102079,
+   "vim": "JM1BL1UF8B1442221"
+ },
+ {
+   "date": "2019-03-19",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102149,
+   "vim": "JM1CW2CL7C0117883"
+ },
+ {
+   "date": "2018-02-22",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101471,
+   "vim": "JM3ER293880210272"
+ },
+ {
+   "date": "2018-09-27",
+   "vendor": "ADESA MONCTON",
+   "item_number": 101873,
+   "vim": "JM3KE2CE3D0157094"
+ },
+ {
+   "date": "2018-12-04",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101961,
+   "vim": "JM3KE4BE0D0111106"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101904,
+   "vim": "JM3KE4BE1D0156846"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101950,
+   "vim": "JM3KE4CE3D0139464"
+ },
+ {
+   "date": "2019-01-09",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102000,
+   "vim": "JN8AF5MR6BT009252"
+ },
+ {
+   "date": "2019-02-07",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102057,
+   "vim": "JN8AF5MRXCT104043"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102072,
+   "vim": "JN8AF5MV2BT023615"
+ },
+ {
+   "date": "2018-12-18",
+   "vendor": "401 KINGSTON",
+   "item_number": 101987,
+   "vim": "JN8AF5MV7CT109486"
+ },
+ {
+   "date": "2019-01-14",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102009,
+   "vim": "JN8AF5MV9BT022090 "
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102134,
+   "vim": "JN8AS5MT3DW013459"
+ },
+ {
+   "date": "2019-02-19",
+   "vendor": "IMPACT OTTAWA",
+   "item_number": 102092,
+   "vim": "JN8AS5MT8CW295046"
+ },
+ {
+   "date": "2018-08-09",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101800,
+   "vim": "JN8AS5MV1AW115324"
+ },
+ {
+   "date": "2019-03-14",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 102143,
+   "vim": "JN8AS5MV3BW288439"
+ },
+ {
+   "date": "2018-09-06",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101837,
+   "vim": "JN8AS5MV3BW311623"
+ },
+ {
+   "date": "2018-12-13",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101981,
+   "vim": "JN8AS5MV6BW254687"
+ },
+ {
+   "date": "2019-01-09",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101999,
+   "vim": "JN8AS5MV7BW279503"
+ },
+ {
+   "date": "2019-02-22",
+   "vendor": "IMPACT QUEBEC",
+   "item_number": 102102,
+   "vim": "JN8AS5MV7BW293725"
+ },
+ {
+   "date": "2019-03-12",
+   "vendor": "ADESA TORONTO",
+   "item_number": 102131,
+   "vim": "JN8AS5MV8CW368305"
+ },
+ {
+   "date": "2019-01-24",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102037,
+   "vim": "JS1VY51A1Y2103621"
+ },
+ {
+   "date": "2018-08-29",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101821,
+   "vim": "JS3TD0D28A4101070"
+ },
+ {
+   "date": "2018-11-13",
+   "vendor": "MANHEIM MONTREAL",
+   "item_number": 101931,
+   "vim": "JTDBT4K36B1410345"
+ },
+ {
+   "date": "2018-11-13",
+   "vendor": "MANHEIM MONTREAL",
+   "item_number": 101930,
+   "vim": "JTDBT4K37B1409821"
+ },
+ {
+   "date": "2018-08-22",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101816,
+   "vim": "JTDBT923471009879"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "401 KINGSTON",
+   "item_number": 101909,
+   "vim": "JTDKT923475081772"
+ },
+ {
+   "date": "2019-03-28",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 102167,
+   "vim": "JTDKT923485139977"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101900,
+   "vim": "JTEBU5JRXG5372252"
+ },
+ {
+   "date": "2018-10-26",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101895,
+   "vim": "JTEHD20V650058471"
+ },
+ {
+   "date": "2018-08-02",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101797,
+   "vim": "JTMBD33V386070137"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101903,
+   "vim": "JTMBD33V675065387"
+ },
+ {
+   "date": "2019-01-08",
+   "vendor": "ADESA TORONTO",
+   "item_number": 101998,
+   "vim": "JTMBD33V685203009"
+ },
+ {
+   "date": "2018-12-06",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101972,
+   "vim": "JTMBD33V775052230"
+ },
+ {
+   "date": "2018-08-30",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101822,
+   "vim": "JTMBD33V876052313"
+ },
+ {
+   "date": "2018-08-16",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 101807,
+   "vim": "JTMBD33V886085328"
+ },
+ {
+   "date": "2018-08-01",
+   "vendor": "IMPACT LONDON",
+   "item_number": 101792,
+   "vim": "JTNKARJE1HJ528555"
+ },
+ {
+   "date": "2018-08-02",
+   "vendor": "IMPACT HAMILTON",
+   "item_number": 101798,
+   "vim": "JTNKARJEXGJ509484"
+ },
+ {
+   "date": "2018-08-17",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 101808,
+   "vim": "KM8JT3AC9CU327169"
+ },
+ {
+   "date": "2019-01-25",
+   "vendor": "IMPACT QUEBEC",
+   "item_number": 102039,
+   "vim": "KM8JTCAC5CU399714"
+ },
+ {
+   "date": "2018-10-30",
+   "vendor": "401 KINGSTON",
+   "item_number": 101907,
+   "vim": "KM8JTCAC6CU436883"
+ },
+ {
+   "date": "2018-11-13",
+   "vendor": "401 KINGSTON",
+   "item_number": 101929,
+   "vim": "KM8JTCAC8AU057896"
+ },
+ {
+   "date": "2019-01-31",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102043,
+   "vim": "KM8JU3AC3CU500987"
+ },
+ {
+   "date": "2019-01-17",
+   "vendor": "ADESA MONCTON",
+   "item_number": 102021,
+   "vim": "KM8JU3AC7BU175761"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102071,
+   "vim": "KM8JU3AC9DU655576"
+ },
+ {
+   "date": "2018-11-20",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101935,
+   "vim": "KM8JUCAC4BU276966"
+ },
+ {
+   "date": "2018-08-16",
+   "vendor": "ADESA OTTAWA",
+   "item_number": 101804,
+   "vim": "KM8JUCAC6DU676241"
+ },
+ {
+   "date": "2019-03-22",
+   "vendor": "IMPACT QUEBEC",
+   "item_number": 102158,
+   "vim": "KM8JUCAC8BU279093"
+ },
+ {
+   "date": "2018-12-18",
+   "vendor": "401 KINGSTON",
+   "item_number": 101986,
+   "vim": "KM8JUCAC8CU439359"
+ },
+ {
+   "date": "2019-02-27",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102107,
+   "vim": "KNADM4A33F6451741"
+ },
+ {
+   "date": "2019-02-12",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 102066,
+   "vim": "KNADN4A37E6355655"
+ },
+ {
+   "date": "2019-03-19",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 102152,
+   "vim": "KNAFX4A67E5108767"
+ },
+ {
+   "date": "2018-11-28",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101947,
+   "vim": "KNAGR4A68B5125930"
+ },
+ {
+   "date": "2018-12-13",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101980,
+   "vim": "KNDJP3A57E7073831"
+ },
+ {
+   "date": "2019-03-05",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102121,
+   "vim": "KNDJT2A68C7383305"
+ },
+ {
+   "date": "2019-02-07",
+   "vendor": "ADESA QUEBEC",
+   "item_number": 102052,
+   "vim": "KNDPB3A27B7058451"
+ },
+ {
+   "date": "2018-07-18",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101764,
+   "vim": "KNDPBCA24D7378149"
+ },
+ {
+   "date": "2019-03-14",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102146,
+   "vim": "KNDPBCAC8E7600122"
+ },
+ {
+   "date": "2018-09-26",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 101871,
+   "vim": "KNDPCCAC9E7573011"
+ },
+ {
+   "date": "2019-01-08",
+   "vendor": "IMPACT TORONTO",
+   "item_number": 101993,
+   "vim": "ML32A3HJ4JH002490"
+ },
+ {
+   "date": "2019-02-14",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102081,
+   "vim": "MLHPC4444H5400102"
+ },
+ {
+   "date": "2019-02-13",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 102076,
+   "vim": "NM0LS7DN0BT060946"
+ },
+ {
+   "date": "2019-01-22",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 102029,
+   "vim": "SALVP2BG8DH786024"
+ },
+ {
+   "date": "2019-02-19",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 102088,
+   "vim": "SALVR1BG3CH616110"
+ },
+ {
+   "date": "2019-01-31",
+   "vendor": "IMPACT SUDBURY",
+   "item_number": 102047,
+   "vim": "VNKKTUD34EA014066"
+ },
+ {
+   "date": "2019-03-14",
+   "vendor": "IMPACT MONTREAL",
+   "item_number": 102144,
+   "vim": "WA1LFCFP4CA137596"
+ },
+ {
+   "date": "2018-12-13",
+   "vendor": "ADESA KITCHNER",
+   "item_number": 101982,
+   "vim": "WA1LFCFP8EA115331"
+ },
+ {
+   "date": "2019-03-26",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 102165,
+   "vim": "WA1VFCFP5CA015791"
+ },
+ {
+   "date": "2018-07-17",
+   "vendor": "ADESA HALIFAX",
+   "item_number": 101759,
+   "vim": "WBAVL1C5XCVM57025"
+ },
+ {
+   "date": "2018-10-15",
+   "vendor": "ADESA MONTREAL",
+   "item_number": 101891,
+   "vim": "WMWRC33546TK15585"
+ },
+ {
+   "date": "2018-11-29",
+   "vendor": "MANHEIM TORONTO",
+   "item_number": 101953,
+   "vim": "WVGBV7AX5BW508037"
+ },
+ {
+   "date": "2019-02-27",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102108,
+   "vim": "WVGBV7AX7BW501316"
+ },
+ {
+   "date": "2019-01-18",
+   "vendor": "ADESA ST.JOHN",
+   "item_number": 102025,
+   "vim": "WVGBV7AX9BW518523"
+ },
+ {
+   "date": "2019-01-16",
+   "vendor": "MANHEIM HALIFAX",
+   "item_number": 102013,
+   "vim": "WVGBV7AX9BW530705"
+ }
+]
 purchases = [
  {
    "invoice": "14117",
