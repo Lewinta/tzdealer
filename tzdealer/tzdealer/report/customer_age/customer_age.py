@@ -20,6 +20,7 @@ def execute(filters=None):
 		# invoice details
 
 		row = [
+			inv.item,
 			inv.name,
 			inv.posting_date,
 			inv.customer,
@@ -35,6 +36,7 @@ def execute(filters=None):
 def get_columns(invoice_list):
 	"""return columns based on filters"""
 	columns = [
+		_("Item") 			+ ":Data:350",
 		_("Invoice") 			+ ":Link/Sales Invoice:120",
 		_("Posting Date") 		+ ":Date:80",
 		_("Customer") 			+ ":Link/Customer:120",
@@ -65,6 +67,23 @@ def get_invoices(filters):
 
 	return frappe.db.sql("""
 		SELECT 
+			(
+				SELECT 
+					CONCAT(`tabItem`.item_code,':',`tabItem`.item_name) as item
+				FROM 
+					`tabSales Invoice Item`
+				JOIN
+					`tabItem`
+				ON
+					`tabSales Invoice Item`.item_code = `tabItem`.item_code
+				AND
+					`tabSales Invoice Item`.idx = 1
+				WHERE 
+					`tabSales Invoice Item`.parent = `tabSales Invoice`.name
+				LIMIT 
+					1 
+
+			) as item,
 			`tabSales Invoice`.name,
 			`tabSales Invoice`.posting_date,
 			`tabSales Invoice`.customer,

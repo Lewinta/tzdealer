@@ -22,6 +22,7 @@ def execute(filters=None):
 		# invoice details
 
 		row = [
+			inv.item,
 			inv.name,
 			inv.posting_date,
 			inv.supplier,
@@ -40,9 +41,10 @@ def execute(filters=None):
 def get_columns(invoice_list):
 	"""return columns based on filters"""
 	columns = [
+		_("Item") + ":Data:350",
 		_("Invoice") + ":Link/Purchase Invoice:120",
 		_("Posting Date") + ":Date:80",
-		_("Supplier") + ":Link/Supplier:120",
+		_("Vendor") + ":Link/Supplier:120",
 		_("Bill No") + "::120",
 		_("Bill Date") + ":Date:80",
 		_("Grand Total") + ":Currency/currency:120",
@@ -74,6 +76,23 @@ def get_invoices(filters):
 	
 	return frappe.db.sql("""
 		SELECT
+			(
+				SELECT 
+					CONCAT(`tabItem`.item_code,':',`tabItem`.item_name) as item
+				FROM 
+					`tabPurchase Invoice Item`
+				JOIN
+					`tabItem`
+				ON
+					`tabPurchase Invoice Item`.item_code = `tabItem`.item_code
+				AND
+					`tabPurchase Invoice Item`.idx = 1
+				WHERE 
+					`tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
+				LIMIT 
+					1 
+
+			) as item,
 			`tabPurchase Invoice`.name,
 			`tabPurchase Invoice`.posting_date,
 			`tabPurchase Invoice`.supplier,

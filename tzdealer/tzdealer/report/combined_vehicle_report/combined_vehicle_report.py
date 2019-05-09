@@ -19,8 +19,7 @@ def get_conditions(filters):
 	NOTE: Value is mandatory if condition_type == value
 	"""
 	conditions = (
-		("Item", "item_code", "=", "%(item_code)s"),
-		("Purchase Invoice", "posting_date", "=", "%(purchase_date)s"),
+		("Sales Invoice", "customer", "=", "%(customer)s"),
 	)
 
 	sql_conditions = []
@@ -62,52 +61,34 @@ def get_data(filters):
 
 	return frappe.db.sql("""
 		Select
-			{fields},
-			(Select Sum(actual_qty) from `tabStock Ledger Entry` where item_code = `tabPurchase Invoice Item`.item_code) as qty
+			{fields}
 		From
-			`tabPurchase Invoice`
+			`tabSales Invoice`
+		Inner Join
+			`tabSales Invoice Item`
+			On
+				`tabSales Invoice`.name = `tabSales Invoice Item`.parent
+			And 
+				`tabSales Invoice`.is_return = 0
+			And 
+				`tabSales Invoice`.docstatus = 1
 		Inner Join
 			`tabPurchase Invoice Item`
 			On
-				`tabPurchase Invoice`.name = `tabPurchase Invoice Item`.parent
-			And 
-				`tabPurchase Invoice`.is_return = 0
-			And 
+				`tabPurchase Invoice Item`.item_code = `tabSales Invoice Item`.item_code
+		Inner Join
+			`tabPurchase Invoice`
+			On
+				`tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
+			And
 				`tabPurchase Invoice`.docstatus = 1
 		Inner Join
 			`tabItem`
 			On
-				`tabPurchase Invoice Item`.item_code = `tabItem`.item_code
-			And 
-				`tabItem`.item_type = 'Vehicles'
-			And
-				`tabItem`.item_code not in (
-					Select 
-						item_code 
-					From 
-						`tabSales Order Item` 
-					Where
-						`tabSales Order Item`.docstatus = 1
-				)
-		Inner Join
-			`tabBin`
-			On
-				`tabItem`.item_code = `tabBin`.item_code
-		Inner Join
-			(
-				Select
-					`tabSingles`.value As margin_rate
-				From
-					`tabSingles`
-				Where
-					`tabSingles`.doctype = "Configuration"
-					And
-						`tabSingles`.field = "default_revenue_rate"
-			) As `tabSales Price`
+				`tabSales Invoice Item`.item_code = `tabItem`.item_code
+
 		Where
 			{conditions}
-			Having 
-			qty > 0
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
 	filters, debug=True)
 
@@ -116,6 +97,7 @@ def get_columns(filters):
 	Return Frappe columns ready to be used on report
 	"""
 	columns = (
+		("Status", "status", "data", 100),
 		("Vim Number", "item_code", "Link/Item", 160),
 		("Model", "model", "Link/Model", 100),
 		("Year", "year", "Int", 50),
@@ -125,18 +107,15 @@ def get_columns(filters):
 		("Trim", "trim", "Data", 60),
 		("Drive Train", "drive_train", "Data", 80),
 		("Sales Price", "sales_price", "Currency", 100),
-		("Status", "status", "Data", 90),
-		# ("Item Name", "item_name", "Data", 200),
-		("Purchase Date", "posting_date", "Date", 100),
-		# ("Valuation Rate", "valuation_rate", "Currency", 100),
-		("Supplier", "supplier", "Link/Supplier", 200),
-		("Invoice", "name", "Link/Purchase Invoice", 100),
-		("Odometer", "odometer_value", "Data", 90),
-		("Salvage", "salvage_title", "Check", 70),
-		("MK", "mk", "Data", 60),
-		("Title Status", "title_status", "Data", 90),
-		("Supplier Inv.", "name", "Data", 100),
-		# ("Margin Amount", "margin_amount", "Currency"),
+		("Sold Date", "posting_date", "Date", 100),
+		("Customer", "customer", "Link/Customer", 200),
+		# ("Sales Order", "sales_order", "Link/Sales Order", 100),
+		("Billing Status", "billing_status", "Data", 100),
+		("Sales Inv.", "sales_name", "Link/Sales Invoice", 100),
+		("Purchase Inv.", "purchase_name", "Link/Purchase Invoice", 100),
+		("Purchase Date", "purchase_date", "Date", 100),
+		("Supplier", "supplier", "Link/Supplier", 100),
+		("Title", "title_status", "data", 100),
 	)
 
 	formatted_columns = []
@@ -155,6 +134,7 @@ def get_fields(filters):
 	"""
 
 	fields = (
+		("Item", "status"),
 		("Item", "item_code"),
 		("Item", "model"),
 		("Item", "year"),
@@ -163,30 +143,16 @@ def get_fields(filters):
 		("Item", "engine_size"),
 		("Item", "trim"),
 		("Item", "drive_train"),
-		# ("Item", "item_name"),
-		("""
-			(
-				Select
-					(((`tabSingles`.value / 100) + 1) * (`tabBin`.valuation_rate + `tabPurchase Invoice`.total - `tabPurchase Invoice Item`.rate)) As p
-				From
-					`tabSingles`
-				Where
-					`tabSingles`.doctype = "Configuration"
-					And
-						`tabSingles`.field = "default_revenue_rate"
-			) As sales_price
-		"""),
-		("Item", "status"),
-		("Purchase Invoice", "bill_date"),
-		# ("Bin", "valuation_rate"),
-		("Purchase Invoice", "supplier"),
+		("Sales Invoice Item", "amount"),
+		("Sales Invoice", "posting_date"),
+		("Sales Invoice", "customer"),
+		("Sales Invoice Item", "sales_order"),
+		# ("Sales Order", "billing_status"),
+		("Sales Invoice", "name"),
 		("Purchase Invoice", "name"),
-		("Item", "odometer_value"),
-		("Item", "salvage_title"),
-		("Item", "mk"),
+		("Purchase Invoice", "posting_date"),
+		("Purchase Invoice", "supplier"),
 		("Item", "title_status"),
-		("Purchase Invoice", "bill_no"),
-		# ("Sales Price", "margin_amount"),
 	)
 
 	sql_fields = []

@@ -1,10 +1,8 @@
 frappe.ui.form.on("Sales Invoice", {
 	refresh: frm => {
-		if(frm.is_new())
-			frm.trigger("invoice_type");
-		
-		frm.trigger("reqd_transaction_group");
-
+		if(frm.is_new()){
+			frm.trigger("set_defaults");
+		}
 		frm.set_query("transaction_group",  event => {
 			return{
 				filters:{
@@ -14,8 +12,8 @@ frappe.ui.form.on("Sales Invoice", {
 		});
 	},
 	transaction_group: frm => {
-		let = {account, items} = frm.doc;
 
+		let = {account, items} = frm.doc;
 		if (!account || !items )
 			return
 
@@ -48,7 +46,6 @@ frappe.ui.form.on("Sales Invoice", {
 	invoice_type: frm => {
 		let check = frm.doc.invoice_type != "Services" ? true : false;
 		frm.set_value("update_stock", check);
-		frm.trigger("set_defaults");
 	},
 	set_defaults: frm => {
 		const defaults = {
@@ -58,18 +55,17 @@ frappe.ui.form.on("Sales Invoice", {
 			"Services": "Sales CAD Services"
 		}
 		
-		let {invoice_type} = frm.doc;
-		
+		let {invoice_type, transaction_group} = frm.doc;
+
 		setTimeout(event => {
-
+			frm.set_value("account"	, "4150 - SALE Vehicle CAD-Export - EZ");
 			frm.set_value("transaction_group", defaults[invoice_type]);
-			frm.trigger("set_default_currency");
-
 		}, 500)
 	},
 	set_default_currency: frm => {
 		const {transaction_group} = frm.doc;
-
+		if (!transaction_group)
+			return
 		frm.set_value(
 			"currency",
 			transaction_group.includes("USD") ? "USD" : "CAD"
@@ -140,6 +136,16 @@ frappe.ui.form.on("Sales Invoice", {
 });
 
 frappe.ui.form.on("Sales Invoice Item",  {
+	item_add: (frm, cdt, cdn) => {
+		let {account} = frm.doc;
+
+		if (!account)
+			return
+
+		setTimeout(event =>{
+			frappe.model.set_value(cdt, cdn, "income_account", account);
+		}, 500);
+	},
 	item_code: (frm, cdt, cdn) => {
 		let {account} = frm.doc;
 

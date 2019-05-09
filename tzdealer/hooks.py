@@ -95,10 +95,16 @@ doc_events = {
 	},
 	"Sales Invoice": {
 		"validate": "tzdealer.hook.sales_invoice.validate",
+		"on_submit": "tzdealer.hook.sales_invoice.on_submit",
 	},
 	"Sales Order": {
 		"validate": "tzdealer.hook.sales_order.validate",
-	}
+	},
+	"Landed Cost Voucher": {
+		"on_submit": "tzdealer.hook.landed_cost_voucher.on_submit",
+		"on_cancel": "tzdealer.hook.landed_cost_voucher.on_cancel",
+		"on_trash": "tzdealer.hook.landed_cost_voucher.on_trash",
+	}	
 }
 
 # Scheduled Tasks
