@@ -29,6 +29,7 @@ frappe.query_reports["Vendor Age"] = {
 			"label": __("Company"),
 			"fieldtype": "Link",
 			"options": "Company",
+			"depends_on": frappe.session.user == "Administrator",
 			"default": frappe.defaults.get_user_default("Company")
 		},
 		{

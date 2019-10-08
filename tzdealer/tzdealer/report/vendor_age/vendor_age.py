@@ -55,16 +55,23 @@ def get_columns(invoice_list):
 	return columns
 
 def get_conditions(filters):
+	company = frappe.get_value("User Permission", {
+		"user":frappe.session.user,
+		"allow":"Company",
+	}, "for_value")
 	conditions = ""
+	
+	if frappe.session.user != "Administrator":
+		conditions = "`tabPurchase Invoice`.company = '{}'".format(company)
 
-	if filters.get("company"):
-		conditions += " and company = %(company)s"
+	if filters.get("company") and frappe.session.user == "Administrator":
+		conditions += " company = %(company)s"
 	if filters.get("supplier"):
-		conditions += " and supplier = %(supplier)s"
+		conditions += " and `tabPurchase Invoice`.supplier = %(supplier)s"
 	if filters.get("from_date"):
-		conditions += " and posting_date >= %(from_date)s"
+		conditions += " and `tabPurchase Invoice`.posting_date >= %(from_date)s"
 	if filters.get("to_date"):
-		conditions += " and posting_date <= %(to_date)s"
+		conditions += " and `tabPurchase Invoice`.posting_date <= %(to_date)s"
 	if filters.get("mode_of_payment"):
 		conditions += " and ifnull(mode_of_payment, '') = %(mode_of_payment)s"
 
@@ -113,7 +120,7 @@ def get_invoices(filters):
 		FROM 
 			`tabPurchase Invoice`
 		WHERE
-			`tabPurchase Invoice`.docstatus = 1 %s
+			`tabPurchase Invoice`.docstatus = 1 and %s
 		ORDER BY 
 			`tabPurchase Invoice`.posting_date DESC,
 			`tabPurchase Invoice`.name DESC

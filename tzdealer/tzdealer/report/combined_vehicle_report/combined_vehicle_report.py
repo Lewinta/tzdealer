@@ -18,8 +18,14 @@ def get_conditions(filters):
 
 	NOTE: Value is mandatory if condition_type == value
 	"""
+	company = frappe.get_value("User Permission", {
+		"user":frappe.session.user,
+		"allow":"Company",
+	}, "for_value")
+
 	conditions = (
 		("Sales Invoice", "customer", "=", "%(customer)s"),
+		("Item", "company", "=", company),
 	)
 
 	sql_conditions = []
@@ -90,7 +96,7 @@ def get_data(filters):
 		Where
 			{conditions}
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
-	filters, debug=True)
+	filters, debug=False)
 
 def get_columns(filters):
 	"""

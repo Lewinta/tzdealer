@@ -3,9 +3,8 @@ from __future__ import unicode_literals
 import frappe
 
 def validate(doc, event):
-	pass
-	# for d in doc.items:
-	# 	create_or_update_item_price(d)
+	if doc.customer != doc.title:
+		doc.title = doc.customer
 def on_submit(doc, event):
 	# When submitting an invoice we need to update the last sold price
 	# to each Item.

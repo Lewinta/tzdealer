@@ -15,6 +15,16 @@ frappe.ui.form.on("Payment Entry", {
 		}
 		frm.trigger("_reference_no");
 	},
+	date: frm => {
+		const {date, posting_date} = frm.doc;
+		
+		if (!date){
+			frm.set_value("posting_date", "");
+			return
+		}
+		frm.set_value("posting_date", date);
+
+	},
 	payment_type: frm => {
 		if (frm.doc.payment_type == "Pay")
 			frm.set_value("party_type", "Supplier")

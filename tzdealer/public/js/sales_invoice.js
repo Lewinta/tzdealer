@@ -1,8 +1,31 @@
 frappe.ui.form.on("Sales Invoice", {
 	refresh: frm => {
-		if(frm.is_new()){
-			frm.trigger("set_defaults");
+		// if(frm.is_new()){
+		// 	frm.trigger("set_defaults");
+		// }
+		frm.trigger("set_queries");
+
+	},
+	date: frm => {
+		const {date, posting_date} = frm.doc;
+		
+		if (!date){
+			frm.set_value("posting_date", "");
+			return
 		}
+		frm.set_value("posting_date", date);
+
+	},
+	set_queries: frm => {
+
+		frm.set_query("item_code", "items", () => {
+			return{
+				filters:{
+					"company": frm.doc.company
+				}
+			}
+		});
+
 		frm.set_query("transaction_group",  event => {
 			return{
 				filters:{
@@ -13,29 +36,48 @@ frappe.ui.form.on("Sales Invoice", {
 	},
 	transaction_group: frm => {
 
-		let = {account, items} = frm.doc;
-		if (!account || !items )
-			return
+		const {transaction_group, items} = frm.doc;
+		console.log("Fetching account");
+		frappe.db.get_value(
+			"Transaction Group",
+			transaction_group,
+			"account", ({account}) => {
+				if(!account)
+					frappe.throw(_("Please set an account for Transaction Group "+ transaction_group));
+				
+				console.log("Found "+ account);
+				frm.set_value("account", account);
+				
+				if (!items )
+					return
 
-		$.map(items, item => {
-			item.income_account = account;
-		});
+				$.map(items, item => {
+					item.income_account = account;
+				});
 
-		frm.trigger("set_default_currency");
+				frm.trigger("set_default_currency");
+				
+			}
+		)
+
 	},
 	validate: frm => {
-		frm.trigger("invoice_type");
-		let {account, items} = frm.doc;
-		
-		if (!account)
-			return
+		const {account, items} = frm.doc;
+		frappe.run_serially([
+			frm.trigger("invoice_type"),
+			frm.trigger("transaction_group"),
+			// () => setTimeout( event => {
+			// 	$.map(items, item => {
+			// 		if(!account)
+			// 			return
+			// 		if(item.income_account != account){
+			// 			frappe.msgprint("Please refresh Transaction Group " + item.idx);
+			// 			validated = fale;
+			// 		}
+			// 	})
+			// },400)
+		]);
 
-		$.map(items, item => {
-			if (item.income_account != account){
-				frappe.msgprint("Please refresh Transaction Group " + item.idx);
-				validated = false;
-			}
-		});
 	},
 	is_opening: frm => {
 		frm.trigger("reqd_transaction_group");
@@ -49,7 +91,7 @@ frappe.ui.form.on("Sales Invoice", {
 	},
 	set_defaults: frm => {
 		const defaults = {
-			"Vehicles": "Sales Vehicle CAD-Export",
+			"Vehicles": "Sales Vehicle Export",
 			"Containers": "Sales CAD Shipping Services",
 			"Parts": "Sales PARTS CAD-LOCAL",
 			"Services": "Sales CAD Services"
@@ -58,7 +100,7 @@ frappe.ui.form.on("Sales Invoice", {
 		let {invoice_type, transaction_group} = frm.doc;
 
 		setTimeout(event => {
-			frm.set_value("account"	, "4150 - SALE Vehicle CAD-Export - EZ");
+			frm.set_value("account"	, "4150 - Sale Vehicle Export - EZ");
 			frm.set_value("transaction_group", defaults[invoice_type]);
 		}, 500)
 	},
@@ -70,6 +112,9 @@ frappe.ui.form.on("Sales Invoice", {
 			"currency",
 			transaction_group.includes("USD") ? "USD" : "CAD"
 		);
+	},
+	customer: frm => {
+		frm.set_value("title", frm.doc.customer);
 	},
 	currency: frm => {
 		const {currency} = frm.doc;
@@ -92,7 +137,7 @@ frappe.ui.form.on("Sales Invoice", {
 	},
 	calcualte_grand_g_total: frm => {
 		const {total_g, total_g_taxes_and_charges} = frm.doc;
-		const total = flt(total_g) + flt(total_g_taxes_and_charges);
+		const total = flt(total_g, 4) + flt(total_g_taxes_and_charges, 4);
 
 		frm.set_value("grand_g_total", total);
 	},
@@ -107,9 +152,9 @@ frappe.ui.form.on("Sales Invoice", {
 			return
 		let total_g_tax = 0.00;
 		$.map(frm.doc.taxes, row => {
-			total_g_tax += flt(row.g_tax);
+			total_g_tax += flt(row.g_tax, 4);
 		})
-		frm.set_value("total_g_taxes_and_charges", flt(total_g_tax, 2));
+		frm.set_value("total_g_taxes_and_charges", flt(total_g_tax, 4));
 	},
 	calculate_g_taxes_item: frm => {
 		setTimeout(event => {
@@ -117,9 +162,9 @@ frappe.ui.form.on("Sales Invoice", {
 				let tax = 0.00;
 				let g_amount = 0.00;
 
-				if (charge_type == "On Net Total "){
-					tax = frm.doc.total_g * flt(rate / 100, 2);
-					g_amount = frm.doc.total_g * flt(1 + rate / 100, 2);
+				if (charge_type == "On Net Total"){
+					tax = flt(frm.doc.total_g * rate / 100.00, 4);
+					g_amount = flt(frm.doc.total_g * (1 + rate / 100.0), 4);
 				}
 
 				if (charge_type == "Actual"){
@@ -148,13 +193,40 @@ frappe.ui.form.on("Sales Invoice Item",  {
 	},
 	item_code: (frm, cdt, cdn) => {
 		let {account} = frm.doc;
+		let row = frappe.model.get_doc(cdt,cdn);
+		let df = frm.get_field("items").grid.docfields[2];
+		setTimeout( event => {
+			if(row.item_group == "Containers"){
+				console.log("is a container")
+				frappe.call(
+					"tzdealer.api.get_container_vims", 
+					{
+						"item_code": row.item_code,
+						"company": frm.doc.company,
+					},
+					({message})=> {
+						df.options = message;
+						df.reqd = 1;
+						frm.refresh_field("items");
+					}
+				);
+			}
+			else{
+				console.log(row.item_group+ " is not a container for item "+ row.item_code)
+				row.vim_number = '';
+				df.reqd = 0;
+				frm.refresh_field("items");
 
-		if (!account)
-			return
+			}
+			
+			if (!account)
+				return
+			setTimeout(event =>{
+				frappe.model.set_value(cdt, cdn, "income_account", account);
+			}, 500);
 
-		setTimeout(event =>{
-			frappe.model.set_value(cdt, cdn, "income_account", account);
-		}, 500);
+			frm.refresh_field("items");
+		}, 600);
 	},
 	gprice: (frm, cdt, cdn) => {
 		frm.trigger("refresh_gprice");

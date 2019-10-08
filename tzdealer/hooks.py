@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+	# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 from . import __version__ as app_version
 
@@ -37,6 +37,7 @@ doctype_js = {
 	"Payment Entry" : "public/js/payment_entry.js",
 	"Purchase Invoice" : "public/js/purchase_invoice.js",
 	"Sales Invoice" : "public/js/sales_invoice.js",
+	"Sales Order" : "public/js/sales_order.js",
 	"Contact" : "public/js/contact.js",
 	"Landed Cost Voucher" : "public/js/landed_cost_voucher.js",
 	"Address" : "public/js/address.js",
@@ -92,18 +93,22 @@ doctype_js = {
 doc_events = {
 	"Item": {
 		"before_insert": "tzdealer.hook.item.before_insert",
+		"validate": "tzdealer.hook.item.validate",
 	},
 	"Sales Invoice": {
 		"validate": "tzdealer.hook.sales_invoice.validate",
 		"on_submit": "tzdealer.hook.sales_invoice.on_submit",
 	},
 	"Sales Order": {
-		"validate": "tzdealer.hook.sales_order.validate",
+		"validate": "tzdealer.hook.sales_order.check", 
 	},
 	"Landed Cost Voucher": {
 		"on_submit": "tzdealer.hook.landed_cost_voucher.on_submit",
 		"on_cancel": "tzdealer.hook.landed_cost_voucher.on_cancel",
 		"on_trash": "tzdealer.hook.landed_cost_voucher.on_trash",
+	},
+	"Purchase Invoice":{
+		"on_cancel": "tzdealer.hook.purchase_invoice.on_cancel",
 	}	
 }
 

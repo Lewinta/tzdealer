@@ -18,15 +18,21 @@ def get_conditions(filters):
 
 	NOTE: Value is mandatory if condition_type == value
 	"""
+	company = frappe.get_value("User Permission", {
+			"user":frappe.session.user,
+			"allow":"Company",
+		}, "for_value")
+
 	cond_obj = {
-		# "Stock Report": (
-		# 	(),
-		# ),
-		# "Sold Report": (
-		# 	(),
-		# ),
+		"Stock Report": (
+			("Item", "company", "=", company),
+		),
+		"Sold Report": (
+			("Item", "company", "=", company),
+		),
 		"Sales Order To Be Billed": (
 			("Sales Invoice Item", "parent", "IS", "NULL"),
+			("Item", "company", "=", company),
 		)
 	}
 
@@ -41,14 +47,18 @@ def get_conditions(filters):
 
 		if not value:
 			continue
-
-		sql_condition = "`tab{doctype}`.`{fieldname}` {compare} {value}" \
-			.format(doctype=doctype, fieldname=fieldname, compare=compare,
-				value=value)
+		if value == "NULL":
+			sql_condition = "`tab{doctype}`.`{fieldname}` {compare} {value}" \
+				.format(doctype=doctype, fieldname=fieldname, compare=compare,
+					value=value)
+		else:
+			sql_condition = "`tab{doctype}`.`{fieldname}` {compare} '{value}'" \
+				.format(doctype=doctype, fieldname=fieldname, compare=compare,
+					value=value)
 
 		sql_conditions.append(sql_condition)
 
-	frappe.errprint(conditions)
+	# frappe.errprint(conditions)
 
 	return " And ".join(sql_conditions)
 
@@ -80,6 +90,10 @@ def get_data(filters):
 				(Select Sum(actual_qty) from `tabStock Ledger Entry` where item_code = `tabPurchase Invoice Item`.item_code) as qty
 			From
 				`tabPurchase Invoice`
+			Inner Join
+				`tabSupplier`
+			ON
+				`tabSupplier`.name = `tabPurchase Invoice`.supplier
 			Inner Join
 				`tabPurchase Invoice Item`
 				On
@@ -123,7 +137,7 @@ def get_data(filters):
 				Having 
 				qty > 0
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=True)
+		filters, debug=False)
 	
 	if filters.get("report_type") == "Sold Report":
 		results = frappe.db.sql("""
@@ -131,6 +145,10 @@ def get_data(filters):
 				{fields}
 			From
 				`tabSales Invoice`
+			Inner Join
+				`tabCustomer`
+			ON
+				`tabCustomer`.name = `tabSales Invoice`.customer
 			Inner Join
 				`tabSales Invoice Item`
 				On
@@ -143,21 +161,43 @@ def get_data(filters):
 				`tabPurchase Invoice Item`
 				On
 					`tabPurchase Invoice Item`.item_code = `tabSales Invoice Item`.item_code
+	
 			Inner Join
 				`tabPurchase Invoice`
 				On
 					`tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
 				And
 					`tabPurchase Invoice`.docstatus = 1
+			Join
+				`tabSupplier`
+			ON
+				`tabSupplier`.name = `tabPurchase Invoice`.supplier
 			Inner Join
 				`tabItem`
 				On
 					`tabSales Invoice Item`.item_code = `tabItem`.item_code
+				And 
+					`tabItem`.item_type = 'Vehicles'
+			Inner Join
+			`tabBin`
+				On
+					`tabItem`.item_code = `tabBin`.item_code
+			Inner Join
+				(
+					Select
+						`tabSingles`.value As margin_rate
+					From
+						`tabSingles`
+					Where
+						`tabSingles`.doctype = "Configuration"
+						And
+							`tabSingles`.field = "default_revenue_rate"
+				) As `tabSales Price`
 
 			Where
 				{conditions}
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=True)
+		filters, debug=False)
 
 	if filters.get("report_type") == "Sales Order To Be Billed":
 		results = frappe.db.sql("""
@@ -173,12 +213,18 @@ def get_data(filters):
 				`tabItem`
 			ON
 				`tabSales Order Item`.item_code = `tabItem`.item_code
+			And 
+				`tabItem`.item_type = 'Vehicles'
 			JOIN 
 				`tabSales Order`
 			ON 
 				`tabSales Order Item`.parent = `tabSales Order`.name
 			AND
 				`tabSales Order`.status in ('Not Billed', 'Partly Billed', 'To Deliver and Bill')
+			JOIN
+				`tabCustomer`
+			ON
+				`tabCustomer`.name = `tabSales Order`.customer
 			JOIN
 				`tabPurchase Invoice Item`
 			ON
@@ -189,10 +235,29 @@ def get_data(filters):
 				`tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
 			AND
 				`tabPurchase Invoice`.docstatus = 1
+			JOIN
+				`tabSupplier`
+			ON
+				`tabSupplier`.name = `tabPurchase Invoice`.supplier
+			Inner Join
+			`tabBin`
+				On
+					`tabItem`.item_code = `tabBin`.item_code
+			Inner Join
+				(
+					Select
+						`tabSingles`.value As margin_rate
+					From
+						`tabSingles`
+					Where
+						`tabSingles`.doctype = "Configuration"
+						And
+							`tabSingles`.field = "default_revenue_rate"
+				) As `tabSales Price`
 			Where
 				{conditions}
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=True)
+		filters, debug=False)
 
 	return results
 
@@ -210,18 +275,20 @@ def get_columns(filters):
 			("Engine", "engine_size", "Data", 55),
 			("Trim", "trim", "Data", 60),
 			("Drive Train", "drive_train", "Data", 80),
+			("Odometer", "odometer_value", "Data", 90),
 			("Sales Price", "sales_price", "Currency", 100),
 			("Status", "status", "Data", 90),
 			("Purchase Date", "posting_date", "Date", 100),
 			("Supplier", "supplier", "Link/Supplier", 200),
+			("Telephone", "s_phone", "data", 90),
 			("Invoice", "name", "Link/Purchase Invoice", 100),
-			("Odometer", "odometer_value", "Data", 90),
 			("Salvage", "salvage_title", "Check", 70),
 			("MK", "mk", "Data", 60),
 			("Title Status", "title_status", "Data", 90),
 			("Supplier Inv.", "name", "Data", 100),
 		),
 		"Sold Report":(
+			("Status", "status", "data", 100),
 			("Vim Number", "item_code", "Link/Item", 160),
 			("Model", "model", "Link/Model", 100),
 			("Year", "year", "Int", 50),
@@ -231,18 +298,21 @@ def get_columns(filters):
 			("Trim", "trim", "Data", 60),
 			("Drive Train", "drive_train", "Data", 80),
 			("Sales Price", "sales_price", "Currency", 100),
-			("Status", "status", "data", 100),
 			("Sold Date", "posting_date", "Date", 100),
 			("Customer", "customer", "Link/Customer", 200),
+			("Telephone", "c_phone", "data", 90),
 			("Billing Status", "billing_status", "Data", 100),
 			("Sales Inv.", "sales_name", "Link/Sales Invoice", 100),
 			("Purchase Inv.", "purchase_name", "Link/Purchase Invoice", 100),
 			("Purchase Date", "purchase_date", "Date", 100),
 			("Supplier", "supplier", "Link/Supplier", 100),
+			("Odometer", "odometer_value", "Data", 90),
+			("Telephone", "s_phone", "data", 90),
 			("Title", "title_status", "data", 100),
+			("Cost", "price", "Currency", 100),
 		),
 		"Sales Order To Be Billed":(
-			("Status", "status", "Date", 100),
+			("Status", "status", "Data", 100),
 			("Vim Number", "item_code", "Link/Item", 160),
 			("Model", "model", "Link/Model", 100),
 			("Year", "year", "Int", 50),
@@ -253,8 +323,8 @@ def get_columns(filters):
 			("Drive Train", "drive_train", "Data", 80),
 			("Customer", "customer", "Link/Customer", 150),
 			("Price", "price", "Currency", 100),
-			("Order", "order_name", "Link/Sales Order", 100),
 			("Order Date", "order_date", "Date", 100),
+			("Order", "order_name", "Link/Sales Order", 100),
 			("Order Status", "order_status", "Data", 90),
 			("Odometer", "odometer_value", "Data", 90),
 			("Salvage", "salvage_title", "Check", 70),
@@ -262,7 +332,9 @@ def get_columns(filters):
 			("Purchase Inv.", "purchase_name", "Link/Purchase Invoice", 110),
 			("Purchase Date", "p_date", "Date", 100),
 			("Supplier", "supplier", "Link/Supplier", 150),
+			("S.Telephone", "s_phone", "data", 90),
 			("Title Status", "title_status", "Data", 90),
+			("Cost", "price", "Currency", 100),
 		),
 
 	}
@@ -293,6 +365,7 @@ def get_fields(filters):
 			("Item", "engine_size"),
 			("Item", "trim"),
 			("Item", "drive_train"),
+			("Item", "odometer_value"),
 			# ("Item", "item_name"),
 			("""
 				(
@@ -307,11 +380,11 @@ def get_fields(filters):
 				) As sales_price
 			"""),
 			("Item", "status"),
-			("Purchase Invoice", "bill_date"),
+			("Purchase Invoice", "posting_date"),
 			# ("Bin", "valuation_rate"),
 			("Purchase Invoice", "supplier"),
+			("Supplier", "phone_number"),
 			("Purchase Invoice", "name"),
-			("Item", "odometer_value"),
 			("Item", "salvage_title"),
 			("Item", "mk"),
 			("Item", "title_status"),
@@ -319,6 +392,7 @@ def get_fields(filters):
 			# ("Sales Price", "margin_amount"),
 		),
 		"Sold Report": (
+			("Item", "status"),
 			("Item", "item_code"),
 			("Item", "model"),
 			("Item", "year"),
@@ -328,16 +402,30 @@ def get_fields(filters):
 			("Item", "trim"),
 			("Item", "drive_train"),
 			("Sales Invoice Item", "amount"),
-			("Item", "status"),
 			("Sales Invoice", "posting_date"),
 			("Sales Invoice", "customer"),
+			("Customer", "phone_number"),
 			("Sales Invoice Item", "sales_order"),
 			# ("Sales Order", "billing_status"),
 			("Sales Invoice", "name"),
 			("Purchase Invoice", "name"),
 			("Purchase Invoice", "posting_date"),
 			("Purchase Invoice", "supplier"),
+			("Item", "odometer_value"),
+			("Supplier", "phone_number"),
 			("Item", "title_status"),
+			("""
+				(
+					Select
+						(((`tabSingles`.value / 100) + 1) * (`tabBin`.valuation_rate + `tabPurchase Invoice`.total - `tabPurchase Invoice Item`.rate)) As p
+					From
+						`tabSingles`
+					Where
+						`tabSingles`.doctype = "Configuration"
+						And
+							`tabSingles`.field = "default_revenue_rate"
+				) As sales_price
+			"""),
 		),
 		"Sales Order To Be Billed":(
 			("Item", "status"),
@@ -351,8 +439,8 @@ def get_fields(filters):
 			("Item", "drive_train"),
 			("Sales Order", "customer"),
 			("Sales Order Item", "amount"),
-			("Sales Order", "name"),
 			("Sales Order", "transaction_date"),
+			("Sales Order", "name"),
 			("Sales Order", "status"),
 			("Item", "odometer_value"),
 			("Item", "salvage_title"),
@@ -360,7 +448,20 @@ def get_fields(filters):
 			("Purchase Invoice", "name"),
 			("Purchase Invoice", "posting_date"),
 			("Purchase Invoice", "supplier"),
+			("Supplier", "phone_number"),
 			("Item", "title_status"),
+			("""
+				(
+					Select
+						(((`tabSingles`.value / 100) + 1) * (`tabBin`.valuation_rate + `tabPurchase Invoice`.total - `tabPurchase Invoice Item`.rate)) As p
+					From
+						`tabSingles`
+					Where
+						`tabSingles`.doctype = "Configuration"
+						And
+							`tabSingles`.field = "default_revenue_rate"
+				) As sales_price
+			"""),
 		)
 	}
 

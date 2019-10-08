@@ -3,13 +3,17 @@ frappe.ui.form.on("Item", {
 		if (frm.is_new()) {
 			frm.trigger("item_type");
 		}
+
 		frm.fields_dict._form_dashboard.collapse();
 		$.map([
 			"set_queries",
-			"add_custom_buttons"
+			"add_custom_buttons",
+			"set_mandatory_fields",
 		], event => {
 			frm.trigger(event);
 		});
+		frm.trigger("set_df_fields");
+
 	},
 	onload_post_render: frm => {
 		if (frm.is_new()) {
@@ -18,6 +22,42 @@ frappe.ui.form.on("Item", {
 	},
 	validate: frm => {
 		frm.trigger("item_type");
+		frm.trigger("validate_suppliers");
+		frm.trigger("create_item_name");
+	},
+	validate_suppliers: frm => {
+		const {item_type, trucking_supplier_price, loading_supplier_price} = frm.doc;
+		
+		if(item_type != "Containers")
+			return
+		if(trucking_supplier_price <= 0.00){
+			frappe.msgprint(__("Please set Trucking Supplier Price"))
+			validated = false;
+		}
+		if(loading_supplier_price <= 0.00){
+			frappe.msgprint(__("Please set Loading Supplier Price"))
+			validated = false;
+		}
+
+	},
+	set_mandatory_fields: frm => {
+		let reqd = frm.doc.item_type == "Containers"
+		if (reqd){
+			let fields = [
+			"booking_supplier",
+			"booking_supplier_price",
+			"trucking_supplier",
+			"trucking_supplier_price",
+			"loading_supplier",
+			"loading_supplier_price",
+			"destination",
+			"shipping_line",
+			]
+			$.map(fields, field => {
+				frm.toggle_reqd(field, reqd)
+			});
+		}
+
 	},
 	set_queries: frm => {
 		frm.set_query("item_type", function () {
@@ -101,6 +141,7 @@ frappe.ui.form.on("Item", {
 		frm.set_value("item_group", item_type);
 		frm.set_value("is_stock_item", maintain);
 		frm.trigger("set_df_fields");
+		frm.trigger("set_mandatory_fields");
 	},
 	_default_supplier: frm => {
 		frm.set_value("default_supplier", frm.doc._default_supplier)
@@ -211,7 +252,7 @@ frappe.ui.form.on("Item", {
 		let clear_req = [];
 		let clear_enabled = [];
 		let reqd = {
-			"vehicles" : ["make", "model", "year", "vim_number"],
+			"vehicles" : ["make", "model", "year", "vim_number", "exterior_color"],
 			"containers" : ["booking_no"],
 			"vehicle_parts" : ["part_type"],
 			"services" : ["item_code"],

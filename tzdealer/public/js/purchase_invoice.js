@@ -1,9 +1,6 @@
 frappe.ui.form.on("Purchase Invoice", {
 	refresh: frm => {
-		if(frm.is_new())
-			frm.trigger("invoice_type");
-
-		if (frappe.user.has_role("Sales User"))
+		if (frappe.user.has_role("Sales User") && !frappe.user.has_role("System Manager"))
 			frappe.show_not_permitted();
 		
 		frm.trigger("reqd_transaction_group");
@@ -16,8 +13,27 @@ frappe.ui.form.on("Purchase Invoice", {
 			}
 		});
 	},
+	onload_post_render: frm => {
+		if(frm.is_new)
+			setTimeout( event => {
+				frm.set_value("posting_date", '')
+			}, 1000);
+	},
+	date: frm => {
+		const {date, posting_date} = frm.doc;
+		
+		if (!date){
+			frm.set_value("posting_date", "");
+			return
+		}
+		frm.set_value("posting_date", date);
+
+	},
 	transaction_group: frm => {
-		let = {account, items} = frm.doc;
+		const {account, items, transaction_group} = frm.doc;
+
+		if(!transaction_group)
+			return
 
 		frappe.db.get_value(
 			"Account", 
@@ -31,7 +47,6 @@ frappe.ui.form.on("Purchase Invoice", {
 		if (!account || !items )
 			return
 
-
 		$.map(items, item => {
 			item.expense_account = account;
 		});
@@ -39,7 +54,9 @@ frappe.ui.form.on("Purchase Invoice", {
 	},
 	validate: frm => {
 		frm.trigger("invoice_type");
-		let {account, items} = frm.doc;
+		let {account, items, date} = frm.doc;
+
+		frm.set_value("posting_date", date);
 		
 		if (!account)
 			return
@@ -50,8 +67,6 @@ frappe.ui.form.on("Purchase Invoice", {
 				validated = false;
 			}
 		});
-		
-
 	},
 	is_opening: frm => {
 		frm.trigger("reqd_transaction_group");

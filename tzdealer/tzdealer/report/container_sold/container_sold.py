@@ -79,7 +79,7 @@ def get_data(filters):
 		Where
 			{conditions}
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
-	filters, debug=True)
+	filters, debug=False)
 
 def get_columns(filters):
 	"""

@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
+import frappe
 
-def validate(doc, event):
-	pass
-	# for d in doc.items:
-	# 	create_or_update_item_price(d)
-
+def check(doc, event):
+	if not frappe.db.get_value("Customer", doc.customer, "phone_number"):
+		frappe.throw("Please set a phone number for {}!".format(doc.customer))
+ 
 def create_or_update_item_price(doc):
 	from frappe import db, new_doc, get_doc
 

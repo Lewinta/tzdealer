@@ -48,16 +48,21 @@ def get_columns(invoice_list):
 	return columns
 
 def get_conditions(filters):
-	conditions = ""
+	company = frappe.get_value("User Permission", {
+		"user":frappe.session.user,
+		"allow":"Company",
+	}, "for_value")
 
-	if filters.get("company"):
-		conditions += " and company  = %(company)s"
+	conditions = "`tabSales Invoice`.company = '{}'".format(company)
+
+	# if filters.get("company"):
+		# conditions += " and company = %(company)s"
 	if filters.get("customer"):
-		conditions += " and customer = %(customer)s"
+		conditions += " and `tabSales Invoice`.customer = %(customer)s"
 	if filters.get("from_date"):
-		conditions += " and posting_date >= %(from_date)s"
+		conditions += " and `tabSales Invoice`.posting_date >= %(from_date)s"
 	if filters.get("to_date"):
-		conditions += " and posting_date <= %(to_date)s"
+		conditions += " and `tabSales Invoice`.posting_date <= %(to_date)s"
 
 	return conditions
 
@@ -105,9 +110,9 @@ def get_invoices(filters):
 			FROM 
 				`tabSales Invoice`
 		WHERE 
-			docstatus = 1 %s 
+			`tabSales Invoice`.docstatus = 1 and %s 
 		ORDER BY 
-			posting_date DESC, name DESC
+			`tabSales Invoice`.posting_date DESC, `tabSales Invoice`.name DESC
 
-	""" % conditions, filters, debug=True, as_dict=1)
+	""" % conditions, filters, debug=False, as_dict=True)
 
