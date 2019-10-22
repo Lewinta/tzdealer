@@ -4,32 +4,63 @@
 
 frappe.query_reports["Customer Age"] = {
 	"filters": [
-
 		{
-			"fieldname":"from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
-			"default": frappe.datetime.add_months(frappe.datetime.get_today(), -1),
-			"width": "80"
+			"fieldname": "from_date",
 		},
 		{
-			"fieldname":"to_date",
 			"label": __("To Date"),
 			"fieldtype": "Date",
-			"default": frappe.datetime.get_today()
+			"fieldname": "to_date",
 		},
 		{
-			"fieldname":"customer",
 			"label": __("Customer"),
 			"fieldtype": "Link",
-			"options": "Customer"
+			"fieldname": "customer",
+			"options": "Customer",
 		},
-		// {
-		// 	"fieldname":"company",
-		// 	"label": __("Company"),
-		// 	"fieldtype": "Link",
-		// 	"options": "Company",
-		// 	"default": frappe.defaults.get_user_default("Company")
-		// }
-	]
+		{
+			"label": __("Item Code"),
+			"fieldtype": "Link",
+			"fieldname": "item_code",
+			"options": "Item",
+		},
+		{
+			"label": __("Limit"),
+			"fieldtype": "Int",
+			"fieldname": "limit",
+			"default": 50,
+		},
+		{
+			"label": __("Show Unpaid Only?"),
+			"fieldtype": "Check",
+			"fieldname": "unpaid",
+			"default": 1,
+		},
+	],
+	// formatter: function(row, cell, value, columnDef, dataContext) {
+	// 	if (new Array(1, 2, 11, 12).includes(cell)) {
+	// 		route = value.split(":")[0]
+	// 		return `<a class="grey" href="#Form/${columnDef.df.options}/${route}" data-doctype="Item">${value}</a>`;
+	// 	} 
+		
+	// 	if(new Array(5, 8, 9, 10).includes(cell)) {
+	// 		value = frappe.format(value, {
+	// 			fieldtype: "Currency",
+	// 			precision: 2,
+	// 		});
+	// 		return this.left_align(row, cell, value, columnDef, dataContext);
+	// 	}
+
+	// 	return `<span style="padding-left: 10px;">${value}</span>`;	
+	// },
+	// left_align: function(row, cell, value, columnDef, dataContext) {
+	// 	const stylesheet = [
+	// 		"text-align: right !important;",
+	// 		"display: block;",
+	// 	].join(" ");
+
+	// 	return `<span style="${stylesheet}">${value || ""}</span>`;
+	// },
 }

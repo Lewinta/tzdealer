@@ -69,12 +69,17 @@ def get_fields(filters):
 		("Item", "trim"),
 		("Item", "drive_train"),
 		("Purchase Invoice Item", "amount", "pinv_price"), 	#"OC/Price"
-		("(SELECT SUM(`tabPurchase Invoice Item`.amount) from `tabPurchase Invoice Item` WHERE `tabPurchase Invoice Item`.item_code = 'fee' and `tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name ) as fee"), 	#"OC/Fee"
-		("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Transport',`tabLanded Cost Taxes and Charges`.amount,0)) as transport FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as transport"), 	#"Transport"
-		("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Courrier/Delivery',`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as delivery"), 	#"Courrier/Delivery"
-		("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Parts',`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as parts"), 	#"Parts"
-		("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Labor/Repair',`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as repair"), 	#"Labor/Repair"
-		("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type not in ('Transport', 'Courrier/Delivery', 'Parts', 'Labor/Repair'),`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as others"), 	#"Others"
+		("SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Transport', `tabLanded Cost Taxes and Charges`.amount, 0)) as transport"),
+		("SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Courrier/Delivery', `tabLanded Cost Taxes and Charges`.amount, 0)) as delivery"),
+		("SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Parts', `tabLanded Cost Taxes and Charges`.amount, 0)) as parts"),
+		("SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Labour', `tabLanded Cost Taxes and Charges`.amount, 0)) as repair"),
+		("SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Others', `tabLanded Cost Taxes and Charges`.amount, 0)) as others"),
+		# ("(SELECT SUM(`tabPurchase Invoice Item`.amount) from `tabPurchase Invoice Item` WHERE `tabPurchase Invoice Item`.item_code = 'fee' and `tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name ) as fee"), 	#"OC/Fee"
+		# ("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Transport',`tabLanded Cost Taxes and Charges`.amount,0)) as transport FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as transport"), 	#"Transport"
+		# ("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Courrier/Delivery',`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as delivery"), 	#"Courrier/Delivery"
+		# ("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Parts',`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as parts"), 	#"Parts"
+		# ("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type = 'Labor/Repair',`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as repair"), 	#"Labor/Repair"
+		# ("(SELECT SUM(IF(`tabLanded Cost Taxes and Charges`.supplier_invoice_type not in ('Transport', 'Courrier/Delivery', 'Parts', 'Labor/Repair'),`tabLanded Cost Taxes and Charges`.amount,0)) as courrier_delivery FROM  `tabLanded Cost Purchase Receipt` JOIN `tabLanded Cost Item` ON `tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent JOIN `tabLanded Cost Taxes and Charges` ON `tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent WHERE `tabLanded Cost Taxes and Charges`.docstatus =1 AND `tabLanded Cost Item`.item_code = `tabPurchase Invoice Item`.item_code) as others"), 	#"Others"
 		("Sales Invoice Item", "amount", "sinv_price"),
 		("Sales Invoice", "posting_date", "sinv_date"),
 		("Sales Invoice", "customer"),
@@ -121,36 +126,46 @@ def get_data(filters):
 		Select
 			{fields}
 			
-		From
-			`tabPurchase Invoice Item`
-		Inner Join 
+		FROM  
+			`tabLanded Cost Purchase Receipt` 
+		JOIN
+			`tabLanded Cost Item` 
+		ON 
+			`tabLanded Cost Purchase Receipt`.parent = `tabLanded Cost Item`.parent
+		JOIN
 			`tabItem`
-			On
-				`tabItem`.item_code = `tabPurchase Invoice Item`.item_code
-			And 
-				`tabItem`.item_type = 'Vehicles'
-		Left Join
+		ON
+			`tabItem`.item_code = `tabLanded Cost Item`.item_code
+		JOIN
+			`tabLanded Cost Taxes and Charges` 
+		ON 
+			`tabLanded Cost Item`.parent = `tabLanded Cost Taxes and Charges`.parent
+		JOIN
 			`tabPurchase Invoice`
-			On
-				`tabPurchase Invoice`.name = `tabPurchase Invoice Item`.parent
-			And
-				`tabPurchase Invoice`.docstatus = 1	
-		Left Join
+		ON
+			`tabLanded Cost Purchase Receipt`.receipt_document =  `tabPurchase Invoice`.name
+		JOIN
+			`tabPurchase Invoice Item`
+		ON
+			`tabPurchase Invoice`.name = `tabPurchase Invoice Item`.parent
+		AND	
+			`tabPurchase Invoice`.docstatus = 1
+		LEFT JOIN
 			`tabSales Invoice Item`
-			On
-				`tabItem`.item_code = `tabSales Invoice Item`.item_code
-		Left Join
+		ON
+			`tabSales Invoice Item`.item_code = `tabItem`.item_code
+		LEFT JOIN
 			`tabSales Invoice`
-			On
+		ON
 			`tabSales Invoice`.name = `tabSales Invoice Item`.parent
-			And 
-				`tabSales Invoice`.docstatus = 1
+		AND 
+			`tabPurchase Invoice`.docstatus = 1
 		
 		Where
 			{conditions}
 
 		Group By 
-			`tabPurchase Invoice Item`.item_code
+			`tabItem`.item_code
 
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
 	filters, as_dict=True, debug=False)

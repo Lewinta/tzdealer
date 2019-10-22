@@ -21,6 +21,7 @@ def on_cancel(doc, event):
 		inv = frappe.get_doc("Purchase Invoice", tax.invoice)
 		if inv.docstatus == 1:
 			inv.cancel()
+			tax.invoice = ''
 
 def on_trash(doc, event):
 	if not doc.taxes:

@@ -186,26 +186,30 @@ def get_data(filters):
 
 		Where
 			{conditions}
-		Order By `tabSales Invoice`.name
+		Order By `tabSales Invoice`.name, `tabPayment Entry`.name
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
 	filters, as_dict=True, debug=True)
 	last_inv = ''
 	vim = ''
+	entry = ''
+	pay_date = ''
+	mode = ''
 	for row in data:
 		total_costs = flt(row.pinv_price) + flt(row.fee) + flt(row.transport) + \
 			flt(row.delivery) + flt(row.parts) + flt(row.repair) + flt(row.others)
 		vim_number = row.vim_number.split('-')[0] if row.vim_number and '-' in row.vim_number else row.vim_number
-		if last_inv != row.sinv_name or vim_number != vim:
+		
+		if last_inv != row.sinv_name or vim_number != vim or entry != row.payment_entry:
 			results.append(
 				(
 					"{}:{}".format(row.item_code, row.item_name) ,
 					vim_number ,
-					row.sinv_date ,
+					row.sinv_date,
 					row.customer ,
 					row.grand_total if last_inv != row.sinv_name else .00,
-					row.p_posting_date,
-					row.mode_of_payment,
-					row.allocated_amount if last_inv != row.sinv_name else .00,
+					row.p_posting_date if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else '-',
+					row.mode_of_payment if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else ' ',
+					row.allocated_amount if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
 					flt(row.grand_total) - flt(row.outstanding_amount) if last_inv != row.sinv_name else .00,
 					row.outstanding_amount if last_inv != row.sinv_name else .00,
 					row.payment_entry,
@@ -234,4 +238,7 @@ def get_data(filters):
 			)
 		last_inv = row.sinv_name
 		vim = vim_number
+		entry = row.payment_entry
+		pay_date = row.p_posting_date
+		mode = row.mode_of_payment
 	return results

@@ -188,9 +188,8 @@ def get_data(filters):
 			`tabPayment Entry Reference`.parent = `tabPayment Entry`.name
 			And 
 			`tabPayment Entry`.docstatus = 1
-
-		Where
-			{conditions}
+		Group By 
+			`tabPayment Entry`.name
 
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
 	filters, as_dict=True, debug=False)

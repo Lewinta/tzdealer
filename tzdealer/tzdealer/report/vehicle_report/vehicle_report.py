@@ -267,6 +267,7 @@ def get_columns(filters):
 	"""
 	cols_obj = {
 		"Stock Report": (
+			("Status", "status", "Data", 90),
 			("Vim Number", "item_code", "Link/Item", 160),
 			("Model", "model", "Link/Model", 100),
 			("Year", "year", "Int", 50),
@@ -276,8 +277,8 @@ def get_columns(filters):
 			("Trim", "trim", "Data", 60),
 			("Drive Train", "drive_train", "Data", 80),
 			("Odometer", "odometer_value", "Data", 90),
+			("Voucher", "landed_cost_voucher_amount", "Currency", 90),
 			("Sales Price", "sales_price", "Currency", 100),
-			("Status", "status", "Data", 90),
 			("Purchase Date", "posting_date", "Date", 100),
 			("Supplier", "supplier", "Link/Supplier", 200),
 			("Telephone", "s_phone", "data", 90),
@@ -310,6 +311,7 @@ def get_columns(filters):
 			("Telephone", "s_phone", "data", 90),
 			("Title", "title_status", "data", 100),
 			("Cost", "price", "Currency", 100),
+			("Voucher", "landed_cost_voucher_amount", "Currency", 90),
 		),
 		"Sales Order To Be Billed":(
 			("Status", "status", "Data", 100),
@@ -321,6 +323,7 @@ def get_columns(filters):
 			("Engine", "engine_size", "Data", 55),
 			("Trim", "trim", "Data", 60),
 			("Drive Train", "drive_train", "Data", 80),
+			("Voucher", "landed_cost_voucher_amount", "Currency", 90),
 			("Customer", "customer", "Link/Customer", 150),
 			("Price", "price", "Currency", 100),
 			("Order Date", "order_date", "Date", 100),
@@ -357,6 +360,7 @@ def get_fields(filters):
 	"""
 	fields_obj = {
 		"Stock Report":  (
+			("Item", "status"),
 			("Item", "item_code"),
 			("Item", "model"),
 			("Item", "year"),
@@ -366,6 +370,7 @@ def get_fields(filters):
 			("Item", "trim"),
 			("Item", "drive_train"),
 			("Item", "odometer_value"),
+			("Purchase Invoice Item", "landed_cost_voucher_amount"),
 			# ("Item", "item_name"),
 			("""
 				(
@@ -379,7 +384,6 @@ def get_fields(filters):
 							`tabSingles`.field = "default_revenue_rate"
 				) As sales_price
 			"""),
-			("Item", "status"),
 			("Purchase Invoice", "posting_date"),
 			# ("Bin", "valuation_rate"),
 			("Purchase Invoice", "supplier"),
@@ -426,6 +430,7 @@ def get_fields(filters):
 							`tabSingles`.field = "default_revenue_rate"
 				) As sales_price
 			"""),
+			("Purchase Invoice Item", "landed_cost_voucher_amount"),
 		),
 		"Sales Order To Be Billed":(
 			("Item", "status"),
@@ -437,6 +442,7 @@ def get_fields(filters):
 			("Item", "engine_size"),
 			("Item", "trim"),
 			("Item", "drive_train"),
+			("Purchase Invoice Item", "landed_cost_voucher_amount"),
 			("Sales Order", "customer"),
 			("Sales Order Item", "amount"),
 			("Sales Order", "transaction_date"),
