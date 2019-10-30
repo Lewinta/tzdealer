@@ -85,8 +85,6 @@ def get_conditions(filters):
 			("Sales Invoice Item", "item_code", "=", filters.get('item_code'))
 		)
 	
-
-
 	sql_conditions = []
 
 	if not conditions:

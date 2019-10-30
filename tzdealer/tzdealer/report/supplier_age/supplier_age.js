@@ -26,12 +26,12 @@ frappe.query_reports["Supplier Age"] = {
 			"fieldname": "item_code",
 			"options": "Item",
 		},
-		{
-			"label": __("Limit"),
-			"fieldtype": "Int",
-			"fieldname": "limit",
-			"default": 50,
-		},
+		// {
+		// 	"label": __("Limit"),
+		// 	"fieldtype": "Int",
+		// 	"fieldname": "limit",
+		// 	"default": 50,
+		// },
 		{
 			"label": __("Show Unpaid Only?"),
 			"fieldtype": "Check",
