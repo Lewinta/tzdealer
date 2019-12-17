@@ -105,7 +105,7 @@ def get_fields(filters):
 	Return sql fields ready to be used on query
 	"""
 	fields = (
-		("Sales Invoice Item", "item_code"),
+		("Item", "vim_number"),
 		("Item", "model"),
 		("Item", "year"),
 		("Item", "exterior_color"),
@@ -199,7 +199,7 @@ def get_data(filters):
 			flt(row.delivery) + flt(row.parts) + flt(row.repair) + flt(row.others)
 		results.append(
 			(
-				row.item_code,
+				row.vim_number,
 				row.model,
 				row.year,
 				row.exterior_color,

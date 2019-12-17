@@ -11,8 +11,9 @@ def execute(filters=None):
 
 def get_columns():
 	columns = (
-		("ID", "Link/Item", 325),
-		("Vim Number", "Link/Item", 150),
+		("Stock No.", "Link/Item", 100),
+		("Vim Number", "Data", 150),
+		("Details", "Data", 250),
 		# ("Model", "Data", 100),
 		# ("Year", "Data", 60),
 		# ("Color", "Data", 70),
@@ -120,7 +121,13 @@ def get_fields(filters):
 	"""
 	fields = (
 		("Sales Invoice Item", "item_code"),
-		("IF(ISNULL(`tabSales Invoice Item`.vim_number), `tabSales Invoice Item`.item_code, `tabSales Invoice Item`.vim_number) as vim_number"),
+		("Item", "vim_number"),
+		("Item", "make"),
+		("Item", "model"),
+		("Item", "year"),
+		("Item", "exterior_color"),
+		("Sales Invoice Item", "vim_number", "cont_vim"),
+		# ("IF(ISNULL(`tabSales Invoice Item`.vim_number), `tabSales Invoice Item`.item_code, `tabSales Invoice Item`.vim_number) as vim_number"),
 		("Sales Invoice Item", "item_name"),
 		("Sales Invoice", "posting_date", "sinv_date"),
 		("Sales Invoice", "customer"),
@@ -176,20 +183,22 @@ def get_data(filters):
 			`tabSales Invoice`.name = `tabSales Invoice Item`.parent
 			And 
 				`tabSales Invoice`.docstatus = 1
+		Inner Join
+			`tabItem`
+		On
+			`tabSales Invoice Item`.item_code = `tabItem`.item_code
 		Left Join
 			`tabPayment Entry Reference`
 			On
 			`tabPayment Entry Reference`.reference_name = `tabSales Invoice`.name
 			And
 				`tabPayment Entry Reference`.docstatus = 1
-
-		Left	 Join
+		Left Join
 			`tabPayment Entry`
 			On
 			`tabPayment Entry Reference`.parent = `tabPayment Entry`.name
 			And 
 			`tabPayment Entry`.docstatus = 1
-
 		Where
 			{conditions}
 
@@ -203,13 +212,20 @@ def get_data(filters):
 	for row in data:
 		total_costs = flt(row.pinv_price) + flt(row.fee) + flt(row.transport) + \
 			flt(row.delivery) + flt(row.parts) + flt(row.repair) + flt(row.others)
-		vim_number = row.vim_number.split('-')[0] if row.vim_number and '-' in row.vim_number else row.vim_number
-		
+		vim_number = row.cont_vim.split('-')[0] if row.cont_vim and '-' in row.cont_vim else row.vim_number
+		details = "-" 
+		if row.model:
+			details = "{} {} {} {}".format(row.make, row.model, row.exterior_color, row.year)
+		elif row.cont_vim:
+			details = row.cont_vim.split("-")[1]
+	
+		frappe.errprint(row.vim_number)
 		if last_inv != row.sinv_name or vim_number != vim or entry != row.payment_entry:
 			results.append(
 				(
-					"{}:{}".format(row.item_code, row.item_name) ,
-					vim_number ,
+					row.item_code,
+					vim_number,
+					details,
 					row.sinv_date,
 					row.customer ,
 					row.grand_total if last_inv != row.sinv_name else .00,

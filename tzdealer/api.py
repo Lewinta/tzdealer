@@ -5,7 +5,7 @@ def get_container_vims(item_code, company):
 	result = frappe.db.sql("""
 		SELECT
 			CONCAT(
-				`tabItem Description`.item_code,     '-',
+				`tabItem Description`.vim_number,     '-',
 				`tabItem Description`.make,          ' ',
 				`tabItem Description`.model,         ' ',
 				`tabItem Description`.exterior_color,' ',

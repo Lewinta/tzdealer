@@ -1,0 +1,22 @@
+{% if items %}
+<table class='table table-bordered table-condensed'>
+	<thead>
+		<tr>
+			<th class='text-center' style='background-color: aliceblue'>Stock No.</th>
+			<th class='text-center' style='background-color: aliceblue'>Item Name</th>
+			<th class='text-center' style='background-color: aliceblue'>Vim Number</th>
+			<th class='text-center' style='background-color: aliceblue'>Rate</th>
+		</tr>
+	</thead>
+	<tbody>
+		{%for row in items%}
+		<tr>
+			<td class='text-center'>{{row.item_code}}</td>
+			<td class='text-center'>{{row.item_name}}</td>
+			<td class='text-center'>{{row.vim_number}}</td>
+			<td class='text-center'>$ {{row.rate}}</td>
+		</tr>
+		{%endfor%}
+	</tbody>
+</table>
+{%endif%}

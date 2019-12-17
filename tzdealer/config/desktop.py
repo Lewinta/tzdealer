@@ -10,5 +10,13 @@ def get_data():
 			"icon": "fa fa-car",
 			"type": "module",
 			"label": _("TZDEALER")
+		},{
+			"module_name": "Vehicle Status",
+			"_report": "Vehile Status",
+			"link": "query-report/Vehicle Status",
+			"color": "#33bf19",
+			"icon": "fa fa-car",
+			"type": "link",
+			"label": _("Vehicle Stvatus")
 		}
 	]

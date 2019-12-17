@@ -2,7 +2,7 @@ frappe.ui.form.on("Purchase Invoice", {
 	refresh: frm => {
 		if (frappe.user.has_role("Sales User") && !frappe.user.has_role("System Manager"))
 			frappe.show_not_permitted();
-		
+
 		frm.trigger("reqd_transaction_group");
 
 		frm.set_query("transaction_group",  event => {

@@ -109,6 +109,9 @@ doc_events = {
 	},
 	"Purchase Invoice":{
 		"on_cancel": "tzdealer.hook.purchase_invoice.on_cancel",
+	},
+	"Journal Entry":{
+		"validate": "tzdealer.hook.journal_entry.validate",
 	}	
 }
 

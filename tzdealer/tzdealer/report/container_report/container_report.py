@@ -92,7 +92,7 @@ def get_data(filters):
 				qty > 0
 				
 		""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=False)
+		filters, debug=True)
 
 	if filters.get("report_type") == "Sold Report":
 		result = frappe.db.sql("""
@@ -109,7 +109,7 @@ def get_data(filters):
 			Inner Join 
 				`tabItem Description`
 			On
-				`tabItem Description`.item_code = SUBSTRING_INDEX(`tabSales Invoice Item`.vim_number,'-', 1)
+				`tabItem Description`.vim_number = SUBSTRING_INDEX(`tabSales Invoice Item`.vim_number,'-', 1)
 			Inner Join 
 				`tabItem`
 			On
@@ -133,7 +133,7 @@ def get_columns(filters):
 	cols_obj = {
 		"Stock Report":(
 			("Item Code", "item_code", "Link/Item", 110),
-			("Booking No.", "booking", "Data", 100),
+			("Booking No.", "booking", "Data", 120),
 			("Container", "container", "Data", 110),
 			("Shipping Line", "shipping_line", "Data", 110),
 			("Vim Number", "vim_number", "Link/Item", 150),
@@ -147,18 +147,18 @@ def get_columns(filters):
 			("Actual Qty", "qty", "Int", 100),
 		),
 		"Sold Report":(
-			("Item Code", "item_code", "Link/Item", 110),
-			("Booking No.", "booking", "Data", 100),
-			("Container", "container", "Data", 110),
-			("Shipping Line", "shipping_line", "Data", 110),
+			("Sold Date", "p_date", "Date", 100),
+			("Customer", "customer", "Link/Customer", 150),
 			("Vim Number", "vim_number", "Link/Item", 150),
 			("Make", "make", "Data", 80),
 			("Year", "year", "Data", 80),
+			("Item Code", "item_code", "Link/Item", 110),
+			("Booking No.", "booking", "Data", 120),
+			("Container", "container", "Data", 110),
 			("Price", "price", "Currency", 90),
 			("Purchased Qty", "qty", "Int", 100),
 			("Sales Inv.", "purchase_name", "Link/Sales Invoice", 110),
-			("Sold Date", "p_date", "Date", 100),
-			("Customer", "customer", "Link/Customer", 150),
+			("Shipping Line", "shipping_line", "Data", 110),
 		)
 	}
 
@@ -183,7 +183,7 @@ def get_fields(filters):
 			("Item", "booking_no"),
 			("Item", "container_no"),
 			("Item", "shipping_line"),
-			("Item Description", "item_code", "vim_number"),
+			("Item Description", "vim_number"),
 			("Item Description", "model", "model"),
 			("Item Description", "year", "year"),
 			("Purchase Invoice Item", "rate"),
@@ -193,18 +193,18 @@ def get_fields(filters):
 			("Purchase Invoice", "name"),
 		),
 		"Sold Report":(
+			("Sales Invoice", "posting_date"),
+			("Sales Invoice", "customer"),
+			("Item Description", "vim_number"),
+			("Item Description", "model", "model"),
+			("Item Description", "year", "year"),
 			("Item", "item_code"),
 			("Item", "booking_no"),
 			("Item", "container_no"),
-			("Item", "shipping_line"),
-			("Item Description", "item_code", "vim_number"),
-			("Item Description", "model", "model"),
-			("Item Description", "year", "year"),
 			("Sales Invoice Item", "amount"),
 			("Sales Invoice Item", "qty"),
 			("Sales Invoice", "name"),
-			("Sales Invoice", "posting_date"),
-			("Sales Invoice", "customer"),
+			("Item", "shipping_line"),
 		)
 	}
 
