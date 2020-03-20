@@ -72,6 +72,7 @@ def create_purchase_invoice(row):
 		"supplier": row.vendor,
 		"posting_date": inv_date,
 		"date": inv_date,
+		"company": frappe.db.get_value("Landed Cost Voucher", row.parent, "company"),
 		"due_date": add_days(inv_date, 30),
 		"update_stock": 0,
 		"set_posting_time": 1,

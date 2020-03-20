@@ -42,10 +42,11 @@ def execute(filters=None):
 			]
 		else:
 			row = [
-				inv.due_date,
+				"",
+				"",
 				inv.supplier,
-				inv.item,
-				inv.item_code,
+				"",
+				"",
 				inv.invoice_type,
 				.000,
 				.000,
@@ -70,7 +71,7 @@ def get_columns(invoice_list):
 		_("Due Date") 			+ ":Date:80",
 		_("Date") 				+ ":Date:80",
 		_("Supplier") 			+ ":Link/Supplier:180",
-		_("Item") 				+ ":Link/Item:100",
+		_("Item") 				+ ":Link/Item:105",
 		_("Vim Number") 		+ ":Data:150",
 		_("Invoice Type") 		+ ":Link/Purchase Invoice:90",
 		_("Net Total") 			+ ":Currency/currency:120",
@@ -88,12 +89,13 @@ def get_columns(invoice_list):
 	return columns
 
 def get_conditions(filters):
-	company = frappe.get_value("User Permission", {
-		"user":frappe.session.user,
-		"allow":"Company",
-	}, "for_value")
+	# company = frappe.get_value("User Permission", {
+	# 	"user":frappe.session.user,
+	# 	"allow":"Company",
+	# }, "for_value")
 
-	conditions = " `viewPurchase Invoice`.company = '{}'".format(company)
+	conditions = " `viewPurchase Invoice`.company = '{}'".format(filters.get("company"))
+	# conditions += " and IFNULL(`tabPayment Entry Reference`.allocated_amount, 0) >= 0"
 
 	# if filters.get("company"):
 		# conditions += " and company = %(company)s"
@@ -125,26 +127,26 @@ def get_invoices(filters):
 			`viewPurchase Invoice`.item_code,
 			`viewPurchase Invoice`.vim_number,
 			`viewPurchase Invoice`.invoice_type,
-			`viewPurchase Invoice`.total,
-			SUM(
-				IF(
-					`tabPurchase Taxes and Charges`.account_head != 'PST/QST to pay - 9.975 - EZ',
-						IFNULL(`tabPurchase Taxes and Charges`.tax_amount, 0),
-						0
-					)
-				) as gst_total,
-			SUM(
-				IF(
-					`tabPurchase Taxes and Charges`.account_head = 'PST/QST to pay - 9.975 - EZ',
-						IFNULL(`tabPurchase Taxes and Charges`.tax_amount, 0),
-						0
-					)
-				) as pst_total,
+			IF(
+				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
+				`viewPurchase Invoice`.total * -1,
+				`viewPurchase Invoice`.total
+			) as total,
+			`viewPurchase Invoice`.gst_total,
+			`viewPurchase Invoice`.pst_total,
 			`viewPurchase Invoice`.name,
 			`tabPayment Entry Reference`.allocated_amount as breakdown,
-			`viewPurchase Invoice`.grand_total,
+			IF(
+				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
+				`viewPurchase Invoice`.grand_total * -1,
+				`viewPurchase Invoice`.grand_total
+			) as grand_total,
 			`viewPurchase Invoice`.trans_type,
-			`viewPurchase Invoice`.paid_amount,
+			IF(
+				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
+				`tabPayment Entry Reference`.allocated_amount,
+				`viewPurchase Invoice`.paid_amount
+			) as paid_amount,
 			`viewPurchase Invoice`.outstanding_amount,
 			`tabPayment Entry Reference`.parent as pinv
 		FROM
@@ -155,25 +157,15 @@ def get_invoices(filters):
 			`tabPayment Entry Reference`.reference_name = `viewPurchase Invoice`.name
 			And
 				`tabPayment Entry Reference`.docstatus = 1
-
 		Left Join
 			`tabPayment Entry`
 			On
 			`tabPayment Entry Reference`.parent = `tabPayment Entry`.name
 			And 
 			`tabPayment Entry`.docstatus = 1 
-		Left Join
-			`tabPurchase Taxes and Charges`
-			On
-			`tabPurchase Taxes and Charges`.parent = `viewPurchase Invoice`.name
 		WHERE 
 			{conditions}  
-		Group By
-			`viewPurchase Invoice`.name
 		ORDER BY 
-			`viewPurchase Invoice`.item_code, `viewPurchase Invoice`.posting_date ASC, `viewPurchase Invoice`.name ASC
+			`viewPurchase Invoice`.item_code, `viewPurchase Invoice`.posting_date ASC, `viewPurchase Invoice`.name ASC, `tabPayment Entry Reference`.parent
 
-
-		
-
-	""".format(conditions=conditions or "1 = 1"), debug=False, as_dict=True)
+	""".format(conditions=conditions or "1 = 1"), debug=True, as_dict=True)

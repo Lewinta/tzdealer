@@ -29,6 +29,38 @@ frappe.ui.form.on("Purchase Invoice", {
 		frm.set_value("posting_date", date);
 
 	},
+	company: frm => {
+		if (!frm.doc.company)
+			return
+		
+		let filters = {"company": frm.doc.company, "default": 1}
+		frappe.db.get_value("Warehouse", filters, "name", (response) => {
+			frm.doc.default_warehouse = "";
+			if (!response || !response.name)
+				return
+			frm.doc.default_warehouse = response.name;
+			
+			// if there are items let's update the warehouse
+			if (frm.doc.items)
+				frm.trigger("update_warehouse_items");
+		})
+	},
+	update_warehouse_items: frm => {
+		$.map(frm.doc.items, item => {
+			frappe.model.set_value(
+				item.doctype, item.name, 
+				"warehouse", 
+				frm.doc.default_warehouse
+			)
+			
+			frappe.model.set_value(
+				item.doctype,
+				item.name,
+				"rejected_warehouse",
+				frm.doc.default_warehouse
+			)
+		})
+	},
 	transaction_group: frm => {
 		const {account, items, transaction_group} = frm.doc;
 
@@ -75,7 +107,7 @@ frappe.ui.form.on("Purchase Invoice", {
 		frm.toggle_reqd("transaction_group", frm.doc.is_opening == "No");
 	},
 	invoice_type: frm => {
-		let check = frm.doc.invoice_type != "Services" ? true : false;
+		let check = frm.doc.invoice_type != "Services" && !frm.doc.is_return ? true : false;
 		frm.set_value("update_stock", check);
 	}
 
@@ -90,6 +122,9 @@ frappe.ui.form.on("Purchase Invoice Item",  {
 
 		setTimeout(event =>{
 			frappe.model.set_value(cdt, cdn, "expense_account", account);
+			frappe.model.set_value(cdt, cdn, "warehouse", frm.doc.default_warehouse);
+			frappe.model.set_value(cdt, cdn, "rejected_warehouse", frm.doc.default_warehouse);
+
 		}, 500);
 	}
 });

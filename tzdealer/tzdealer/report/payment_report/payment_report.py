@@ -11,7 +11,8 @@ def execute(filters=None):
 
 def get_columns():
 	columns = (
-		("Vim Number", "Link/Item", 150),
+		("Stock no.", "Link/Item", 150),
+		("Vim Number", "Data", 150),
 		("Model", "Data", 100),
 		("Year", "Data", 60),
 		("Color", "Data", 70),
@@ -105,7 +106,10 @@ def get_fields(filters):
 	Return sql fields ready to be used on query
 	"""
 	fields = (
+		("Item", "name"),
 		("Item", "vim_number"),
+		("Item", "item_type"),
+		("Sales Invoice Item", "vim_number", "item_vim_number"),
 		("Item", "model"),
 		("Item", "year"),
 		("Item", "exterior_color"),
@@ -199,7 +203,8 @@ def get_data(filters):
 			flt(row.delivery) + flt(row.parts) + flt(row.repair) + flt(row.others)
 		results.append(
 			(
-				row.vim_number,
+				row.name,
+				row.item_vim_number.split("-")[0] if row.item_type == "Containers" else row.vim_number ,
 				row.model,
 				row.year,
 				row.exterior_color,

@@ -195,9 +195,10 @@ def get_data(filters):
 				) As `tabSales Price`
 
 			Where
+				`tabPurchase Invoice`.is_return = 0 AND
 				{conditions}
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=False)
+		filters, debug=True)
 
 	if filters.get("report_type") == "Sales Order To Be Billed":
 		results = frappe.db.sql("""
@@ -268,6 +269,9 @@ def get_columns(filters):
 	cols_obj = {
 		"Stock Report": (
 			("Status", "status", "Data", 90),
+			("Kijiji", "kijiji", "Check", 50),
+			("Auto Trd", "auto_trd", "Check", 50),
+			("Web", "web", "Check", 50),
 			("Stock No.", "item_code", "Link/Item", 100),
 			("Vim Number", "vim_number", "Data", 160),
 			("Model", "model", "Link/Model", 100),
@@ -291,6 +295,9 @@ def get_columns(filters):
 		),
 		"Sold Report":(
 			("Status", "status", "data", 100),
+			("Kijiji", "kijiji", "Check", 50),
+			("Auto Trd", "auto_trd", "Check", 50),
+			("Web", "web", "Check", 50),
 			("Stock No.", "item_code", "Link/Item", 100),
 			("Sold Date", "posting_date", "Date", 100),
 			("Customer", "customer", "Link/Customer", 200),
@@ -364,6 +371,9 @@ def get_fields(filters):
 	fields_obj = {
 		"Stock Report":  (
 			("Item", "status"),
+			("Item", "kijiji_post"),
+			("Item", "auto_trader_post"),
+			("Item", "website_post"),
 			("Item", "item_code"),
 			("Item", "vim_number"),
 			("Item", "model"),
@@ -401,6 +411,9 @@ def get_fields(filters):
 		),
 		"Sold Report": (
 			("Item", "status"),
+			("Item", "kijiji_post"),
+			("Item", "auto_trader_post"),
+			("Item", "website_post"),
 			("Item", "item_code"),
 			("Sales Invoice", "posting_date"),
 			("Sales Invoice", "customer"),

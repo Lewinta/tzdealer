@@ -197,7 +197,7 @@ def get_data(filters):
 			Where
 				{conditions}
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=False)
+		filters, debug=True)
 
 	if filters.get("report_type") == "Sales Order To Be Billed":
 		results = frappe.db.sql("""

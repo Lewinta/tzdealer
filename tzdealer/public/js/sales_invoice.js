@@ -1,8 +1,5 @@
 frappe.ui.form.on("Sales Invoice", {
 	refresh: frm => {
-		// if(frm.is_new()){
-		// 	frm.trigger("set_defaults");
-		// }
 		frm.trigger("set_queries");
 
 	},
@@ -105,6 +102,8 @@ frappe.ui.form.on("Sales Invoice", {
 		}, 500)
 	},
 	set_default_currency: frm => {
+		//This will allow users to bill the customer on different currency
+		return
 		const {transaction_group} = frm.doc;
 		if (!transaction_group)
 			return

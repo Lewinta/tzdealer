@@ -11,14 +11,18 @@ def execute(filters=None):
 
 def get_columns():
 	columns = (
-		("Stock No.", "Link/Item", 100),
+		("Stock No.", "Link/Item", 110),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
 		# ("Model", "Data", 100),
 		# ("Year", "Data", 60),
 		# ("Color", "Data", 70),
+		("Due Date", "Date", 90),
 		("Inv. Date", "Date", 90),
 		("Customer", "Link/Customer", 130),
+		("Sale N/Total", "Currency", 100),
+		("GST", "Currency", 100),
+		("PST", "Currency", 100),
 		("Sale G/Total", "Currency", 100),
 		("Pay Date", "Date", 90),
 		("Payment Type", "Data", 100),
@@ -27,6 +31,7 @@ def get_columns():
 		("Outstanding", "Currency", 100),
 		("Payment Entry", "Link/Payment Entry", 100),
 		("Sales Inv.", "Link/Sales Invoice", 100),
+		("G Price", "Currency", 100),
 	)
 
 	formatted_columns = []
@@ -37,6 +42,127 @@ def get_columns():
 		)
 
 	return formatted_columns
+
+def get_data(filters):
+	"""
+	Return the data that needs to be rendered
+	"""
+	fields = get_fields(filters)
+	conditions = get_conditions(filters)
+	results = []
+	data =  frappe.db.sql("""
+		Select
+			{fields}
+		From
+			`tabSales Invoice`
+		Left Join
+			`tabSales Taxes and Charges`
+		On  
+			`tabSales Invoice`.name = `tabSales Taxes and Charges`.parent
+		Inner Join
+			`tabSales Invoice Item`
+		On
+			`tabSales Invoice`.name = `tabSales Invoice Item`.parent
+		And 
+			`tabSales Invoice`.docstatus = 1
+		Inner Join
+			`tabItem`
+		On
+			`tabSales Invoice Item`.item_code = `tabItem`.item_code
+		Left Join
+			`tabPayment Entry Reference`
+		On
+			`tabPayment Entry Reference`.reference_name = `tabSales Invoice`.name
+		And
+			`tabPayment Entry Reference`.docstatus = 1
+		Left Join
+			`tabPayment Entry`
+		On
+			`tabPayment Entry Reference`.parent = `tabPayment Entry`.name
+		And 
+			`tabPayment Entry`.docstatus = 1
+		Where
+			{conditions}
+		Group By 
+			`tabSales Invoice`.name, `tabPayment Entry Reference`.name
+ 		Order By 
+ 			`tabSales Invoice`.name, `tabPayment Entry`.name
+		LIMIT {limit}
+
+		""".format(
+				fields=fields,
+				conditions=conditions or "1 = 1", limit=filters.get('limit') or 100000),
+		filters, as_dict=True, debug=True)
+	last_inv = ''
+	vim = ''
+	entry = ''
+	pay_date = ''
+	mode = ''
+	for row in data:
+		total_costs = flt(row.pinv_price) + flt(row.fee) + flt(row.transport) + \
+			flt(row.delivery) + flt(row.parts) + flt(row.repair) + flt(row.others)
+		vim_number = row.cont_vim.split('-')[0] if row.cont_vim and '-' in row.cont_vim else row.vim_number
+		details = "-" 
+		if row.model:
+			details = "{} {} {} {}".format(row.make, row.model, row.exterior_color, row.year)
+		elif row.cont_vim:
+			details = row.cont_vim.split("-")[1]
+	
+		# frappe.errprint(row.vim_number)
+		if last_inv != row.sinv_name or vim_number != vim or entry != row.payment_entry:
+			results.append(
+				(
+					row.item_code,
+					vim_number,
+					details,
+					row.due_date if last_inv != row.sinv_name else '',
+					row.sinv_date if last_inv != row.sinv_name else '',
+					row.customer  if last_inv != row.sinv_name else '',
+					row.net_total if last_inv != row.sinv_name else '',
+					row.gst_total if last_inv != row.sinv_name else '',
+					row.pst_total if last_inv != row.sinv_name else '',
+					row.grand_total if last_inv != row.sinv_name else .00,
+					row.p_posting_date if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else '-',
+					row.mode_of_payment if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else ' ',
+					row.allocated_amount if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
+					flt(row.grand_total) - flt(row.outstanding_amount) if last_inv != row.sinv_name else .00,
+					row.outstanding_amount if last_inv != row.sinv_name else .00,
+					row.payment_entry,
+					row.sinv_name if last_inv != row.sinv_name else '',
+					row.gprice,
+				)
+			)
+		else:
+			results.append(
+				(
+					# "",
+					# "",
+					# "",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					"",
+					row.p_posting_date,
+					row.mode_of_payment,
+					row.allocated_amount,
+					"",
+					"",
+					row.payment_entry,
+					"",
+					"",
+				)
+			)
+		last_inv = row.sinv_name
+		vim = vim_number
+		entry = row.payment_entry
+		pay_date = row.p_posting_date
+		mode = row.mode_of_payment
+	return results
 
 def get_formatted_column(label, fieldtype, width):
 	# [label]:[fieldtype/Options]:width
@@ -85,7 +211,6 @@ def get_conditions(filters):
 		conditions.append(
 			("Sales Invoice Item", "item_code", "=", filters.get('item_code'))
 		)
-	
 	sql_conditions = []
 
 	if not conditions:
@@ -106,15 +231,8 @@ def get_conditions(filters):
 		sql_conditions.append(sql_condition)
 
 	# frappe.errprint(conditions)
-	sql_query = " And ".join(sql_conditions)
-	sql_query += " Order By `tabSales Invoice`.name, `tabPayment Entry`.name"
+	return " And ".join(sql_conditions)
 	
-	if filters.get("limit"):
-		sql_query += " LIMIT %(limit)s"
-	
-	return sql_query
-
-
 def get_fields(filters):
 	"""
 	Return sql fields ready to be used on query
@@ -127,10 +245,29 @@ def get_fields(filters):
 		("Item", "year"),
 		("Item", "exterior_color"),
 		("Sales Invoice Item", "vim_number", "cont_vim"),
-		# ("IF(ISNULL(`tabSales Invoice Item`.vim_number), `tabSales Invoice Item`.item_code, `tabSales Invoice Item`.vim_number) as vim_number"),
 		("Sales Invoice Item", "item_name"),
+		("Sales Invoice", "due_date", "due_date"),
 		("Sales Invoice", "posting_date", "sinv_date"),
 		("Sales Invoice", "customer"),
+		("Sales Invoice", "net_total"),
+		("""
+			SUM(
+				IF(
+					`tabSales Taxes and Charges`.account_head != 'PST/QST receivable - 9.975%% - EZ',
+					IFNULL(`tabSales Taxes and Charges`.tax_amount, 0), 0
+				)
+			) as gst_total
+		"""
+		),
+		("""
+			SUM(
+				IF(
+					`tabSales Taxes and Charges`.account_head = 'PST/QST receivable - 9.975%% - EZ',
+					IFNULL(`tabSales Taxes and Charges`.tax_amount, 0), 0
+				)
+			) as pst_total
+		"""
+		),
 		("Sales Invoice", "grand_total"),
 		("Payment Entry", "posting_date", "p_posting_date"),
 		("Payment Entry", "mode_of_payment"),
@@ -138,6 +275,7 @@ def get_fields(filters):
 		("Sales Invoice", "outstanding_amount"),
 		("Payment Entry Reference", "parent", "payment_entry"),
 		("Sales Invoice", "name", "sinv_name"),
+		("Sales Invoice Item", "gprice"),
 	)
 		
 	sql_fields = []
@@ -146,7 +284,7 @@ def get_fields(filters):
 		sql_field = get_field(args)
 
 		sql_fields.append(sql_field)
-
+	frappe.errprint(", ".join(sql_fields))
 	return ", ".join(sql_fields)
 
 def get_field(args):
@@ -157,113 +295,12 @@ def get_field(args):
 	elif len(args) == 3:
 		doctype, fieldname, alias = args
 	else:
-		return args if isinstance(args, basestring) \
-			else " ".join(args)
+		return args
 
 	sql_field = "`tab{doctype}`.`{fieldname}` as {alias}" \
 		.format(doctype=doctype, fieldname=fieldname, alias=alias)
 
 	return sql_field
-
-def get_data(filters):
-	"""
-	Return the data that needs to be rendered
-	"""
-	fields = get_fields(filters)
-	conditions = get_conditions(filters)
-	results = []
-	data =  frappe.db.sql("""
-		Select
-			{fields}
-		From
-			`tabSales Invoice`
-		Inner Join
-			`tabSales Invoice Item`
-			On
-			`tabSales Invoice`.name = `tabSales Invoice Item`.parent
-			And 
-				`tabSales Invoice`.docstatus = 1
-		Inner Join
-			`tabItem`
-		On
-			`tabSales Invoice Item`.item_code = `tabItem`.item_code
-		Left Join
-			`tabPayment Entry Reference`
-			On
-			`tabPayment Entry Reference`.reference_name = `tabSales Invoice`.name
-			And
-				`tabPayment Entry Reference`.docstatus = 1
-		Left Join
-			`tabPayment Entry`
-			On
-			`tabPayment Entry Reference`.parent = `tabPayment Entry`.name
-			And 
-			`tabPayment Entry`.docstatus = 1
-		Where
-			{conditions}
-
-		""".format(fields=fields, conditions=conditions or "1 = 1"),
-	filters, as_dict=True, debug=False)
-	last_inv = ''
-	vim = ''
-	entry = ''
-	pay_date = ''
-	mode = ''
-	for row in data:
-		total_costs = flt(row.pinv_price) + flt(row.fee) + flt(row.transport) + \
-			flt(row.delivery) + flt(row.parts) + flt(row.repair) + flt(row.others)
-		vim_number = row.cont_vim.split('-')[0] if row.cont_vim and '-' in row.cont_vim else row.vim_number
-		details = "-" 
-		if row.model:
-			details = "{} {} {} {}".format(row.make, row.model, row.exterior_color, row.year)
-		elif row.cont_vim:
-			details = row.cont_vim.split("-")[1]
-	
-		frappe.errprint(row.vim_number)
-		if last_inv != row.sinv_name or vim_number != vim or entry != row.payment_entry:
-			results.append(
-				(
-					row.item_code,
-					vim_number,
-					details,
-					row.sinv_date,
-					row.customer ,
-					row.grand_total if last_inv != row.sinv_name else .00,
-					row.p_posting_date if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else '-',
-					row.mode_of_payment if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else ' ',
-					row.allocated_amount if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
-					flt(row.grand_total) - flt(row.outstanding_amount) if last_inv != row.sinv_name else .00,
-					row.outstanding_amount if last_inv != row.sinv_name else .00,
-					row.payment_entry,
-					row.sinv_name,
-				)
-			)
-		else:
-			results.append(
-				(
-					# "",
-					# "",
-					# "",
-					"",
-					"",
-					"",
-					"",
-					"",
-					row.p_posting_date,
-					row.mode_of_payment,
-					row.allocated_amount,
-					"",
-					"",
-					row.payment_entry,
-					"",
-				)
-			)
-		last_inv = row.sinv_name
-		vim = vim_number
-		entry = row.payment_entry
-		pay_date = row.p_posting_date
-		mode = row.mode_of_payment
-	return results
 
 # # Copyright (c) 2013, TZCODE SRL and contributors
 # # For license information, please see license.txt

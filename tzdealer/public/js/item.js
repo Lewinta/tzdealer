@@ -44,6 +44,7 @@ frappe.ui.form.on("Item", {
 		let reqd = frm.doc.item_type == "Containers"
 		if (reqd){
 			let fields = [
+			"eta",
 			"booking_supplier",
 			"booking_supplier_price",
 			"trucking_supplier",
