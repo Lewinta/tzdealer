@@ -1,6 +1,6 @@
 frappe.ui.form.on("Sales Invoice", {
 	refresh: frm => {
-		frm.trigger("set_queries");
+		// frm.trigger("set_queries");
 
 	},
 	date: frm => {
@@ -13,12 +13,17 @@ frappe.ui.form.on("Sales Invoice", {
 		frm.set_value("posting_date", date);
 
 	},
+	company: frm => {
+		frm.set_value("customer_group", "");
+		frm.trigger("set_queries");
+	},
 	set_queries: frm => {
 
 		frm.set_query("item_code", "items", () => {
 			return{
 				filters:{
-					"company": frm.doc.company
+					"company": frm.doc.company,
+					"is_sales_item": 1,
 				}
 			}
 		});
@@ -26,15 +31,14 @@ frappe.ui.form.on("Sales Invoice", {
 		frm.set_query("transaction_group",  event => {
 			return{
 				filters:{
-					"transaction_type": "Sales"
+					"transaction_type": "Sales",
+					"company": frm.doc.company,
 				}
 			}
 		});
 	},
 	transaction_group: frm => {
-
 		const {transaction_group, items} = frm.doc;
-		console.log("Fetching account");
 		frappe.db.get_value(
 			"Transaction Group",
 			transaction_group,
@@ -196,7 +200,6 @@ frappe.ui.form.on("Sales Invoice Item",  {
 		let df = frm.get_field("items").grid.docfields[2];
 		setTimeout( event => {
 			if(row.item_group == "Containers"){
-				console.log("is a container")
 				frappe.call(
 					"tzdealer.api.get_container_vims", 
 					{

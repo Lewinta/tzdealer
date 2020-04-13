@@ -9,7 +9,6 @@ frappe.query_reports["Supplier Age"] = {
 			"fieldtype": "Link",
 			"options": "Company",
 			"fieldname": "company",
-			"reqd": 1,
 		},
 		{
 			"label": __("From Date"),

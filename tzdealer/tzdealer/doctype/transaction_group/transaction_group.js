@@ -3,6 +3,20 @@
 
 frappe.ui.form.on('Transaction Group', {
 	refresh: function(frm) {
-
+		frm.trigger("set_queries");
+		
+	},
+	set_queries: frm => {
+		frm.set_query("account", function () {
+			return {
+				"filters": {
+					"company": frm.doc.company
+				}
+			}
+		});
+	},
+	company: frm => {
+		frm.set_value("account", "");
+		frm.trigger("set_queries");
 	}
 });

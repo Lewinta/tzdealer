@@ -22,18 +22,26 @@ def execute(filters=None):
 	for inv in invoice_list:
 		# invoice details
 		if last_inv != inv.name or last_vim != inv.item_code:
+			details = "-" 
+			if inv.model:
+				details = "{} {} {} {}".format(inv.make, inv.model, inv.exterior_color, inv.year)
+			# elif inv.cont_vim:
+			# 	details = inv.cont_vim.split("-")[1]
 			row = [
+				inv.company,
+				inv.item_code,
+				inv.vim_number,
+				details,
 				inv.due_date,
 				inv.posting_date,
 				inv.supplier,
-				inv.item_code,
-				inv.vim_number,
 				inv.invoice_type,
 				inv.total,
 				inv.gst_total,
 				inv.pst_total,
 				inv.grand_total,
 				inv.trans_type,
+				inv.payment_date or "",
 				inv.name,
 				inv.breakdown,
 				inv.paid_amount,
@@ -42,17 +50,20 @@ def execute(filters=None):
 			]
 		else:
 			row = [
-				"",
-				"",
+				"", # Company
+				"",	# Stock No.
+				"",	# Vim Number
+				"",	# Details
+				"", # Due Date
+				"", # Inv. Date
 				inv.supplier,
-				"",
-				"",
 				inv.invoice_type,
 				.000,
 				.000,
 				.000,
 				.000,
 				inv.trans_type,
+				inv.payment_date or "",
 				inv.name,
 				inv.breakdown,
 				.000,
@@ -68,17 +79,20 @@ def execute(filters=None):
 def get_columns(invoice_list):
 	"""return columns based on filters"""
 	columns = [
-		_("Due Date") 			+ ":Date:80",
-		_("Date") 				+ ":Date:80",
-		_("Supplier") 			+ ":Link/Supplier:180",
-		_("Item") 				+ ":Link/Item:105",
+		_("Company") 			+ ":Company:120",
+		_("Stock No.") 			+ ":Link/Item:120",
 		_("Vim Number") 		+ ":Data:150",
+		_("Details") 			+ ":Data:250",
+		_("Due Date") 			+ ":Date:80",
+		_("Inv.Date") 			+ ":Date:80",
+		_("Supplier") 			+ ":Link/Supplier:180",
 		_("Invoice Type") 		+ ":Link/Purchase Invoice:90",
 		_("Net Total") 			+ ":Currency/currency:120",
 		_("GST") 				+ ":Currency/currency:100",
 		_("PST") 				+ ":Currency/currency:100",
 		_("Grand Total") 		+ ":Currency/currency:120",
 		_("Trs. Type") 			+ ":Data:80",
+		_("Payment Date") 		+ ":Date:100",
 		_("Invoice") 			+ ":Link/Purchase Invoice:120",
 		_("Breakdown") 			+ ":Currency/currency:120",
 		_("Paid Amount") 		+ ":Currency/currency:120",
@@ -93,22 +107,24 @@ def get_conditions(filters):
 	# 	"user":frappe.session.user,
 	# 	"allow":"Company",
 	# }, "for_value")
-
-	conditions = " `viewPurchase Invoice`.company = '{}'".format(filters.get("company"))
+	conditions = ''
+	if filters.get("company"):
+		conditions = " `viewSupplier Age`.company = '{}'".format(filters.get("company"))
 	# conditions += " and IFNULL(`tabPayment Entry Reference`.allocated_amount, 0) >= 0"
 
-	# if filters.get("company"):
 		# conditions += " and company = %(company)s"
 	if filters.get("supplier"):
-		conditions += " and `viewPurchase Invoice`.supplier  = '{}'".format(filters.get("supplier"))
+		conditions += " and `viewSupplier Age`.supplier  = '{}'".format(filters.get("supplier"))
 	if filters.get("from_date"):
-		conditions += " and `viewPurchase Invoice`.posting_date >= '{}'".format(filters.get("from_date"))
+		conditions += " and `viewSupplier Age`.posting_date >= '{}'".format(filters.get("from_date"))
 	if filters.get("to_date"):
-		conditions += " and `viewPurchase Invoice`.posting_date <= '{}'".format(filters.get("to_date"))
+		conditions += " and `viewSupplier Age`.posting_date <= '{}'".format(filters.get("to_date"))
 	if filters.get("item_code"):
-		conditions += " and `viewPurchase Invoice`.item_code = '{}'".format(filters.get("item_code"))
+		conditions += " and `viewSupplier Age`.item_code = '{}'".format(filters.get("item_code"))
 	if filters.get("unpaid") == 1:
-		conditions += " and `viewPurchase Invoice`.outstanding_amount > 0"
+		if conditions:
+			conditions += " and "
+		conditions += " `viewSupplier Age`.outstanding_amount > 0"
 		
 	# if filters.get("limit"):
 	# 	conditions += " LIMIT {}".format(filters.get("limit"))
@@ -121,40 +137,46 @@ def get_invoices(filters):
 
 	return frappe.db.sql("""
 		SELECT 
-			`viewPurchase Invoice`.due_date,
-			`viewPurchase Invoice`.posting_date,
-			`viewPurchase Invoice`.supplier,
-			`viewPurchase Invoice`.item_code,
-			`viewPurchase Invoice`.vim_number,
-			`viewPurchase Invoice`.invoice_type,
+			`viewSupplier Age`.company,
+			`viewSupplier Age`.due_date,
+			`viewSupplier Age`.posting_date,
+			`viewSupplier Age`.supplier,
+			`viewSupplier Age`.item_code,
+			`viewSupplier Age`.make,
+			`viewSupplier Age`.model,
+			`viewSupplier Age`.exterior_color,
+			`viewSupplier Age`.year,
+			`viewSupplier Age`.vim_number,
+			`viewSupplier Age`.invoice_type,
 			IF(
 				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
-				`viewPurchase Invoice`.total * -1,
-				`viewPurchase Invoice`.total
+				`viewSupplier Age`.base_total * -1,
+				`viewSupplier Age`.base_total
 			) as total,
-			`viewPurchase Invoice`.gst_total,
-			`viewPurchase Invoice`.pst_total,
-			`viewPurchase Invoice`.name,
+			`viewSupplier Age`.gst_total,
+			`viewSupplier Age`.pst_total,
+			`viewSupplier Age`.name,
 			`tabPayment Entry Reference`.allocated_amount as breakdown,
 			IF(
 				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
-				`viewPurchase Invoice`.grand_total * -1,
-				`viewPurchase Invoice`.grand_total
+				`viewSupplier Age`.base_grand_total * -1,
+				`viewSupplier Age`.base_grand_total
 			) as grand_total,
-			`viewPurchase Invoice`.trans_type,
+			`viewSupplier Age`.trans_type,
 			IF(
 				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
 				`tabPayment Entry Reference`.allocated_amount,
-				`viewPurchase Invoice`.paid_amount
+				`viewSupplier Age`.paid_amount
 			) as paid_amount,
-			`viewPurchase Invoice`.outstanding_amount,
-			`tabPayment Entry Reference`.parent as pinv
+			`viewSupplier Age`.outstanding_amount,
+			`tabPayment Entry Reference`.parent as pinv,
+			`tabPayment Entry`.date as payment_date
 		FROM
-			`viewPurchase Invoice`
+			`viewSupplier Age`
 		Left Join
 			`tabPayment Entry Reference`
 			On
-			`tabPayment Entry Reference`.reference_name = `viewPurchase Invoice`.name
+			`tabPayment Entry Reference`.reference_name = `viewSupplier Age`.name
 			And
 				`tabPayment Entry Reference`.docstatus = 1
 		Left Join
@@ -166,6 +188,6 @@ def get_invoices(filters):
 		WHERE 
 			{conditions}  
 		ORDER BY 
-			`viewPurchase Invoice`.item_code, `viewPurchase Invoice`.posting_date ASC, `viewPurchase Invoice`.name ASC, `tabPayment Entry Reference`.parent
+			`viewSupplier Age`.item_code, `viewSupplier Age`.posting_date ASC, `viewSupplier Age`.name ASC, `tabPayment Entry Reference`.parent
 
-	""".format(conditions=conditions or "1 = 1"), debug=True, as_dict=True)
+	""".format(conditions=conditions or "1 = 1"), debug=False, as_dict=True)

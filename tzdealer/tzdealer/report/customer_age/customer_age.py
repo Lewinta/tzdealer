@@ -11,6 +11,7 @@ def execute(filters=None):
 
 def get_columns():
 	columns = (
+		("Company", "Data", 110),
 		("Stock No.", "Link/Item", 110),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
@@ -87,11 +88,10 @@ def get_data(filters):
 			`tabSales Invoice`.name, `tabPayment Entry Reference`.name
  		Order By 
  			`tabSales Invoice`.name, `tabPayment Entry`.name
-		LIMIT {limit}
 
 		""".format(
 				fields=fields,
-				conditions=conditions or "1 = 1", limit=filters.get('limit') or 100000),
+				conditions=conditions or "1 = 1"),
 		filters, as_dict=True, debug=True)
 	last_inv = ''
 	vim = ''
@@ -107,11 +107,12 @@ def get_data(filters):
 			details = "{} {} {} {}".format(row.make, row.model, row.exterior_color, row.year)
 		elif row.cont_vim:
 			details = row.cont_vim.split("-")[1]
-	
-		# frappe.errprint(row.vim_number)
+		
 		if last_inv != row.sinv_name or vim_number != vim or entry != row.payment_entry:
+			total_paid = sum([x.allocated_amount for x in filter(lambda x, n=row.sinv_name : x.get('sinv_name') == n, data)])
 			results.append(
 				(
+					row.company,
 					row.item_code,
 					vim_number,
 					details,
@@ -125,8 +126,9 @@ def get_data(filters):
 					row.p_posting_date if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else '-',
 					row.mode_of_payment if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else ' ',
 					row.allocated_amount if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
-					flt(row.grand_total) - flt(row.outstanding_amount) if last_inv != row.sinv_name else .00,
-					row.outstanding_amount if last_inv != row.sinv_name else .00,
+					# flt(row.grand_total) - flt(row.outstanding_amount) if last_inv != row.sinv_name else .00, # Total Paid
+					total_paid if last_inv != row.sinv_name else .00,
+					row.outstanding_amount if last_inv != row.sinv_name else .00, 
 					row.payment_entry,
 					row.sinv_name if last_inv != row.sinv_name else '',
 					row.gprice,
@@ -135,26 +137,24 @@ def get_data(filters):
 		else:
 			results.append(
 				(
-					# "",
-					# "",
-					# "",
-					"",
-					"",
-					"",
-					"",
-					"",
-					"",
-					"",
-					"",
-					"",
-					row.p_posting_date,
-					row.mode_of_payment,
-					row.allocated_amount,
-					"",
-					"",
-					row.payment_entry,
-					"",
-					"",
+					"", # Company
+					"", # Stock No.
+					"", # Vim Number
+					"", # Details
+					"", # Due Date
+					"", # Inv Date
+					"", # Customer 
+					"", # Sale N/ Total
+					"", # GST
+					"", # PST
+					row.p_posting_date, # Pay Date
+					row.mode_of_payment, # Payment Type
+					row.allocated_amount, # Breakdown
+					"", # Total Paid
+					"", # Outstanding
+					row.payment_entry, # Payment Entry
+					"", # Sales Inv.
+					"", #  GPrice
 				)
 			)
 		last_inv = row.sinv_name
@@ -186,15 +186,25 @@ def get_conditions(filters):
 
 	conditions = []
 
-
+	if filters.get('company'):
+		conditions.append(
+			("Sales Invoice", "company", "=", filters.get('company'))
+		)
+	
 	if filters.get('from_date'):
 		conditions.append(
 			("Sales Invoice", "posting_date", ">=", filters.get('from_date'))
+		)
+		conditions.append(
+			("Payment Entry", "posting_date", ">=", filters.get('from_date'))
 		)
 
 	if filters.get('to_date'):
 		conditions.append(
 			("Sales Invoice", "posting_date", "<=", filters.get('to_date'))
+		)
+		conditions.append(
+			("Payment Entry", "posting_date", "<=", filters.get('to_date'))
 		)
 
 	if filters.get('customer'):
@@ -238,6 +248,7 @@ def get_fields(filters):
 	Return sql fields ready to be used on query
 	"""
 	fields = (
+		("Sales Invoice", "company"),
 		("Sales Invoice Item", "item_code"),
 		("Item", "vim_number"),
 		("Item", "make"),

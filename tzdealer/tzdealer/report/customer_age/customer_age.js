@@ -5,32 +5,35 @@
 frappe.query_reports["Customer Age"] = {
 	"filters": [
 		{
+			"label": __("Company"),
+			"fieldtype": "Link",
+			"options": "Company",
+			"fieldname": "company",
+		},
+		{
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"fieldname": "from_date",
+			"reqd": 1,
 		},
 		{
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"fieldname": "to_date",
+			"reqd": 1,
 		},
 		{
 			"label": __("Customer"),
 			"fieldtype": "Link",
 			"fieldname": "customer",
 			"options": "Customer",
+
 		},
 		{
 			"label": __("Item Code"),
 			"fieldtype": "Link",
 			"fieldname": "item_code",
 			"options": "Item",
-		},
-		{
-			"label": __("Limit"),
-			"fieldtype": "Int",
-			"fieldname": "limit",
-			"default": 50,
 		},
 		{
 			"label": __("Show Unpaid Only?"),

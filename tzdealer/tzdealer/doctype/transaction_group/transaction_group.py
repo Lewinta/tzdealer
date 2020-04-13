@@ -7,4 +7,11 @@ import frappe
 from frappe.model.document import Document
 
 class TransactionGroup(Document):
-	pass
+	def validate(self):
+		acc_comp = frappe.db.get_value("Account", self.account, "company")
+		if acc_comp != self.company:
+			frappe.throw(
+				"The account <b>{account}</b> doesn't belong to <b>{company}</b>".format(
+					**self.as_dict()
+				)
+			)

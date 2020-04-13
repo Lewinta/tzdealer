@@ -4,20 +4,52 @@ frappe.ui.form.on("Purchase Invoice", {
 			frappe.show_not_permitted();
 
 		frm.trigger("reqd_transaction_group");
+		frm.trigger("set_queries");
 
-		frm.set_query("transaction_group",  event => {
-			return{
-				filters:{
-					"transaction_type": "Purchases"
-				}
-			}
-		});
+		
 	},
 	onload_post_render: frm => {
 		if(frm.is_new)
 			setTimeout( event => {
 				frm.set_value("posting_date", '')
 			}, 1000);
+	},
+	set_queries: frm => {
+		frm.set_query("transaction_group",  event => {
+			return{
+				filters:{
+					"transaction_type": "Purchases",
+					"company": frm.doc.company,
+				}
+			}
+		});
+
+		if (frm.doc.company)
+			frm.set_query("item_code", "items", () => {
+				return{
+					filters:{
+						"company": frm.doc.company,
+						"is_purchase_item": 1
+					}
+				}
+			});
+
+		frm.set_query("taxes_and_charges",  event => {
+			return{
+				filters:{
+					"company": frm.doc.company,
+				}
+			}
+		});
+		frm.set_query("transaction_group",  event => {
+			return{
+				filters:{
+					"transaction_type": "Purchases",
+					"company": frm.doc.company,
+				}
+			}
+		});
+
 	},
 	date: frm => {
 		const {date, posting_date} = frm.doc;
