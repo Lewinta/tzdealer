@@ -8,6 +8,7 @@ def on_submit(doc, event):
 
 	for tax in doc.taxes:
 		if tax.create_invoice:
+			tax = tax.update({"company": doc.company})
 			create_purchase_invoice(tax)
 
 def on_cancel(doc, event):
@@ -58,6 +59,8 @@ def create_purchase_invoice(row):
 		"account"
 	)
 
+	credit_to = frappe.get_value("Company", row.company, "default_payable_account")
+
 	if not account:
 		frappe.throw(
 			"Please set account for Transaction Group {}".format(
@@ -75,6 +78,7 @@ def create_purchase_invoice(row):
 		"company": frappe.db.get_value("Landed Cost Voucher", row.parent, "company"),
 		"due_date": add_days(inv_date, 30),
 		"update_stock": 0,
+		"credit_to": credit_to,
 		"set_posting_time": 1,
 		"bill_no": row.supplier_invoice or "",
 		"taxes_and_charges": row.tax or "",
@@ -94,10 +98,9 @@ def create_purchase_invoice(row):
 		"conversion_factor": 1,
 		"stock_uom": "Unit",
 		"stock_qty": 1,
-		"expense_account": "5330 - Transport Charges CAD - EZ",
+		"expense_account": account,
 		"rate": total if total else amount,
 	})
-
 	p_inv.set_missing_values()
 	if row.tax:
 		for r in get_taxes_and_charges(

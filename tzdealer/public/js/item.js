@@ -8,7 +8,6 @@ frappe.ui.form.on("Item", {
 		$.map([
 			"set_queries",
 			"add_custom_buttons",
-			"set_mandatory_fields",
 		], event => {
 			frm.trigger(event);
 		});
@@ -24,6 +23,7 @@ frappe.ui.form.on("Item", {
 		frm.trigger("item_type");
 		frm.trigger("validate_suppliers");
 		frm.trigger("create_item_name");
+		frm.trigger("validate_warehouse");
 	},
 	validate_suppliers: frm => {
 		const {item_type, trucking_supplier_price, loading_supplier_price} = frm.doc;
@@ -40,27 +40,36 @@ frappe.ui.form.on("Item", {
 		}
 
 	},
-	set_mandatory_fields: frm => {
-		let reqd = frm.doc.item_type == "Containers"
-		if (reqd){
-			let fields = [
-			"eta",
-			"booking_supplier",
-			"booking_supplier_price",
-			"trucking_supplier",
-			"trucking_supplier_price",
-			"loading_supplier",
-			"loading_supplier_price",
-			"destination",
-			"shipping_line",
-			]
-			$.map(fields, field => {
-				frm.toggle_reqd(field, reqd)
-			});
+	validate_warehouse: frm => {
+		let filters = {
+			"default": 1, 
+			"company": frm.doc.company, 
 		}
 
+		frappe.db.get_value("Warehouse", filters, "name", ({name}) => {
+			if(!name)
+				return
+			if(frm.doc.default_warehouse != name){
+				frappe.throw(`Invalid default warehouse for company ${name}`)
+				validated = false;
+			}
+		});
 	},
 	set_queries: frm => {
+		frm.set_query("income_account", function () {
+			return {
+				filters: {
+					"company": frm.doc.company
+				}
+			}
+		});
+		frm.set_query("expense_account", function () {
+			return {
+				filters: {
+					"company": frm.doc.company
+				}
+			}
+		});
 		frm.set_query("item_type", function () {
 			return {
 				filters: {
@@ -127,6 +136,8 @@ frappe.ui.form.on("Item", {
 	},
 	item_name: frm => {
 		frm.set_value("item_name", frm.doc.item_name.toUpperCase());
+		if (frm.doc.item_type == "Services")
+			frm.set_value("item_code", frm.doc.item_name.toUpperCase());
 	},
 	item_type: frm => {
 		let {item_type} = frm.doc;
@@ -142,7 +153,19 @@ frappe.ui.form.on("Item", {
 		frm.set_value("item_group", item_type);
 		frm.set_value("is_stock_item", maintain);
 		frm.trigger("set_df_fields");
-		frm.trigger("set_mandatory_fields");
+	},
+	company: frm => {
+		if(!frm.doc.company)
+			return
+		filters = {
+			"default": 1,
+			"company": frm.doc.company
+		}
+		frappe.db.get_value("Warehouse", filters, "name", ({name}) => {
+			if(!name)
+				return
+			frm.set_value("default_warehouse", name);
+		});
 	},
 	_default_supplier: frm => {
 		frm.set_value("default_supplier", frm.doc._default_supplier)
@@ -190,6 +213,10 @@ frappe.ui.form.on("Item", {
 				name = name.concat(" ", booking_no);
 			if (container_no)
 				name = name.concat("-", container_no);
+		}
+
+		if (frm.doc.item_type == "Services"){
+			name = frm.doc.item_name;
 		}
 
 		name = name.trim();
@@ -253,10 +280,14 @@ frappe.ui.form.on("Item", {
 		let clear_req = [];
 		let clear_enabled = [];
 		let reqd = {
-			"vehicles" : ["make", "model", "year", "vim_number", "exterior_color"],
-			"containers" : ["booking_no"],
-			"vehicle_parts" : ["part_type"],
+			"vehicles" : ["make", "model", "year", "vim_number", "exterior_color", "purchase_date", "default_supplier"],
+			"vehicle_parts" : ["part_type", "purchase_date"],
 			"services" : ["item_code"],
+			"containers" : [
+				"booking_no", "purchase_date", "eta", "booking_supplier",
+				"booking_supplier_price", "trucking_supplier", "trucking_supplier_price", "loading_supplier",
+				"loading_supplier_price","destination", "shipping_line",
+			],
 		}
 		let disable = {
 			"vehicles" : ["item_name", "item_code"],
@@ -286,8 +317,7 @@ frappe.ui.form.on("Item", {
 		frm.toggle_enable(disable[selection], false);
 
 		frm.toggle_display("item_code", selection == "vehicle_parts");
-
-
+		frm.toggle_display("purchase_date", selection != "services");
 	}
 });
 

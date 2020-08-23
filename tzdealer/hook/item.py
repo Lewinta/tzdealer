@@ -1,7 +1,11 @@
 import frappe
 from frappe.model.naming import make_autoname
+import json 
+import requests
+from frappe.utils import flt
 
 def before_insert(doc, event):
+	frappe.errprint(doc.item_code)
 	if doc.item_type == "Vehicle Parts" and  not doc.item_code:
 		doc.item_code = make_autoname("PART-.########") 
 
@@ -10,6 +14,9 @@ def before_insert(doc, event):
 
 	if doc.item_type == "Vehicles":
 		doc.item_code = make_autoname("VEH-.########") 
+
+	if doc.item_type == "Services" and  not doc.item_code:
+		doc.item_code = make_autoname("SER-.########") 
 
 	if doc.item_type == "Vehicles":
 		doc.item_number = frappe.db.sql("""
@@ -21,6 +28,7 @@ def before_insert(doc, event):
 def validate(doc, event):
 	generate_description(doc, event)
 	update_exterior_color(doc)
+	post_to_website(doc)
 
 def generate_description(doc, event):
 	desc = """<b>MAKE:&nbsp;</b>{make}<br>
@@ -48,3 +56,36 @@ def update_exterior_color(doc):
 		item.exterior_color = doc.exterior_color
 		item.db_update()
 
+def post_to_website(doc):
+	if doc.item_type != "Vehicles" or not doc.website_post:
+		return
+	wc = frappe.get_single("Website Connector")
+	wc.sync(cast_to_post(doc), doc.item_code, doc.website_id)
+	
+
+def get_sales_price(item_code):
+	revenue_rate   = frappe.db.get_single_value("Configuration", "default_revenue_rate") or .000
+	valuation_rate = frappe.db.get_value("Bin", {"item_code":item_code}, "valuation_rate") or .000
+	return flt(valuation_rate) * ((flt(revenue_rate) / 100) + 1)
+
+
+def cast_to_post(doc):
+	return json.dumps({
+	# _auto_color_int
+	"title": doc.item_name,
+	"content": doc.item_name,
+	"status": "publish",
+	"type": "pixad-autos",
+	"_auto_condition": "Used",
+	"_auto_doors": doc.doors,
+	"_auto_engine": doc.engine,
+	"_auto_fuel": doc.fuel_type,
+	"_auto_make": doc.make,
+	"_auto_mileage": doc.odometer_value,
+	"_auto_price": get_sales_price(doc.item_code),
+	"_auto_sale_price": get_sales_price(doc.item_code),
+	"_auto_seats": doc.seat_no,
+	"_auto_transmission": doc.gear,
+	"_auto_vin": doc.vim_number,
+	"_auto_year": doc.year,
+})

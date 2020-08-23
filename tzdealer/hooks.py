@@ -205,6 +205,9 @@ fixtures = [
 					"Item-exterior_color",
 					"Item-year",
 					"Item-make",
+					"Sales Partner-company",
+					"Sales Partner-tax_id",
+					"Sales Partner-phone_number",
 				)
 			)
 		}
@@ -287,6 +290,7 @@ doc_events = {
 	"Sales Invoice": {
 		"validate": "tzdealer.hook.sales_invoice.validate",
 		"on_submit": "tzdealer.hook.sales_invoice.on_submit",
+		"on_cancel": "tzdealer.hook.sales_invoice.on_cancel",
 	},
 	"Sales Order": {
 		"validate": "tzdealer.hook.sales_order.check", 
@@ -297,13 +301,17 @@ doc_events = {
 		"on_trash": "tzdealer.hook.landed_cost_voucher.on_trash",
 	},
 	"Purchase Invoice":{
+		"validate": "tzdealer.hook.purchase_invoice.validate",
 		"on_cancel": "tzdealer.hook.purchase_invoice.on_cancel",
 	},
 	"Journal Entry":{
 		"validate": "tzdealer.hook.journal_entry.validate",
-	}	,
+	},
 	"Warehouse":{
 		"validate": "tzdealer.hook.warehouse.validate",
+	},
+	"Sales Partner":{
+		"after_insert": "tzdealer.hook.sales_partner.after_insert",
 	}	
 }
 

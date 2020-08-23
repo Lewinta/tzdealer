@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Customer Age"] = {
+frappe.query_reports["Customer Age Summary"] = {
 	"filters": [
 		{
 			"label": __("Company"),
@@ -43,9 +43,9 @@ frappe.query_reports["Customer Age"] = {
 		},
 	],
 	onload: function(report) {
-		report.page.add_inner_button(__("Customer Age Summary"), function() {
+		report.page.add_inner_button(__("Customer Age"), function() {
 			var filters = report.get_values();
-			frappe.set_route('query-report', 'Customer Age Summary', {
+			frappe.set_route('query-report', 'Customer Age', {
 				company: filters.company,
 				from_date: filters.from_date,
 				to_date: filters.to_date,
@@ -55,28 +55,14 @@ frappe.query_reports["Customer Age"] = {
 			});
 		});
 	},
-	// formatter: function(row, cell, value, columnDef, dataContext) {
-	// 	if (new Array(1, 2, 11, 12).includes(cell)) {
-	// 		route = value.split(":")[0]
-	// 		return `<a class="grey" href="#Form/${columnDef.df.options}/${route}" data-doctype="Item">${value}</a>`;
-	// 	} 
-		
-	// 	if(new Array(5, 8, 9, 10).includes(cell)) {
-	// 		value = frappe.format(value, {
-	// 			fieldtype: "Currency",
-	// 			precision: 2,
-	// 		});
-	// 		return this.left_align(row, cell, value, columnDef, dataContext);
-	// 	}
+	formatter: function (row, cell, value, columnDef, dataContext, default_formatter) {
+		value = default_formatter(row, cell, value, columnDef, dataContext);
 
-	// 	return `<span style="padding-left: 10px;">${value}</span>`;	
-	// },
-	// left_align: function(row, cell, value, columnDef, dataContext) {
-	// 	const stylesheet = [
-	// 		"text-align: right !important;",
-	// 		"display: block;",
-	// 	].join(" ");
+		if (cell == 18) {
+			value = `<a class="grey" target="_blank" href="#List/Payment Entry/?reference_name=${dataContext["Sales Inv."]}&docstatus=1"><b>${value}</b></a>`;
+			
+		}
 
-	// 	return `<span style="${stylesheet}">${value || ""}</span>`;
-	// },
+		return value;
+	}
 }

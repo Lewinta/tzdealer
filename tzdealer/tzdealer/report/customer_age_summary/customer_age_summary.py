@@ -6,6 +6,11 @@ import frappe
 from frappe import _
 from frappe.utils import cstr, flt
 
+mop_1 = frappe.get_list("Mode of Payment", as_list=True, limit=4)[0][0]
+mop_2 = frappe.get_list("Mode of Payment", as_list=True, limit=4)[1][0]
+mop_3 = frappe.get_list("Mode of Payment", as_list=True, limit=4)[2][0]
+mop_4 = frappe.get_list("Mode of Payment", as_list=True, limit=4)[3][0]
+
 def execute(filters=None):
 	return get_columns(), get_data(filters)
 
@@ -15,23 +20,20 @@ def get_columns():
 		("Stock No.", "Link/Item", 110),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
-		# ("Model", "Data", 100),
-		# ("Year", "Data", 60),
-		# ("Color", "Data", 70),
 		("Due Date", "Date", 90),
 		("Inv. Date", "Date", 90),
-		("Customer", "Link/Customer", 130),
+		("Customer", "Link/Customer", 160),
 		("Sale N/Total", "Currency", 100),
 		("GST", "Currency", 100),
 		("PST", "Currency", 100),
 		("Sale G/Total CAD", "Currency", 150),
 		("Sale G/Total USD", "Currency", 150),
-		("Pay Date", "Date", 90),
-		("Payment Type", "Data", 100),
-		("Breakdown", "Currency", 100),
+		(mop_1, "Currency", len(mop_1) * 9),
+		(mop_2, "Currency", len(mop_2) * 9),
+		(mop_3, "Currency", len(mop_3) * 9),
+		(mop_4, "Currency", len(mop_4) * 9),
 		("Total Paid", "Currency", 100),
 		("Outstanding", "Currency", 100),
-		("Payment Entry", "Link/Payment Entry", 100),
 		("Sales Inv.", "Link/Sales Invoice", 100),
 		("G Price", "Currency", 100),
 		("VEH Status", "Data", 100),
@@ -104,16 +106,16 @@ def get_data(filters):
 		Where
 			{conditions}
 		Group By 
-			`tabSales Invoice`.name, `tabPayment Entry Reference`.name
+			`tabSales Invoice`.name
  		Order By 
- 			`tabSales Invoice`.name, `tabPayment Entry`.name
+ 			`tabSales Invoice`.name
 
 		""".format(
 				fields=fields,
 				sinv_date=sinv_date,
 				pinv_date=pinv_date,
 				conditions=conditions or "1 = 1"),
-		filters, as_dict=True, debug=False)
+		filters, as_dict=True, debug=True)
 	last_inv = ''
 	vim = ''
 	entry = ''
@@ -126,14 +128,17 @@ def get_data(filters):
 		details = "-" 
 		if row.invoice_type == "Vehicles":
 			details = "{} {} {} {}".format(row.make, row.model, row.exterior_color, row.year)
-		if row.cont_vim:
-			details = row.cont_vim.split("-")[1]
+		if row.invoice_type == "Containers":
+			details = "{} {}".format(row.booking_no or "", row.container_no or "")
+		# if row.cont_vim:
+		# 	details = row.cont_vim.split("-")[1]
 		if row.invoice_type == "Parts":
 			details = row.part_type
 		
 		if last_inv != row.sinv_name or vim_number != vim or entry != row.payment_entry:
 			paid_arr = [flt(x.allocated_amount) for x in filter(lambda x, n=row.sinv_name : x.get('sinv_name') == n, data)]
 			total_paid = sum(paid_arr) if paid_arr else .00
+			
 			results.append(
 				(
 					row.company,
@@ -148,13 +153,13 @@ def get_data(filters):
 					row.pst_total if last_inv != row.sinv_name else '',
 					row.base_grand_total if last_inv != row.sinv_name else .00,
 					row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00,
-					row.p_posting_date if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else '-',
-					row.mode_of_payment if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else ' ',
-					row.allocated_amount if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
+					row.mop_1 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
+					row.mop_2 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
+					row.mop_3 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
+					row.mop_4 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
 					# flt(row.grand_total) - flt(row.outstanding_amount) if last_inv != row.sinv_name else .00, # Total Paid
-					total_paid if last_inv != row.sinv_name else .00,
+					row.mop_1 + row.mop_2 + row.mop_3 + row.mop_4,
 					row.outstanding_amount if last_inv != row.sinv_name else .00, 
-					row.payment_entry,
 					row.sinv_name if last_inv != row.sinv_name else '',
 					row.gprice,
 					row.status,
@@ -174,7 +179,6 @@ def get_data(filters):
 					"", # Sale N/ Total
 					"", # GST
 					"", # PST
-					row.p_posting_date, # Pay Date
 					row.mode_of_payment, # Payment Type
 					row.allocated_amount, # Breakdown
 					"", # Total Paid
@@ -264,6 +268,8 @@ def get_fields(filters):
 		("Item", "vim_number"),
 		("Item", "make"),
 		("Item", "model"),
+		("Item", "booking_no"),
+		("Item", "container_no"),
 		("Item", "part_type"),
 		("Item", "year"),
 		("Item", "exterior_color"),
@@ -297,7 +303,33 @@ def get_fields(filters):
 		("Sales Invoice", "grand_total"),
 		("Payment Entry", "posting_date", "p_posting_date"),
 		("Payment Entry", "mode_of_payment"),
-		("Payment Entry Reference", "allocated_amount"),
+		("""
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_1,
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_2,
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_3,
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_4
+		""".format(mop_1, mop_2, mop_3, mop_4)
+		),
 		("Sales Invoice", "outstanding_amount"),
 		("Payment Entry Reference", "parent", "payment_entry"),
 		("Sales Invoice", "name", "sinv_name"),

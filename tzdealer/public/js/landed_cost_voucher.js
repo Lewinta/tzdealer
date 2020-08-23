@@ -10,7 +10,16 @@ frappe.ui.form.on("Landed Cost Voucher", {
 		frm.set_query("transaction_group", "taxes", event => {
 			return {
 				"filters":{
-					"transaction_type": "Purchases"
+					"transaction_type": "Purchases",
+					"company": frm.doc.company,
+				}
+			}
+		});
+
+		frm.set_query("tax", "taxes", event => {
+			return {
+				"filters":{
+					"company": frm.doc.company,
 				}
 			}
 		});

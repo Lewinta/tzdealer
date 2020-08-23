@@ -19,19 +19,27 @@ frappe.ui.form.on("Sales Invoice", {
 	},
 	set_queries: frm => {
 
-		frm.set_query("item_code", "items", () => {
-			return{
-				filters:{
-					"company": frm.doc.company,
-					"is_sales_item": 1,
+			frm.set_query("item_code", "items", () => {
+				return{
+					filters:{
+						"company": frm.doc.company,
+						"is_sales_item": 1,
+					}
 				}
-			}
-		});
+			});
 
 		frm.set_query("transaction_group",  event => {
 			return{
 				filters:{
 					"transaction_type": "Sales",
+					"company": frm.doc.company,
+				}
+			}
+		});
+
+		frm.set_query("commission_tax",  event => {
+			return{
+				filters:{
 					"company": frm.doc.company,
 				}
 			}
@@ -184,20 +192,21 @@ frappe.ui.form.on("Sales Invoice", {
 });
 
 frappe.ui.form.on("Sales Invoice Item",  {
-	item_add: (frm, cdt, cdn) => {
-		let {account} = frm.doc;
-
-		if (!account)
-			return
-
-		setTimeout(event =>{
-			frappe.model.set_value(cdt, cdn, "income_account", account);
-		}, 500);
-	},
 	item_code: (frm, cdt, cdn) => {
-		let {account} = frm.doc;
+		let {account, company} = frm.doc;
 		let row = frappe.model.get_doc(cdt,cdn);
-		let df = frm.get_field("items").grid.docfields[2];
+		let df  = frm.get_field("items").grid.docfields[2];
+		let  filters = {
+			"company": company,
+			"default": 1
+		}
+		if (!row.item_code)
+			return 
+		if (!company){
+			frappe.throw("Please set a valid company in order to choose an Item ");
+			frappe.model.set_value(cdt, cdn, "item_code", "");
+		}
+
 		setTimeout( event => {
 			if(row.item_group == "Containers"){
 				frappe.call(
@@ -221,12 +230,13 @@ frappe.ui.form.on("Sales Invoice Item",  {
 
 			}
 			
-			if (!account)
-				return
-			setTimeout(event =>{
-				frappe.model.set_value(cdt, cdn, "income_account", account);
-			}, 500);
+			frappe.db.get_value("Warehouse", filters, "name",({name}) => {
+				if(!name)
+					return
+				frappe.model.set_value(cdt, cdn, "warehouse", name);
+			});
 
+			frappe.model.set_value(cdt, cdn, "income_account", account);
 			frm.refresh_field("items");
 		}, 600);
 	},
@@ -234,6 +244,7 @@ frappe.ui.form.on("Sales Invoice Item",  {
 		frm.trigger("refresh_gprice");
 	},
 });
+
 
 frappe.ui.form.on("Sales Taxes and Charges",  {
 	taxes_add: (frm, cdt, cdn) => {

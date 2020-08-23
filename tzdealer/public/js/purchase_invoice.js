@@ -117,20 +117,13 @@ frappe.ui.form.on("Purchase Invoice", {
 
 	},
 	validate: frm => {
+		
 		frm.trigger("invoice_type");
+		frm.trigger("update_expense_account_items");
 		let {account, items, date} = frm.doc;
 
 		frm.set_value("posting_date", date);
 		
-		if (!account)
-			return
-
-		$.map(items, item => {
-			if (item.expense_account != account){
-				frappe.msgprint("Invalid Transaction Group on row " + item.idx);
-				validated = false;
-			}
-		});
 	},
 	is_opening: frm => {
 		frm.trigger("reqd_transaction_group");
