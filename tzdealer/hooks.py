@@ -211,7 +211,8 @@ fixtures = [
 				)
 			)
 		}
-	},{
+	},
+	{
 		"doctype": "Print Format",
 		"filters": {
 			"name": (
@@ -228,6 +229,20 @@ fixtures = [
 					"Tax Invoice",
 					"GST Tax Invoice",
 					"Simplified Tax Invoice",
+				)
+			)
+		}
+	},
+	{
+		"doctype": "Property Setter",
+		"filters": {
+			"name": (
+				"in", (
+					"Sales Invoice-commission_rate-allow_on_submit",
+					"Sales Invoice-sales_partner-allow_on_submit",
+					"Sales Invoice-total_commission-allow_on_submit",
+					"Sales Invoice-base_in_words-allow_on_submit",
+					"Sales Invoice-in_words-allow_on_submit",
 				)
 			)
 		}
@@ -291,6 +306,7 @@ doc_events = {
 		"validate": "tzdealer.hook.sales_invoice.validate",
 		"on_submit": "tzdealer.hook.sales_invoice.on_submit",
 		"on_cancel": "tzdealer.hook.sales_invoice.on_cancel",
+		"on_update_after_submit": "tzdealer.hook.sales_invoice.on_update_after_submit",
 	},
 	"Sales Order": {
 		"validate": "tzdealer.hook.sales_order.check", 

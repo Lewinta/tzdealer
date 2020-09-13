@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import frappe
 from erpnext.controllers.accounts_controller import get_taxes_and_charges
 from frappe.utils import add_days
+import json
 
 def validate(doc, event):
 	if doc.customer != doc.title:
@@ -17,6 +18,15 @@ def validate(doc, event):
 	for item in doc.items:
 		if not item.expense_account:
 			item.expense_account = expense_account
+
+def on_update_after_submit(doc, event):
+	if has_commission_invoice(doc.name):
+		inv = frappe.get_doc("Purchase Invoice", {"bill_no": doc.name})
+		frappe.msgprint("""This invoice already has commision invoice 
+			<b><a href='/Form/Purchase Invoice/{0}'>{0}</a></b>""".format(inv)
+		)
+	else:
+		create_comission_invoice(doc)
 
 def on_submit(doc, event):
 	# When submitting an invoice we need to update the last sold price
@@ -33,7 +43,7 @@ def on_submit(doc, event):
 	create_comission_invoice(doc)
 
 def on_cancel(doc, event):
-	if frappe.db.exists("Purchase Invoice", {"bill_no": doc.name}):
+	if has_commission_invoice(doc.name):
 		pinv = frappe.get_doc("Purchase Invoice", {"bill_no": doc.name})
 		if pinv.docstatus == 1 and pinv.paid_amount == 0:
 			pinv.cancel()
@@ -45,6 +55,9 @@ def on_cancel(doc, event):
 				and has payments, 
 			""".format(**pinv.as_dict()))
 
+@frappe.whitelist()
+def has_commission_invoice(sinv_name):
+	return frappe.db.exists("Purchase Invoice", {"bill_no": sinv_name})
 
 def create_or_update_item_price(doc):
 	from frappe import db, new_doc, get_doc
@@ -113,6 +126,11 @@ def create_comission_invoice(doc):
 	pinv.calculate_taxes_and_totals()
 	pinv.save()
 	pinv.submit()
+	# For some reason ERPNext decides to clear in_words and base_in_words field
+	# and not setting them back, let's do it manually
+	doc.set_total_in_words()
+	doc.commission_invoice = pinv.name
+	doc.db_update()
 
 	frappe.msgprint("""
 		A Commission invoice has been created for Sales Partner <b>{}</b><br>

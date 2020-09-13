@@ -1,6 +1,6 @@
 frappe.ui.form.on("Sales Invoice", {
 	refresh: frm => {
-		// frm.trigger("set_queries");
+		$.map(["set_queries", "has_commission_invoice"], event => frm.trigger(event));
 
 	},
 	date: frm => {
@@ -36,7 +36,6 @@ frappe.ui.form.on("Sales Invoice", {
 				}
 			}
 		});
-
 		frm.set_query("commission_tax",  event => {
 			return{
 				filters:{
@@ -54,7 +53,6 @@ frappe.ui.form.on("Sales Invoice", {
 				if(!account)
 					frappe.throw(_("Please set an account for Transaction Group "+ transaction_group));
 				
-				console.log("Found "+ account);
 				frm.set_value("account", account);
 				
 				if (!items )
@@ -87,6 +85,21 @@ frappe.ui.form.on("Sales Invoice", {
 			// },400)
 		]);
 
+	},
+	has_commission_invoice: frm => {
+		let _callback = function (response) {
+			let cond = response && response.message;
+			$.map(
+				["sales_partner", "commission_tax", "commission_rate", "total_commission"],
+				field => frm.set_df_property(field, "read_only", !!cond)
+			)
+		}
+		let opts = {
+			"method": "tzdealer.hook.sales_invoice.has_commission_invoice",
+			"args": {"sinv_name":cur_frm.doc.name},
+			"callback": _callback,
+		}
+		frappe.call(opts)
 	},
 	is_opening: frm => {
 		frm.trigger("reqd_transaction_group");
@@ -223,7 +236,6 @@ frappe.ui.form.on("Sales Invoice Item",  {
 				);
 			}
 			else{
-				console.log(row.item_group+ " is not a container for item "+ row.item_code)
 				row.vim_number = '';
 				df.reqd = 0;
 				frm.refresh_field("items");
