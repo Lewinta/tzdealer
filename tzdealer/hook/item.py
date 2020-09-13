@@ -89,3 +89,33 @@ def cast_to_post(doc):
 	"_auto_vin": doc.vim_number,
 	"_auto_year": doc.year,
 })
+
+
+@frappe.whitelist()
+def address_by_supplier(doctype, txt, searchfield, start, page_len, filters):
+
+	if not filters.get("supplier"): 
+		return []
+
+	result = frappe.db.sql("""
+		SELECT
+			`tabAddress`.name,
+			`tabAddress`.address_title,
+			`tabDynamic Link`.link_name
+		FROM
+			`tabDynamic Link`
+		JOIN
+			`tabAddress`
+		ON
+			`tabAddress`.name =	`tabDynamic Link`.parent
+		WHERE
+			`tabDynamic Link`.link_doctype = 'Supplier'
+		AND
+			`tabDynamic Link`.link_name = '{1}'
+		AND
+			`tabAddress`.address_title LIKE '%{0}%'
+		ORDER BY 
+			`tabAddress`.address_title LIMIT 20
+	""".format("%".join(txt.split()), filters.get("supplier")), as_dict=True)
+	
+	return [[row.name, "{1} - {0}".format(row.address_title, row.link_name)] for row in result]

@@ -132,11 +132,12 @@ def get_columns(filters):
 	"""
 	cols_obj = {
 		"Stock Report":(
+			("Company", "company", "Data", 120),
 			("ETA", "eta", "Date", 90),
 			("Due Date", "d_date", "Date", 90),
 			("Purchase Date", "p_date", "Date", 90),
 			("Supplier", "supplier", "Link/Supplier", 150),
-			("Vim Number", "vim_number", "Link/Item", 150),
+			("Vim Number", "vim_number", "Data", 150),
 			("Model", "model", "Data", 80),
 			("Year", "year", "Data", 80),
 			("Item Code", "item_code", "Link/Item", 110),
@@ -149,17 +150,21 @@ def get_columns(filters):
 			("Shipping Line", "shipping_line", "Data", 110),
 		),
 		"Sold Report":(
+			("Company", "company", "Data", 120),
 			("ETA", "eta", "Date", 90),
 			("Due Date", "d_date", "Date", 90),
 			("Sold Date", "p_date", "Date", 90),
 			("Customer", "customer", "Link/Customer", 150),
-			("Vim Number", "vim_number", "Link/Item", 150),
+			("Vim Number", "vim_number", "Data", 150),
 			("Make", "make", "Data", 80),
 			("Year", "year", "Data", 80),
 			("Item Code", "item_code", "Link/Item", 110),
 			("Booking No.", "booking", "Data", 120),
 			("Container", "container", "Data", 110),
 			("Price", "price", "Currency", 90),
+			("Cost CAD", "cost", "Float", 90),
+			("Cost USD", "cost", "Float", 90),
+			("LCV", "lcv", "Float", 90),
 			("Purchased Qty", "qty", "Int", 100),
 			("Sales Inv.", "purchase_name", "Link/Sales Invoice", 110),
 			("Shipping Line", "shipping_line", "Data", 110),
@@ -183,6 +188,7 @@ def get_fields(filters):
 	"""
 	fields_obj = {
 		"Stock Report":  (
+			("Purchase Invoice", "company"),
 			("Item", "eta"),
 			("Purchase Invoice", "due_date"),
 			("Purchase Invoice", "posting_date"),
@@ -200,6 +206,7 @@ def get_fields(filters):
 			("Item", "shipping_line"),
 		),
 		"Sold Report":(
+			("Sales Invoice", "company"),
 			("Item", "eta"),
 			("Sales Invoice", "due_date"),
 			("Sales Invoice", "posting_date"),
@@ -211,6 +218,9 @@ def get_fields(filters):
 			("Item", "booking_no"),
 			("Item", "container_no"),
 			("Sales Invoice Item", "amount"),
+			("(SELECT pinv_base_amount from `viewItem Pricing` where item_code = `tabItem`.item_code) as cost"),
+			("(SELECT pinv_amount from `viewItem Pricing` where item_code = `tabItem`.item_code) as cost"),
+			("(SELECT lcv from `viewItem Pricing` where item_code = `tabItem`.item_code) as lcv"),
 			("Sales Invoice Item", "qty"),
 			("Sales Invoice", "name"),
 			("Item", "shipping_line"),

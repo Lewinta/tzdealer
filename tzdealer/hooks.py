@@ -312,6 +312,10 @@ doc_events = {
 	},
 	"Sales Partner":{
 		"after_insert": "tzdealer.hook.sales_partner.after_insert",
+	},
+	"Address":{
+		"autoname": "tzdealer.hook.address.autoname",
+		"validate": "tzdealer.hook.address.validate",
 	}	
 }
 

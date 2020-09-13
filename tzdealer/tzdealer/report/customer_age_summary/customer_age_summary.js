@@ -58,7 +58,12 @@ frappe.query_reports["Customer Age Summary"] = {
 	formatter: function (row, cell, value, columnDef, dataContext, default_formatter) {
 		value = default_formatter(row, cell, value, columnDef, dataContext);
 
-		if (cell == 18) {
+		if (cell == 2 && value) {
+			_name = value.split('-')[0]
+			value = `<a class="grey" target="_blank" href="#Form/Supplier/${_name}"">${value}</a>`;
+		}
+
+		if (cell == 19) {
 			value = `<a class="grey" target="_blank" href="#List/Payment Entry/?reference_name=${dataContext["Sales Inv."]}&docstatus=1"><b>${value}</b></a>`;
 			
 		}

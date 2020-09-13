@@ -12,6 +12,7 @@ def execute(filters=None):
 def get_columns():
 	return [
 		_("Company") 		+ ":Company:120",
+		_("Location") 		+ ":Company:230",
 		_("Status") 		+ ":Data:100",
 		_("Title") 			+ ":Data:100",
 		_("Item Group") 	+ ":Data:90",
@@ -29,6 +30,7 @@ def get_data(filters=None):
 	return frappe.db.sql("""
 		SELECT
 			`tabItem`.company,
+			CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location,
 			`tabItem`.status,
 			`tabItem`.title_status,
 			`tabItem`.item_group,
@@ -62,6 +64,10 @@ def get_data(filters=None):
 			`tabItem`.item_code = `tabSales Invoice Item`.item_code
 		AND
 			`tabSales Invoice Item`.docstatus = 1 	
+		LEFT JOIN
+			`tabAddress`
+		ON
+			`tabItem`.location = `tabAddress`.name
 		WHERE	
 			`tabItem`.item_type = 'Vehicles'
 		
@@ -69,6 +75,7 @@ def get_data(filters=None):
 
 		SELECT
 			`tabItem`.company,
+			CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location,
 			`tabItem`.status,
 			`tabItem`.title_status,
 			`tabItem`.item_group,
@@ -108,6 +115,10 @@ def get_data(filters=None):
 			`tabItem Description`.vim_number = SUBSTRING_INDEX(`tabSales Invoice Item`.vim_number, '-', 1) 
 		AND
 			`tabSales Invoice Item`.docstatus = 1
+		LEFT JOIN
+			`tabAddress`
+		ON
+			`tabItem`.location = `tabAddress`.name
 		WHERE	
 			`tabItem`.item_type = 'Containers'
 

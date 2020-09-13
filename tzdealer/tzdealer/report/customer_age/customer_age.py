@@ -11,7 +11,8 @@ def execute(filters=None):
 
 def get_columns():
 	columns = (
-		("Company", "Data", 110),
+		("Company", "Data", 120),
+		("S. Location", "Data", 230),
 		("Stock No.", "Link/Item", 110),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
@@ -101,6 +102,10 @@ def get_data(filters):
 		And 
 			`tabPayment Entry`.docstatus = 1
 		{pinv_date}
+		Left Join
+			`tabAddress`
+		On
+			`tabItem`.location = `tabAddress`.name
 		Where
 			{conditions}
 		Group By 
@@ -137,6 +142,7 @@ def get_data(filters):
 			results.append(
 				(
 					row.company,
+					row.location,
 					row.item_code,
 					vim_number,
 					details,
@@ -165,6 +171,7 @@ def get_data(filters):
 			results.append(
 				(
 					"", # Company
+					"", # Location
 					"", # Stock No.
 					"", # Vim Number
 					"", # Details
@@ -260,6 +267,7 @@ def get_fields(filters):
 	"""
 	fields = (
 		("Sales Invoice", "company"),
+		("CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location"),
 		("Sales Invoice Item", "item_code"),
 		("Item", "vim_number"),
 		("Item", "make"),

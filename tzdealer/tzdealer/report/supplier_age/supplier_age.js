@@ -32,12 +32,6 @@ frappe.query_reports["Supplier Age"] = {
 			"fieldname": "item_code",
 			"options": "Item",
 		},
-		// {
-		// 	"label": __("Limit"),
-		// 	"fieldtype": "Int",
-		// 	"fieldname": "limit",
-		// 	"default": 50,
-		// },
 		{
 			"label": __("Show Unpaid Only?"),
 			"fieldtype": "Check",
@@ -45,4 +39,17 @@ frappe.query_reports["Supplier Age"] = {
 			"default": 1,
 		},
 	],
+	onload: function(report) {
+		report.page.add_inner_button(__("Supplier Age Summary"), function() {
+			var filters = report.get_values();
+			frappe.set_route('query-report', 'Supplier Age Summary', {
+				company: filters.company,
+				from_date: filters.from_date,
+				to_date: filters.to_date,
+				supplier: filters.supplier,
+				unpaid: filters.unpaid,
+				item_code: filters.item_code,
+			});
+		});
+	},
 }

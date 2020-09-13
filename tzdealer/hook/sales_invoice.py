@@ -113,6 +113,7 @@ def create_comission_invoice(doc):
 	pinv.calculate_taxes_and_totals()
 	pinv.save()
 	pinv.submit()
+
 	frappe.msgprint("""
 		A Commission invoice has been created for Sales Partner <b>{}</b><br>
 		<b><a href='/desk#Form/Purchase Invoice/{}'>{}</a></b>

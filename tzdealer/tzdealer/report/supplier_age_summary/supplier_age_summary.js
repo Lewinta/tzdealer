@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Customer Age"] = {
+frappe.query_reports["Supplier Age Summary"] = {
 	"filters": [
 		{
 			"label": __("Company"),
@@ -14,20 +14,17 @@ frappe.query_reports["Customer Age"] = {
 			"label": __("From Date"),
 			"fieldtype": "Date",
 			"fieldname": "from_date",
-			// "reqd": 1,
 		},
 		{
 			"label": __("To Date"),
 			"fieldtype": "Date",
 			"fieldname": "to_date",
-			// "reqd": 1,
 		},
 		{
-			"label": __("Customer"),
+			"label": __("Supplier"),
 			"fieldtype": "Link",
-			"fieldname": "customer",
-			"options": "Customer",
-
+			"fieldname": "supplier",
+			"options": "Supplier",
 		},
 		{
 			"label": __("Item Code"),
@@ -43,26 +40,16 @@ frappe.query_reports["Customer Age"] = {
 		},
 	],
 	onload: function(report) {
-		report.page.add_inner_button(__("Customer Age Summary"), function() {
+		report.page.add_inner_button(__("Supplier Age"), function() {
 			var filters = report.get_values();
-			frappe.set_route('query-report', 'Customer Age Summary', {
+			frappe.set_route('query-report', 'Supplier Age', {
 				company: filters.company,
 				from_date: filters.from_date,
 				to_date: filters.to_date,
-				customer: filters.customer,
+				supplier: filters.supplier,
 				unpaid: filters.unpaid,
 				item_code: filters.item_code,
 			});
 		});
 	},
-	formatter: function (row, cell, value, columnDef, dataContext, default_formatter) {
-		value = default_formatter(row, cell, value, columnDef, dataContext);
-
-		if (cell == 2 && value) {
-			_name = value.split('-')[0]
-			value = `<a class="grey" target="_blank" href="#Form/Supplier/${_name}"">${value}</a>`;
-		}
-
-		return value;
-	}
 }

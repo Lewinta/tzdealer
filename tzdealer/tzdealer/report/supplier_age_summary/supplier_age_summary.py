@@ -6,6 +6,12 @@ import frappe
 from frappe.utils import flt
 from frappe import msgprint, _
 
+mop_1 = frappe.get_list("Mode of Payment", as_list=True, limit=5)[0][0]
+mop_2 = frappe.get_list("Mode of Payment", as_list=True, limit=5)[1][0]
+mop_3 = frappe.get_list("Mode of Payment", as_list=True, limit=5)[2][0]
+mop_4 = frappe.get_list("Mode of Payment", as_list=True, limit=5)[3][0]
+mop_5 = frappe.get_list("Mode of Payment", as_list=True, limit=5)[4][0]
+
 def execute(filters=None):
 
 	invoice_list = get_invoices(filters)
@@ -20,63 +26,45 @@ def execute(filters=None):
 	last_inv = ''
 	for inv in invoice_list:
 		# invoice details
-		if last_inv != inv.name or last_vim != inv.item_code:
-			details = "-" 
-			if inv.invoice_type == "Vehicles":
-				details = "{} {} {} {}".format(inv.make, inv.model, inv.exterior_color or "", inv.year or "")
-			if inv.invoice_type == "Containers":
-				details = "{} {}".format(inv.booking_no or "", inv.container_no or "")
-			if inv.invoice_type == "Parts":
-				details = inv.part_type or ""
-			if inv.invoice_type == "Services":
-				details = inv.item_name or ""
-			# elif inv.cont_vim:
-			# 	details = inv.cont_vim.split("-")[1]
-			row = (
-				inv.company, 										# Company
-				inv.invoice_type,
-				inv.stock_no,										# Stock No.
-				inv.vim_number,										# Vim Number
-				details,											# Vehicle Details
-				inv.due_date,
-				inv.posting_date,
-				inv.supplier,
-				inv.total,
-				inv.gst_total,
-				inv.pst_total,
-				inv.base_grand_total,
-				inv.grand_total if inv.currency == "USD" else .00,
-				inv.trans_type,
-				inv.payment_date or "",
-				inv.breakdown,
-				inv.paid_amount,
-				inv.outstanding_amount,
-				inv.pinv,
-				inv.name,
-			)
-		else:
-			row = (
-				"", 												# Company
-				inv.invoice_type,
-				"",													# Stock No.
-				"",													# Vim Number
-				"",													# Details
-				"", 												# Due Date
-				"", 												# Inv.Date
-				inv.supplier,
-				.000,
-				.000,
-				.000,
-				.000,
-				.000,
-				inv.trans_type,
-				inv.payment_date or "",
-				inv.name,
-				inv.breakdown,
-				.000,
-				inv.outstanding_amount,
-				inv.pinv,
-			)		
+
+		details = "-" 
+		if inv.invoice_type == "Vehicles":
+			details = "{} {} {} {}".format(inv.make, inv.model, inv.exterior_color or "", inv.year or "")
+		if inv.invoice_type == "Containers":
+			details = "{} {}".format(inv.booking_no or "", inv.container_no or "")
+		if inv.invoice_type == "Parts":
+			details = inv.part_type or ""
+		if inv.invoice_type == "Services":
+			details = inv.item_name or ""
+		# elif inv.cont_vim:
+		# 	details = inv.cont_vim.split("-")[1]
+		total_paid = inv.mop_1 + inv.mop_2 + inv.mop_3 + inv.mop_4 + inv.mop_5
+		row = (
+			inv.company, 										# Company
+			inv.invoice_type,									# Invoice Type
+			inv.stock_no,										# Stock No.
+			inv.vim_number,										# Vim Number
+			details,											# Details
+			inv.due_date,
+			inv.posting_date,
+			inv.supplier,
+			inv.base_total,
+			inv.total if inv.currency == "USD" else .00,
+			inv.gst_total,
+			inv.pst_total,
+			inv.base_grand_total,
+			inv.grand_total if inv.currency == "USD" else .00,
+			inv.trans_type,
+			inv.mop_1 if last_inv != inv.name  or entry != inv.payment_entry else .00,			#MOP1	
+			inv.mop_2 if last_inv != inv.name  or entry != inv.payment_entry else .00,			#MOP2
+			inv.mop_3 if last_inv != inv.name  or entry != inv.payment_entry else .00,			#MOP3
+			inv.mop_4 if last_inv != inv.name  or entry != inv.payment_entry else .00,			#MOP4
+			inv.mop_5 if last_inv != inv.name  or entry != inv.payment_entry else .00,			#MOP5
+			total_paid, 																			#Total Paid
+			inv.outstanding_amount if last_inv != inv.name else .00, 							#Outstanding
+			inv.name,
+		)
+	
 		last_inv = inv.name
 		last_vim = inv.item_code
 		data.append(row)
@@ -87,7 +75,7 @@ def get_columns(invoice_list):
 	"""return columns based on filters"""
 	columns = [
 		_("Company") 			+ ":Company:120",
-		_("Invoice Type") 		+ ":Link/Purchase Invoice:90",
+		_("Invoice Type") 		+ ":Data:90",
 		_("Stock No.") 			+ ":Link/Item:120",
 		_("Vim Number") 		+ ":Data:150",
 		_("Details") 			+ ":Data:220",
@@ -95,16 +83,19 @@ def get_columns(invoice_list):
 		_("Inv.Date") 			+ ":Date:80",
 		_("Supplier") 			+ ":Link/Supplier:180",
 		_("Net") 				+ ":Currency/currency:120",
+		_("Net USD") 			+ ":Currency/currency:120",
 		_("GST") 				+ ":Currency/currency:100",
 		_("PST") 				+ ":Currency/currency:100",
 		_("Total CAD") 			+ ":Currency/currency:120",
 		_("Total USD") 			+ ":Currency/currency:120",
 		_("Trs. Type") 			+ ":Data:80",
-		_("Payment Date") 		+ ":Date:100",
-		_("Breakdown") 			+ ":Currency/currency:120",
-		_("Paid Amount") 		+ ":Currency/currency:120",
-		_("Outstanding") + ":Currency/currency:120",
-		_("Payment") 			+ ":Link/Payment Entry:90",
+		_(mop_1)				+ ":Currency/currency:120",
+		_(mop_2)				+ ":Currency/currency:120",
+		_(mop_3)				+ ":Currency/currency:120",
+		_("CASH CAD") 			+ ":Currency/currency:120",
+		_(mop_5)				+ ":Currency/currency:120",
+		_("Total Paid") 		+ ":Currency/currency:120",
+		_("Outstanding") 		+ ":Currency/currency:120",
 		_("Invoice") 			+ ":Link/Purchase Invoice:120",
 	]
 
@@ -169,34 +160,46 @@ def get_invoices(filters):
 			`viewSupplier Age`.vim_number,
 			`viewSupplier Age`.invoice_type,
 			`viewSupplier Age`.currency,
-			IF(
-				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
-				`viewSupplier Age`.base_total * -1,
-				`viewSupplier Age`.base_total
-			) as total,
+			`viewSupplier Age`.total,
+			`viewSupplier Age`.base_total,
 			`viewSupplier Age`.gst_total,
 			`viewSupplier Age`.pst_total,
+			`viewSupplier Age`.grand_total,
+			`viewSupplier Age`.base_grand_total,
 			`viewSupplier Age`.name,
-			`tabPayment Entry Reference`.allocated_amount as breakdown,
-			IF(
-				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
-				`viewSupplier Age`.base_grand_total * -1,
-				`viewSupplier Age`.base_grand_total
-			) as base_grand_total,
-			IF(
-				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
-				`viewSupplier Age`.grand_total * -1,
-				`viewSupplier Age`.grand_total
-			) as grand_total,
 			`viewSupplier Age`.trans_type,
-			IF(
-				`tabPayment Entry Reference`.allocated_amount AND `tabPayment Entry Reference`.allocated_amount < 0,
-				`tabPayment Entry Reference`.allocated_amount,
-				`viewSupplier Age`.paid_amount
-			) as paid_amount,
 			`viewSupplier Age`.outstanding_amount,
-			`tabPayment Entry Reference`.parent as pinv,
-			`tabPayment Entry`.date as payment_date
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{mop_1}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_1,
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{mop_2}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_2,
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{mop_3}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_3,
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{mop_4}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_4,
+			SUM(
+				IF(
+					`tabPayment Entry`.mode_of_payment = '{mop_5}',
+					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
+				)
+			) as mop_5
+			
 		FROM
 			`viewSupplier Age`
 		Left Join
@@ -211,7 +214,9 @@ def get_invoices(filters):
 			`tabPayment Entry Reference`.parent = `tabPayment Entry`.name
 			And 
 			`tabPayment Entry`.docstatus = 1  
-		{conditions}  
+		{conditions}
+		Group By 
+			`viewSupplier Age`.name
 		ORDER BY 
 			`viewSupplier Age`.item_code, `viewSupplier Age`.posting_date ASC, `viewSupplier Age`.name ASC, `tabPayment Entry Reference`.parent
-	""".format(conditions=conditions), debug=False, as_dict=True)
+	""".format(conditions=conditions, mop_1=mop_1, mop_2=mop_2, mop_3=mop_3, mop_4=mop_4, mop_5=mop_5,), debug=False, as_dict=True)

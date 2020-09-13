@@ -132,6 +132,10 @@ def get_data(filters):
 						And
 							`tabSingles`.field = "default_revenue_rate"
 				) As `tabSales Price`
+			Left Join
+				`tabAddress`
+			On
+				`tabItem`.location = `tabAddress`.name
 			Where
 				{conditions}
 				Having 
@@ -184,12 +188,16 @@ def get_data(filters):
 				`tabSupplier`
 			ON
 				`tabSupplier`.name = `tabPurchase Invoice`.supplier
+			Left Join
+				`tabAddress`
+			On
+				`tabItem`.location = `tabAddress`.name
 			
 			Where
 				`tabPurchase Invoice`.is_return = 0 AND
 				{conditions}
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=True)
+		filters, debug=False)
 
 	if filters.get("report_type") == "Sales Order To Be Billed":
 		results = frappe.db.sql("""
@@ -246,6 +254,10 @@ def get_data(filters):
 						And
 							`tabSingles`.field = "default_revenue_rate"
 				) As `tabSales Price`
+			Left Join
+				`tabAddress`
+			On
+				`tabItem`.location = `tabAddress`.name
 			Where
 				{conditions}
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
@@ -261,6 +273,7 @@ def get_columns(filters):
 		"Stock Report": (
 			("Status", "status", "Data", 90),
 			("Company", "company", "Data", 120),
+			("S. Location", "location", "Data", 230),
 			("Kijiji", "kijiji", "Check", 50),
 			("Auto Trd", "auto_trd", "Check", 50),
 			("Web", "web", "Check", 50),
@@ -288,6 +301,7 @@ def get_columns(filters):
 		"Sold Report":(
 			("Status", "status", "data", 100),
 			("Company", "company", "Data", 120),
+			("S. Location", "location", "Data", 230),
 			("Kijiji", "kijiji", "Check", 50),
 			("Auto Trd", "auto_trd", "Check", 50),
 			("Web", "web", "Check", 50),
@@ -319,6 +333,7 @@ def get_columns(filters):
 		"Sales Order To Be Billed":(
 			("Status", "status", "Data", 100),
 			("Company", "company", "Data", 120),
+			("S. Location", "location", "Data", 230),
 			("Stock No.", "item_code", "Link/Item", 105),
 			("Order Date", "order_date", "Date", 100),
 			("Customer", "customer", "Link/Customer", 150),
@@ -367,6 +382,7 @@ def get_fields(filters):
 		"Stock Report":  (
 			("Item", "status"),
 			("Item", "company"),
+			("CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location"),
 			("Item", "kijiji_post"),
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
@@ -408,6 +424,7 @@ def get_fields(filters):
 		"Sold Report": (
 			("Item", "status"),
 			("Item", "company"),
+			("CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location"),
 			("Item", "kijiji_post"),
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
@@ -451,6 +468,7 @@ def get_fields(filters):
 		"Sales Order To Be Billed":(
 			("Item", "status"),
 			("Item", "company"),
+			("CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location"),
 			("Item", "item_code"),
 			("Sales Order", "transaction_date"),
 			("Sales Order", "customer"),

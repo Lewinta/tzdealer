@@ -12,7 +12,8 @@ frappe.ui.form.on("Item", {
 			frm.trigger(event);
 		});
 		frm.trigger("set_df_fields");
-
+		frm.trigger("add_supplier_to_history");
+		
 	},
 	onload_post_render: frm => {
 		if (frm.is_new()) {
@@ -20,10 +21,8 @@ frappe.ui.form.on("Item", {
 		}
 	},
 	validate: frm => {
-		frm.trigger("item_type");
-		frm.trigger("validate_suppliers");
-		frm.trigger("create_item_name");
-		frm.trigger("validate_warehouse");
+		let events = ["item_type", "validate_suppliers", "create_item_name", "validate_warehouse"];
+		$.map(events, event => frm.trigger(event))
 	},
 	validate_suppliers: frm => {
 		const {item_type, trucking_supplier_price, loading_supplier_price} = frm.doc;
@@ -56,6 +55,8 @@ frappe.ui.form.on("Item", {
 		});
 	},
 	set_queries: frm => {
+		frm.trigger("set_location_query");
+
 		frm.set_query("income_account", function () {
 			return {
 				filters: {
@@ -130,6 +131,16 @@ frappe.ui.form.on("Item", {
 			}
 		});
 	},
+	set_location_query: frm => {
+		frm.set_query("location", function () {
+			return {
+				"query": "tzdealer.hook.item.address_by_supplier",
+				"filters": {
+					"supplier": frm.doc._default_supplier
+				}
+			};
+		});
+	},
 	add_custom_buttons: frm => {
 		frm.add_custom_button(__("Item Details"), event => {
 			frm.trigger("view_item_details"); }, __("View"));
@@ -169,6 +180,18 @@ frappe.ui.form.on("Item", {
 	},
 	_default_supplier: frm => {
 		frm.set_value("default_supplier", frm.doc._default_supplier)
+		frm.trigger("set_location_query");
+		frm.trigger("add_supplier_to_history");
+	},
+	add_supplier_to_history: frm => {
+		// let's append the supplier on the history in case 
+		// we need to add an address
+		if (!frm.doc._default_supplier)
+			return
+		frappe.route_history[frappe.route_history.length - 1][3] = {
+			"link_doctype": "Supplier",
+			"link_name": frm.doc._default_supplier
+		}
 	},
 	vim_number: frm => {
 		frm.set_value("item_code", frm.doc.vim_number);
@@ -194,7 +217,7 @@ frappe.ui.form.on("Item", {
 		let name = "";
 		
 		if (frm.doc.item_type == "Vehicles"){
-			let {make, model, year, exterior_color, part} = frm.doc;
+			let {make, model, year, exterior_color, part, vim_number} = frm.doc;
 			if (part)
 				name = name.concat(" ", part);
 			if (make)
@@ -205,6 +228,8 @@ frappe.ui.form.on("Item", {
 				name = name.concat(" ", exterior_color);
 			if (year)
 				name = name.concat(" ", year);
+			if (vim_number)
+				name = name.concat(" - ", vim_number);
 		}
 
 		if (frm.doc.item_type == "Containers"){
@@ -280,13 +305,14 @@ frappe.ui.form.on("Item", {
 		let clear_req = [];
 		let clear_enabled = [];
 		let reqd = {
-			"vehicles" : ["make", "model", "year", "vim_number", "exterior_color", "purchase_date", "default_supplier"],
+			"vehicles" : ["make", "model", "year", "vim_number", "exterior_color", "purchase_date", "default_supplier", "_default_supplier", "location"],
 			"vehicle_parts" : ["part_type", "purchase_date"],
 			"services" : ["item_code"],
 			"containers" : [
 				"booking_no", "purchase_date", "eta", "booking_supplier",
 				"booking_supplier_price", "trucking_supplier", "trucking_supplier_price", "loading_supplier",
 				"loading_supplier_price","destination", "shipping_line",
+				"_default_supplier", "location",
 			],
 		}
 		let disable = {

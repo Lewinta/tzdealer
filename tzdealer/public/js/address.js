@@ -1,6 +1,46 @@
 frappe.ui.form.on("Address", {
 	refresh: frm => {
-		console.log("refreshed")
+		// console.log(frappe.route_history[frappe.route_history.length -2][3])
+	},
+	validate: frm => {
+		frm.trigger("make_custom_title");
+	},
+	onload_post_render: frm => {
+		if (frappe.route_history.length > 1){
+			last_page = frappe.route_history[frappe.route_history.length -2];
+			if (last_page[0] == "Form" && last_page[1] == "Item" && last_page[3]){
+				frm.add_child("links", last_page[3]);
+				frm.refresh_field("links");
+			}
+		}
+	},
+	address_title: frm => {
+		parts = frm.doc.address_title.split(",");
+		
+		if (!frm.doc.address_line1)
+			frm.set_value("address_line1", "-");
+		
+		if (parts.length >= 2){
+			frm.set_value("city", parts[0]);
+			frm.set_value("state", parts[1]);
+		}
+
+	},
+	make_custom_title: frm => {
+		entity = "";
+		city = "";
+		state = "";
+
+		if (frm.doc.links)
+			entity = `${frm.doc.links[0].link_name} -`;
+
+		if (frm.doc.city)
+			city = frm.doc.city;
+
+		if (frm.doc.state)
+			state = frm.doc.state;
+
+		frm.set_value("custom_title", `${entity} ${city}, ${state}`);
 	},
 	address_line1: frm => {
 		frm.trigger("get_full_address");
