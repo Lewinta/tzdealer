@@ -20,31 +20,34 @@ def get_columns():
 		("Company", "Data", 120),
 		("S. Location", "Data", 230),
 		("Stock No.", "Link/Item", 110),
+		("Item Type", "Data", 100),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
 		("Due Date", "Date", 90),
 		("Inv. Date", "Date", 90),
 		("Customer", "Link/Customer", 160),
+		("G Price", "Currency", 100),
 		("Net Sale", "Currency", 100),
 		("GST", "Currency", 100),
 		("PST", "Currency", 100),
 		("Total Sale", "Currency", 120),
-		("Total Sale USD", "Currency", 120),
-		(mop_1, "Currency", len(mop_1) * 9),
+		("Total Sale USD", "Currency", 110),
+		(mop_1, "Currency", len(mop_1) * 8),
+		("CASH CAD", "Currency", len("CASH CAD") * 10),
 		(mop_2, "Currency", len(mop_2) * 9),
 		(mop_3, "Currency", len(mop_3) * 9),
-		("CASH CAD", "Currency", len("CASH CAD") * 10),
 		(mop_5, "Currency", len(mop_5) * 9),
 		("Total Paid", "Currency", 100),
 		("Outstanding", "Currency", 100),
 		("Sales Inv.", "Link/Sales Invoice", 100),
+		("Checklist", "Data", 90),
 		("VEH Status", "Data", 100),
 		("Title Status", "Data", 100),
-		("G Price", "Currency", 100),
-		("G GST", "Currency", 100),
-		("G PST", "Currency", 100),
-		("Total", "Currency", 100),
+		# ("G GST", "Currency", 100),
+		# ("G PST", "Currency", 100),
+		# ("Total", "Currency", 100),
 		("CASH OVER/SHORT", "Currency", 120),
+		("NET Cost", "Currency", 120),
 	)
 
 	formatted_columns = []
@@ -86,8 +89,7 @@ def get_data(filters):
 			`tabSales Invoice`.name = `tabSales Invoice Item`.parent
 		And 
 			`tabSales Invoice`.docstatus = 1
-		And  
-			`tabSales Invoice`.is_return = 0
+
 		{sinv_date}
 		Inner Join
 			`tabItem`
@@ -111,13 +113,16 @@ def get_data(filters):
 			`tabPayment Entry Reference`.parent = `tabPayment Entry`.name
 		And 
 			`tabPayment Entry`.docstatus = 1
-		And  
-			`tabSales Invoice`.is_return = 0
+
 		{pinv_date}
 		Left Join
 			`tabAddress`
 		On
 			`tabItem`.location = `tabAddress`.name
+		Left Join
+			`tabVehicle Release`
+		On
+			`tabVehicle Release`.name = `tabItem`.name	
 		Where
 			{conditions}
 		Group By 
@@ -158,31 +163,34 @@ def get_data(filters):
 					row.company, 			#Company
 					row.location,			#S.Location
 					row.item_code,			#Stock No.
+					row.item_type,			#Item Type.
 					vim_number,				#Vim Number
 					details,				#Details
 					row.due_date if last_inv != row.sinv_name else '', 		#Due Date
 					row.sinv_date if last_inv != row.sinv_name else '',		#Inv Date
 					row.customer  if last_inv != row.sinv_name else '',		#Customer
+					row.gprice,				#G Price
 					row.net_total if last_inv != row.sinv_name else '',		#Net Sale
 					row.gst_total,											#GST
 					row.pst_total ,											#PST
 					row.base_grand_total if last_inv != row.sinv_name else .00, 	#Total Sale 
 					row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00, 		#Total Sale USD
 					row.mop_1 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP1	
+					row.mop_4 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP4
 					row.mop_2 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP2
 					row.mop_3 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP3
-					row.mop_4 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP4
 					row.mop_5 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP5
 					total_received,																			#Total Paid
 					row.outstanding_amount if last_inv != row.sinv_name else .00, 							#Outstanding
 					row.sinv_name if last_inv != row.sinv_name else '',										#Sales Inv.
+					row.vehicle_release,	#VEH Status
 					row.status,				#VEH Status
 					row.title_status,		#Title Status
-					row.gprice,				#G Price
-					row.g_gst_total,		#G_GST
-					row.g_pst_total,		#G_PST
-					g_total,				#Total
+					# row.g_gst_total,		#G_GST
+					# row.g_pst_total,		#G_PST
+					# g_total,				#Total
 					g_total - total_received if row.outstanding_amount == .00 and g_total else .000,		#CashOver
+					row.net_cost,			#Net Cost
 				)
 			)
 		else:
@@ -191,6 +199,7 @@ def get_data(filters):
 					row.company, 			#Company
 					row.location,			#S.Location
 					row.item_code,			#Stock No.
+					row.item_type,			#Item Type.
 					vim_number,				#Vim Number
 					details,				#Details
 					row.due_date if last_inv != row.sinv_name else '', 		#Due Date
@@ -202,13 +211,14 @@ def get_data(filters):
 					row.base_grand_total if last_inv != row.sinv_name else .00, 	#Total Sale 
 					row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00, 		#Total Sale USD
 					row.mop_1 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP1	
+					row.mop_4 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP4
 					row.mop_2 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP2
 					row.mop_3 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP3
-					row.mop_4 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP4
 					row.mop_5 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP5
 					total_received,																			#Total Paid
 					row.outstanding_amount if last_inv != row.sinv_name else .00, 							#Outstanding
 					row.sinv_name if last_inv != row.sinv_name else '',										#Sales Inv.
+					row.vehicle_release	,	#VEH Release
 					row.status,				#VEH Status
 					row.title_status,		#Title Status
 					row.gprice,				#G Price
@@ -216,6 +226,7 @@ def get_data(filters):
 					row.g_pst_total,		#PST
 					g_total,				#Total
 					g_total - total_received if row.outstanding_amount == .00 and g_total else .000,		#CashOver
+					row.net_cost,			#Net Cost
 				)
 			)
 		last_inv = row.sinv_name
@@ -257,11 +268,15 @@ def get_conditions(filters):
 			("Sales Invoice", "customer", "=", filters.get('customer'))
 		)
 
-	if filters.get('unpaid'):
+	if filters.get('payment_status') == "Unpaid Only":
 		conditions.append(
 			("Sales Invoice", "outstanding_amount", ">", 0)
 		)
 
+	if filters.get('payment_status') == "Paid Only":
+		conditions.append(
+			("Sales Invoice", "outstanding_amount", "=", 0)
+		)
 	if filters.get('item_code'):
 		conditions.append(
 			("Sales Invoice Item", "item_code", "=", filters.get('item_code'))
@@ -299,11 +314,13 @@ def get_fields(filters):
 		("Item", "vim_number"),
 		("Item", "make"),
 		("Item", "model"),
+		("Item", "item_type"),
 		("Item", "booking_no"),
 		("Item", "container_no"),
 		("Item", "part_type"),
 		("Item", "year"),
 		("Item", "exterior_color"),
+		("Vehicle Release", "status", "vehicle_release"),
 		("Sales Invoice Item", "vim_number", "cont_vim"),
 		("Sales Invoice Item", "item_name"),
 		("Sales Invoice", "due_date", "due_date"),
@@ -359,6 +376,7 @@ def get_fields(filters):
 		("Sales Invoice Item", "gprice"),
 		("Item", "status"),
 		("Item", "title_status"),
+		("(SELECT valuation_rate from `tabBin` where `tabBin`.item_code = `tabItem`.item_code AND `tabBin`.warehouse = `tabSales Invoice Item`.warehouse) as net_cost")
 	)
 
 	sql_fields = []

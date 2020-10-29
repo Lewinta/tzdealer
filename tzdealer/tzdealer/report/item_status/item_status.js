@@ -4,7 +4,22 @@
 
 frappe.query_reports["Item Status"] = {
 	"filters": [
-
+		{
+			"label": "Company",
+			"fieldtype": "Link",
+			"fieldname": "company",
+			"options": "Company",
+		},	
+		{
+			"label": "From Date",
+			"fieldtype": "Date",
+			"fieldname": "from_date",
+		},
+		{
+			"label": "To Date",
+			"fieldtype": "Date",
+			"fieldname": "to_date",
+		}
 	],
 	formatter: function (row, cell, value, columnDef, dataContext, default_formatter) {
 		value = default_formatter(row, cell, value, columnDef, dataContext);

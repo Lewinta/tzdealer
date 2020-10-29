@@ -23,18 +23,39 @@ def get_conditions(filters):
 			"allow":"Company",
 		}, "for_value")
 
+	default_condition = []
+	
+	if filters.get('title_status'):
+		default_condition.append(("Item", "title_status", "=", filters.get('title_status')))
+	
+	if filters.get('status'):
+		default_condition.append(("Item", "status", "=", filters.get('status')))	
+	
+	if filters.get('company'):
+		default_condition.append(("Item", "company", "=", company))
+
+
+
 	cond_obj = {
-		"Stock Report": (
-			("Item", "company", "=", company),
-		),
-		"Sold Report": (
-			("Item", "company", "=", company),
-		),
-		"Sales Order To Be Billed": (
-			("Sales Invoice Item", "parent", "IS", "NULL"),
-			("Item", "company", "=", company),
-		)
+		"All": default_condition,
+		"Stock Report": default_condition,
+		"Sold Report": default_condition,
+		"Sales Order To Be Billed": default_condition + [("Sales Invoice Item", "parent", "IS", "NULL")]
 	}
+	# else:
+	# 	cond_obj = {
+	# 		"Stock Report": (
+	# 			("Item", "company", "=", company),
+	# 		),
+	# 		"Sold Report": (
+	# 			("Item", "company", "=", company),
+	# 		),
+	# 		"Sales Order To Be Billed": (
+	# 			("Sales Invoice Item", "parent", "IS", "NULL"),
+	# 			("Item", "company", "=", company),
+	# 		)
+	# 	}
+
 
 	conditions = cond_obj.get(filters.get("report_type"))
 
@@ -83,6 +104,132 @@ def get_data(filters):
 	fields = get_fields(filters)
 	conditions = get_conditions(filters)
 	results = []
+	
+	if filters.get("report_type") == "All":
+		cond_1   = get_conditions({"report_type": "All-1"})
+		fields_1 = get_fields({"report_type": "All-1"})
+		cond_2   = get_conditions({"report_type": "All-2"})
+		fields_2 = get_fields({"report_type": "All-2"})
+
+		results = frappe.db.sql("""
+			Select
+				{fields_1},
+				(Select Sum(actual_qty) from `tabStock Ledger Entry` where item_code = `tabPurchase Invoice Item`.item_code) as qty
+			From
+				`tabPurchase Invoice`
+			Inner Join
+				`tabSupplier`
+			ON
+				`tabSupplier`.name = `tabPurchase Invoice`.supplier
+			Inner Join
+				`tabPurchase Invoice Item`
+				On
+					`tabPurchase Invoice`.name = `tabPurchase Invoice Item`.parent
+				And 
+					`tabPurchase Invoice`.is_return = 0
+				And 
+					`tabPurchase Invoice`.docstatus = 1
+			Inner Join
+				`tabItem`
+				On
+					`tabPurchase Invoice Item`.item_code = `tabItem`.item_code
+				And 
+					`tabItem`.item_type = 'Vehicles'
+				And
+					`tabItem`.item_code not in (
+						Select 
+							item_code 
+						From 
+							`tabSales Order Item` 
+						Where
+							`tabSales Order Item`.docstatus = 1
+					)
+			Inner Join
+				`tabBin`
+				On
+					`tabItem`.item_code = `tabBin`.item_code
+			Inner Join
+				(
+					Select
+						`tabSingles`.value As margin_rate
+					From
+						`tabSingles`
+					Where
+						`tabSingles`.doctype = "Configuration"
+						And
+							`tabSingles`.field = "default_revenue_rate"
+				) As `tabSales Price`
+			Left Join
+				`tabAddress`
+			On
+				`tabItem`.location = `tabAddress`.name
+			Where
+				{cond_1}
+				Having 
+				qty > 0
+
+			UNION 
+			
+			Select
+				{fields_2},
+				0 as other_sum
+			From
+				`tabSales Invoice`
+			Inner Join
+				`tabCustomer`
+			ON
+				`tabCustomer`.name = `tabSales Invoice`.customer
+			Inner Join
+				`tabSales Invoice Item`
+				On
+					`tabSales Invoice`.name = `tabSales Invoice Item`.parent
+				And 
+					`tabSales Invoice`.is_return = 0
+				And 
+					`tabSales Invoice`.docstatus = 1
+			Inner Join
+				`tabItem`
+				On
+					`tabSales Invoice Item`.item_code = `tabItem`.item_code
+				And 
+					`tabItem`.item_type = 'Vehicles'
+		
+			Left Join
+			`tabBin`
+				On
+					`tabItem`.item_code = `tabBin`.item_code
+			
+			Left Join
+				`tabPurchase Invoice Item`
+				On
+					`tabPurchase Invoice Item`.item_code = `tabItem`.item_code
+	
+			Left Join
+				`tabPurchase Invoice`
+				On
+					`tabPurchase Invoice Item`.parent = `tabPurchase Invoice`.name
+				And
+					`tabPurchase Invoice`.docstatus = 1
+			Left Join
+				`tabSupplier`
+			ON
+				`tabSupplier`.name = `tabPurchase Invoice`.supplier
+			Left Join
+				`tabAddress`
+			On
+				`tabItem`.location = `tabAddress`.name
+			
+			Where
+				`tabPurchase Invoice`.is_return = 0 AND
+				{cond_2}
+
+			""".format(
+				fields_1=fields_1,
+				fields_2=fields_2,
+				cond_1=cond_1 or "1 = 1",
+				cond_2=cond_2 or "1 = 1"
+			), debug=False)
+
 	if filters.get("report_type") == "Stock Report":
 		results = frappe.db.sql("""
 			Select
@@ -136,6 +283,10 @@ def get_data(filters):
 				`tabAddress`
 			On
 				`tabItem`.location = `tabAddress`.name
+			Left Join
+				`tabVehicle Release`
+			On
+				`tabVehicle Release`.name = `tabItem`.name	
 			Where
 				{conditions}
 				Having 
@@ -192,12 +343,15 @@ def get_data(filters):
 				`tabAddress`
 			On
 				`tabItem`.location = `tabAddress`.name
-			
+			Left Join
+				`tabVehicle Release`
+			On
+				`tabVehicle Release`.name = `tabItem`.name	
 			Where
 				`tabPurchase Invoice`.is_return = 0 AND
 				{conditions}
 			""".format(fields=fields, conditions=conditions or "1 = 1"),
-		filters, debug=False)
+		filters, debug=True)
 
 	if filters.get("report_type") == "Sales Order To Be Billed":
 		results = frappe.db.sql("""
@@ -270,6 +424,34 @@ def get_columns(filters):
 	Return Frappe columns ready to be used on report
 	"""
 	cols_obj = {
+		"All": (
+			("Status", "status", "Data", 90),
+			("Company", "company", "Data", 120),
+			("S. Location", "location", "Data", 230),
+			("Kijiji", "kijiji", "Check", 50),
+			("Auto Trd", "auto_trd", "Check", 50),
+			("Web", "web", "Check", 50),
+			("Stock No.", "item_code", "Link/Item", 105),
+			("Vim Number", "vim_number", "Data", 160),
+			("Model", "model", "Link/Model", 100),
+			("Year", "year", "Int", 50),
+			("Color", "exterior_color", "Data", 65),
+			("Gear", "gear", "Data", 50),
+			("Engine", "engine_size", "Data", 55),
+			("Trim", "trim", "Data", 60),
+			("Drive Train", "drive_train", "Data", 80),
+			("Voucher", "landed_cost_voucher_amount", "Currency", 90),
+			("Sales Price", "sales_price", "Currency", 100),
+			("Purchase Date", "posting_date", "Date", 100),
+			("Supplier", "supplier", "Link/Supplier", 200),
+			("Invoice", "name", "Link/Purchase Invoice", 100),
+			("Salvage", "salvage_title", "Check", 70),
+			("Odometer", "odometer_value", "Int", 90),
+			("MK", "mk", "Data", 60),
+			("Title Status", "title_status", "Data", 90),
+			("Supplier Inv.", "name", "Data", 100),
+			("Telephone", "s_phone", "data", 90),
+		),
 		"Stock Report": (
 			("Status", "status", "Data", 90),
 			("Company", "company", "Data", 120),
@@ -277,6 +459,7 @@ def get_columns(filters):
 			("Kijiji", "kijiji", "Check", 50),
 			("Auto Trd", "auto_trd", "Check", 50),
 			("Web", "web", "Check", 50),
+			("Checklist", "checklist", "Data", 90),
 			("Stock No.", "item_code", "Link/Item", 105),
 			("Vim Number", "vim_number", "Data", 160),
 			("Model", "model", "Link/Model", 100),
@@ -305,6 +488,7 @@ def get_columns(filters):
 			("Kijiji", "kijiji", "Check", 50),
 			("Auto Trd", "auto_trd", "Check", 50),
 			("Web", "web", "Check", 50),
+			("Checklist", "checklist", "Data", 90),
 			("Stock No.", "item_code", "Link/Item", 105),
 			("Sold Date", "posting_date", "Date", 100),
 			("Customer", "customer", "Link/Customer", 200),
@@ -379,6 +563,73 @@ def get_fields(filters):
 	Return sql fields ready to be used on query
 	"""
 	fields_obj = {
+		"All-1":  (
+			("Item", "status"),
+			("Item", "company"),
+			("CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location"),
+			("Item", "kijiji_post"),
+			("Item", "auto_trader_post"),
+			("Item", "website_post"),
+			("Item", "item_code"),
+			("Item", "vim_number"),
+			("Item", "model"),
+			("Item", "year"),
+			("Item", "exterior_color"),
+			("CASE WHEN `tabItem`.gear = 'AUTOMATIC' THEN 'AT' WHEN `tabItem`.gear = 'MANUAL' THEN 'MT' END "),
+			("Item", "engine_size"),
+			("Item", "trim"),
+			("Item", "drive_train"),
+			("Purchase Invoice Item", "landed_cost_voucher_amount"),
+			("""
+				(
+					Select
+						(((`tabSingles`.value / 100) + 1) * (`tabBin`.valuation_rate + `tabPurchase Invoice`.total - `tabPurchase Invoice Item`.rate)) As p
+					From
+						`tabSingles`
+					Where
+						`tabSingles`.doctype = "Configuration"
+						And
+							`tabSingles`.field = "default_revenue_rate"
+				) As sales_price
+			"""),
+			("Purchase Invoice", "posting_date"),
+			("Purchase Invoice", "supplier"),
+			("Purchase Invoice", "name"),
+			("Item", "salvage_title"),
+			("Item", "odometer_value"),
+			("Item", "mk"),
+			("Item", "title_status"),
+			("Purchase Invoice", "bill_no"),
+			("Supplier", "phone_number"),
+		),
+		"All-2": (
+			("Item", "status"),
+			("Item", "company"),
+			("CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location"),
+			("Item", "kijiji_post"),
+			("Item", "auto_trader_post"),
+			("Item", "website_post"),
+			("Item", "item_code"),
+			("Item", "vim_number"),
+			("Item", "model"),
+			("Item", "year"),
+			("Item", "exterior_color"),
+			("CASE WHEN `tabItem`.gear = 'AUTOMATIC' THEN 'AT' WHEN `tabItem`.gear = 'MANUAL' THEN 'MT' END "),
+			("Item", "engine_size"),
+			("Item", "trim"),
+			("Item", "drive_train"),
+			("Purchase Invoice Item", "landed_cost_voucher_amount"),
+			("Sales Invoice Item", "amount"),
+			("Purchase Invoice", "posting_date"),
+			("Purchase Invoice", "supplier"),
+			("Purchase Invoice", "name"),
+			("Item", "salvage_title"),
+			("Item", "odometer_value"),
+			("Item", "mk"),
+			("Item", "title_status"),
+			("Purchase Invoice", "bill_no"),
+			("Supplier", "phone_number"),
+		),
 		"Stock Report":  (
 			("Item", "status"),
 			("Item", "company"),
@@ -386,6 +637,7 @@ def get_fields(filters):
 			("Item", "kijiji_post"),
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
+			("Vehicle Release", "status"),
 			("Item", "item_code"),
 			("Item", "vim_number"),
 			("Item", "model"),
@@ -428,6 +680,7 @@ def get_fields(filters):
 			("Item", "kijiji_post"),
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
+			("Vehicle Release", "status"),
 			("Item", "item_code"),
 			("Sales Invoice", "posting_date"),
 			("Sales Invoice", "customer"),
@@ -508,7 +761,10 @@ def get_fields(filters):
 	}
 
 	fields = fields_obj.get(filters.get("report_type"))
-
+	
+	if not fields:
+		return ""
+	
 	sql_fields = []
 
 	for args in fields:

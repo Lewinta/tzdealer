@@ -21,12 +21,36 @@ def get_columns():
 		_("Vin Number") 	+ ":Data:150",
 		_("Vehicle Details") 		+ ":Data:220",
 		_("Container Details") 		+ ":Data:220",
+		_("Supplier") 		+ ":Data:120",
 		_("Purchase") 		+ ":Currency/currency:120",
+		_("Customer") 		+ ":Data:120",
 		_("Sold") 			+ ":Currency/currency:100",
 		_("Last Updated") 	+ ":Date:140",
 	]
 
+def get_conditions(filters):
+	# company = frappe.get_value("User Permission", {
+	# 	"user":frappe.session.user,
+	# 	"allow":"Company",
+	# }, "for_value")
+	conditions = []
+	
+	if filters.get("company"):
+		conditions.append("`tabItem`.company = '{}'".format(filters.get("company")))
+	
+	if filters.get("from_date"):
+		conditions.append("`tabItem`.purchase_date >= '{}'".format(filters.get("from_date")))
+	
+	if filters.get("to_date"):
+		conditions.append("`tabItem`.purchase_date <= '{}'".format(filters.get("to_date")))
+	
+	return " and ".join(conditions)
+
 def get_data(filters=None):
+	conditions = get_conditions(filters)
+	if conditions:
+		conditions = " AND {}".format(conditions)
+	 
 	return frappe.db.sql("""
 		SELECT
 			`tabItem`.company,
@@ -47,7 +71,9 @@ def get_data(filters=None):
 				`tabItem`.booking_no, " ",
 				`tabItem`.container_no, " "
 			) as cont_details,
+			(SELECT supplier from `tabPurchase Invoice` where name = `tabPurchase Invoice Item`.parent) as supplier,
 			`tabPurchase Invoice Item`.base_amount,
+			(SELECT customer from `tabSales Invoice` where name = `tabSales Invoice Item`.parent) as customer,
 			`tabSales Invoice Item`.base_amount,
 			`tabItem`.modified
 		FROM 
@@ -70,6 +96,7 @@ def get_data(filters=None):
 			`tabItem`.location = `tabAddress`.name
 		WHERE	
 			`tabItem`.item_type = 'Vehicles'
+		{conditions}
 		
 		UNION
 
@@ -92,7 +119,9 @@ def get_data(filters=None):
 				`tabItem`.booking_no, " ",
 				`tabItem`.container_no, " "
 			) as cont_details,
+			(SELECT supplier from `tabPurchase Invoice` where name = `tabPurchase Invoice Item`.parent) as supplier,
 			`tabPurchase Invoice Item`.base_rate ,
+			(SELECT customer from `tabSales Invoice` where name = `tabSales Invoice Item`.parent) as customer,
 			`tabSales Invoice Item`.base_rate,
 			`tabItem`.modified
 		FROM 
@@ -121,6 +150,5 @@ def get_data(filters=None):
 			`tabItem`.location = `tabAddress`.name
 		WHERE	
 			`tabItem`.item_type = 'Containers'
-
-		
-	""")
+		{conditions}
+	""".format(conditions=conditions), debug=True)

@@ -108,6 +108,8 @@ frappe.ui.form.on("Sales Invoice", {
 		frm.toggle_reqd("transaction_group", frm.doc.is_opening == "No");
 	},
 	invoice_type: frm => {
+		if (frm.doc.is_return)
+			return
 		let check = frm.doc.invoice_type != "Services" ? true : false;
 		frm.set_value("update_stock", check);
 	},

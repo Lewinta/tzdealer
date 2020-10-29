@@ -1,0 +1,20 @@
+{
+ "add_total_row": 0, 
+ "apply_user_permissions": 1, 
+ "creation": "2020-10-03 20:39:14.182440", 
+ "disabled": 0, 
+ "docstatus": 0, 
+ "doctype": "Report", 
+ "idx": 0, 
+ "is_standard": "Yes", 
+ "letter_head": "Main", 
+ "modified": "2020-10-03 20:39:14.182440", 
+ "modified_by": "Administrator", 
+ "module": "TZDEALER", 
+ "name": "Third Party Service", 
+ "owner": "Administrator", 
+ "ref_doctype": "Sales Invoice", 
+ "report_name": "Third Party Service", 
+ "report_type": "Script Report", 
+ "roles": []
+}

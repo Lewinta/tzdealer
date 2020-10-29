@@ -28,3 +28,13 @@ def get_container_vims(item_code, company):
 		return ""
 
 	return "\n".join([v.item_code for v in result])
+
+@frappe.whitelist()
+def post_image(item_code):
+	wc = frappe.get_single("Website Connector")
+	wc.sync_images(item_code)
+
+@frappe.whitelist()
+def post_media(web_img):
+	wc = frappe.get_single("Website Connector")
+	return wc.sync_single_image(web_img)

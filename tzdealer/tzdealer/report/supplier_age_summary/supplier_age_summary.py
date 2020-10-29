@@ -126,10 +126,17 @@ def get_conditions(filters):
 		if conditions:
 			conditions += " and "
 		conditions += "`viewSupplier Age`.item_code = '{}'".format(filters.get("item_code"))
-	if filters.get("unpaid"):
+
+	if filters.get('payment_status') == "Unpaid Only":
 		if conditions:
 			conditions += " and "
 		conditions += "`viewSupplier Age`.outstanding_amount > 0"
+	
+	if filters.get('payment_status') == "Paid Only":
+		if conditions:
+			conditions += " and "
+		conditions += "`viewSupplier Age`.outstanding_amount = 0"
+
 		
 	# if filters.get("limit"):
 	# 	conditions += " LIMIT {}".format(filters.get("limit"))

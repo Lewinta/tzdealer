@@ -14,6 +14,7 @@ def get_columns():
 		("Company", "Data", 120),
 		("S. Location", "Data", 230),
 		("Stock No.", "Link/Item", 110),
+		("Item Type", "Data", 100),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
 		# ("Model", "Data", 100),
@@ -35,6 +36,7 @@ def get_columns():
 		("Payment Entry", "Link/Payment Entry", 100),
 		("Sales Inv.", "Link/Sales Invoice", 100),
 		("G Price", "Currency", 100),
+		("Checklist", "Data", 90),
 		("VEH Status", "Data", 100),
 		("Title Status", "Data", 100),
 	)
@@ -106,6 +108,10 @@ def get_data(filters):
 			`tabAddress`
 		On
 			`tabItem`.location = `tabAddress`.name
+		Left Join
+			`tabVehicle Release`
+		On
+			`tabVehicle Release`.name = `tabItem`.name	
 		Where
 			{conditions}
 		Group By 
@@ -144,6 +150,7 @@ def get_data(filters):
 					row.company,
 					row.location,
 					row.item_code,
+					row.item_type,			#Item Type.
 					vim_number,
 					details,
 					row.due_date if last_inv != row.sinv_name else '',
@@ -163,6 +170,7 @@ def get_data(filters):
 					row.payment_entry,
 					row.sinv_name if last_inv != row.sinv_name else '',
 					row.gprice,
+					row.checklist,
 					row.status,
 					row.title_status,
 				)
@@ -173,6 +181,7 @@ def get_data(filters):
 					"", # Company
 					"", # Location
 					"", # Stock No.
+					"", #Item Type
 					"", # Vim Number
 					"", # Details
 					"", # Due Date
@@ -187,6 +196,7 @@ def get_data(filters):
 					"", # Total Paid
 					"", # Outstanding
 					row.payment_entry, # Payment Entry
+					"", # Checklist
 					"", # Sales Inv.
 					"", #  GPrice
 				)
@@ -230,9 +240,14 @@ def get_conditions(filters):
 			("Sales Invoice", "customer", "=", filters.get('customer'))
 		)
 
-	if filters.get('unpaid'):
+	if filters.get('payment_status') == "Unpaid Only":
 		conditions.append(
 			("Sales Invoice", "outstanding_amount", ">", 0)
+		)
+
+	if filters.get('payment_status') == "Paid Only":
+		conditions.append(
+			("Sales Invoice", "outstanding_amount", "=", 0)
 		)
 
 	if filters.get('item_code'):
@@ -272,9 +287,11 @@ def get_fields(filters):
 		("Item", "vim_number"),
 		("Item", "make"),
 		("Item", "model"),
+		("Item", "item_type"),
 		("Item", "part_type"),
 		("Item", "year"),
 		("Item", "exterior_color"),
+		("Vehicle Release", "status", "checklist"),
 		("Sales Invoice Item", "vim_number", "cont_vim"),
 		("Sales Invoice Item", "item_name"),
 		("Sales Invoice", "due_date", "due_date"),

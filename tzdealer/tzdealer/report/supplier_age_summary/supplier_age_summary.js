@@ -33,11 +33,19 @@ frappe.query_reports["Supplier Age Summary"] = {
 			"options": "Item",
 		},
 		{
-			"label": __("Show Unpaid Only?"),
-			"fieldtype": "Check",
-			"fieldname": "unpaid",
-			"default": 1,
+			"label": __("Payment Status"),
+			"fieldtype": "Select",
+			"fieldname": "payment_status",
+			"options": "All\nUnpaid Only\nPaid Only",
+			"default": "Unpaid Only",
+			"reqd": 1,
 		},
+		// {
+		// 	"label": __("Show Unpaid Only?"),
+		// 	"fieldtype": "Check",
+		// 	"fieldname": "unpaid",
+		// 	"default": 1,
+		// },
 	],
 	onload: function(report) {
 		report.page.add_inner_button(__("Supplier Age"), function() {
@@ -52,4 +60,19 @@ frappe.query_reports["Supplier Age Summary"] = {
 			});
 		});
 	},
+	formatter: function (row, cell, value, columnDef, dataContext, default_formatter) {
+		value = default_formatter(row, cell, value, columnDef, dataContext);
+
+		// if (cell == 2 && value) {
+		// 	_name = value.split('-')[0]
+		// 	value = `<a class="grey" target="_blank" href="#Form/Supplier/${_name}"">${value}</a>`;
+		// }
+
+		if (cell == 21) {
+			value = `<a class="grey" target="_blank" href="#List/Payment Entry/?reference_name=${dataContext["Invoice"]}&docstatus=1"><b>${value}</b></a>`;
+			
+		}
+
+		return value;
+	}
 }

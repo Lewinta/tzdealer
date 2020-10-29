@@ -36,10 +36,12 @@ frappe.query_reports["Customer Age"] = {
 			"options": "Item",
 		},
 		{
-			"label": __("Show Unpaid Only?"),
-			"fieldtype": "Check",
-			"fieldname": "unpaid",
-			"default": 1,
+			"label": __("Payment Status"),
+			"fieldtype": "Select",
+			"fieldname": "payment_status",
+			"options": "All\nUnpaid Only\nPaid Only",
+			"default": "Unpaid Only",
+			"reqd": 1,
 		},
 	],
 	onload: function(report) {
@@ -50,7 +52,7 @@ frappe.query_reports["Customer Age"] = {
 				from_date: filters.from_date,
 				to_date: filters.to_date,
 				customer: filters.customer,
-				unpaid: filters.unpaid,
+				payment_status: filters.payment_status,
 				item_code: filters.item_code,
 			});
 		});
@@ -61,6 +63,11 @@ frappe.query_reports["Customer Age"] = {
 		if (cell == 2 && value) {
 			_name = value.split('-')[0]
 			value = `<a class="grey" target="_blank" href="#Form/Supplier/${_name}"">${value}</a>`;
+		}
+
+		if (cell == 23) {
+			value = `<a class="grey" target="_blank" href="#Form/Vehicle Release/${dataContext['Stock No.']}"">${value}</a>`;
+			
 		}
 
 		return value;

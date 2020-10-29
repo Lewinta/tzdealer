@@ -3,9 +3,10 @@ from frappe.model.naming import make_autoname
 import json 
 import requests
 from frappe.utils import flt
+from datetime import datetime
+from frappe.utils.background_jobs import enqueue
 
 def before_insert(doc, event):
-	frappe.errprint(doc.item_code)
 	if doc.item_type == "Vehicle Parts" and  not doc.item_code:
 		doc.item_code = make_autoname("PART-.########") 
 
@@ -16,6 +17,9 @@ def before_insert(doc, event):
 		doc.item_code = make_autoname("VEH-.########") 
 
 	if doc.item_type == "Services" and  not doc.item_code:
+		doc.item_code = make_autoname("SER-.########")
+	
+	if doc.item_type == "Third Party Services" and  not doc.item_code:
 		doc.item_code = make_autoname("SER-.########") 
 
 	if doc.item_type == "Vehicles":
@@ -28,7 +32,7 @@ def before_insert(doc, event):
 def validate(doc, event):
 	generate_description(doc, event)
 	update_exterior_color(doc)
-	post_to_website(doc)
+	enqueue(post_to_website, docname=doc.name)
 
 def generate_description(doc, event):
 	desc = """<b>MAKE:&nbsp;</b>{make}<br>
@@ -56,11 +60,13 @@ def update_exterior_color(doc):
 		item.exterior_color = doc.exterior_color
 		item.db_update()
 
-def post_to_website(doc):
+def post_to_website(docname):
+	doc = frappe.get_doc("Item", docname)
 	if doc.item_type != "Vehicles" or not doc.website_post:
 		return
 	wc = frappe.get_single("Website Connector")
-	wc.sync(cast_to_post(doc), doc.item_code, doc.website_id)
+	wc.sync(doc.item_code)
+
 	
 
 def get_sales_price(item_code):
@@ -72,9 +78,9 @@ def get_sales_price(item_code):
 def cast_to_post(doc):
 	return json.dumps({
 	# _auto_color_int
-	"title": doc.item_name,
+	"title": doc.item_name.split("-")[0],
 	"content": doc.item_name,
-	"status": "publish",
+	"status": "draft",
 	"type": "pixad-autos",
 	"_auto_condition": "Used",
 	"_auto_doors": doc.doors,
@@ -88,9 +94,30 @@ def cast_to_post(doc):
 	"_auto_transmission": doc.gear,
 	"_auto_vin": doc.vim_number,
 	"_auto_year": doc.year,
+	"terms": {
+		"model": [ doc.make, doc.model ]
+	},
 })
 
+def cast_image(web_img):
+	if not web_img.get("doctype") or web_img.get("doctype") != "Website Image":
+		frappe.throw("You must send a Website Image Doctype, received {}".format(type(web_img)))
 
+	dt = str(datetime.now())[:19]
+
+	return json.dumps({
+	"date": dt,
+    "date_gmt": dt,
+    "status": "future",
+    "title": web_img.parent.split("-")[0],
+    "description": web_img.parent.split("-")[0],
+    "media_type": "image",
+    "source_url": web_img.image,
+    "source_url": web_img.image,
+    "Content-Disposition": {"filename":web_img.image},
+
+})
+	
 @frappe.whitelist()
 def address_by_supplier(doctype, txt, searchfield, start, page_len, filters):
 

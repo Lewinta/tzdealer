@@ -147,7 +147,7 @@ frappe.ui.form.on("Item", {
 	},
 	item_name: frm => {
 		frm.set_value("item_name", frm.doc.item_name.toUpperCase());
-		if (frm.doc.item_type == "Services")
+		if (["Services", "Third Party Services"].includes(frm.doc.item_type))
 			frm.set_value("item_code", frm.doc.item_name.toUpperCase());
 	},
 	item_type: frm => {
@@ -158,8 +158,9 @@ frappe.ui.form.on("Item", {
 		let maintain = [
 			"Vehicles",
 			"Vehicle Parts",
-			"Containers"
-		].includes(item_type) ? true : false;
+			"Containers",
+			"Third Party Services",
+		].includes(item_type) ? 1 : 0;
 
 		frm.set_value("item_group", item_type);
 		frm.set_value("is_stock_item", maintain);
@@ -240,7 +241,7 @@ frappe.ui.form.on("Item", {
 				name = name.concat("-", container_no);
 		}
 
-		if (frm.doc.item_type == "Services"){
+		if (["Services", "Third Party Services"].includes(frm.doc.item_type)){
 			name = frm.doc.item_name;
 		}
 
@@ -301,12 +302,13 @@ frappe.ui.form.on("Item", {
 		});
 	},
 	set_df_fields: frm => {
-		let selection = frm.doc.item_type.replace(" ","_").toLowerCase();
+		let selection = frm.doc.item_type.replaceAll(" ","_").toLowerCase();
 		let clear_req = [];
 		let clear_enabled = [];
 		let reqd = {
 			"vehicles" : ["make", "model", "year", "vim_number", "exterior_color", "purchase_date", "default_supplier", "_default_supplier", "location"],
 			"vehicle_parts" : ["part_type", "purchase_date"],
+			"third_party_services" : ["item_code"],
 			"services" : ["item_code"],
 			"containers" : [
 				"booking_no", "purchase_date", "eta", "booking_supplier",
@@ -320,6 +322,7 @@ frappe.ui.form.on("Item", {
 			"containers" : ["item_name", "item_code"],
 			"vehicle_parts" : ["item_code", "barcode", ],
 			"services" : [],
+			"third_party_servicese" : [],
 		}
 		//Let's combine all custom mandatory fields
 		$.each(reqd, (key, val) => {
@@ -331,16 +334,17 @@ frappe.ui.form.on("Item", {
 		});
 
 		//Let's clear all custom mandatory fields
-		frm.toggle_reqd(clear_req, false);
-
+		if(clear_req)
+			frm.toggle_reqd(clear_req, false);
 		//Let's add all custom mandatory fields
-		frm.toggle_reqd(reqd[selection], true);
-
+		if(reqd[selection])
+			frm.toggle_reqd(reqd[selection], true);
 		//Let's clear all custom enabled fields
-		frm.toggle_enable(clear_enabled, true);
-
+		if(clear_enabled)
+			frm.toggle_enable(clear_enabled, true);
 		//Let's add all custom enabled fields
-		frm.toggle_enable(disable[selection], false);
+		if(disable[selection])
+			frm.toggle_enable(disable[selection], false);
 
 		frm.toggle_display("item_code", selection == "vehicle_parts");
 		frm.toggle_display("purchase_date", selection != "services");
@@ -375,5 +379,12 @@ frappe.ui.form.on("Item Description", {
 		}).join("<br>");
 
 		frm.set_value("description", value);
+	}
+});
+
+frappe.ui.form.on("Website Image", {
+	post: (frm, cdt, cdn) => {
+		let args = {"web_img": cdn}
+		frappe.call("tzdealer.api.post_media", args, console.log).then( ()=> frm.reload_doc());
 	}
 });
