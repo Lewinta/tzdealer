@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 /* eslint-disable */
 
-frappe.query_reports["Customer Age Summary"] = {
+frappe.query_reports["G Report"] = {
 	"filters": [
 		{
 			"label": __("Company"),
@@ -45,19 +45,6 @@ frappe.query_reports["Customer Age Summary"] = {
 		},
 		
 	],
-	onload: function(report) {
-		report.page.add_inner_button(__("Customer Age"), function() {
-			var filters = report.get_values();
-			frappe.set_route('query-report', 'Customer Age', {
-				company: filters.company,
-				from_date: filters.from_date,
-				to_date: filters.to_date,
-				customer: filters.customer,
-				payment_status: filters.payment_status,
-				item_code: filters.item_code,
-			});
-		});
-	},
 	formatter: function (row, cell, value, columnDef, dataContext, default_formatter) {
 		value = default_formatter(row, cell, value, columnDef, dataContext);
 
@@ -66,13 +53,13 @@ frappe.query_reports["Customer Age Summary"] = {
 			value = `<a class="grey" target="_blank" href="#Form/Supplier/${_name}"">${value}</a>`;
 		}
 
-		if (cell == 14) {
+		if (cell == 16) {
 			value = `<a class="grey" target="_blank" href="#List/Payment Entry/?reference_name=${dataContext["Sales Inv."]}&docstatus=1"><b>${value}</b></a>`;
 			
 		}
 		
-		if (cell == 18) {
-			value = `<a class="grey" target="_blank" href="#Form/Vehicle Release/${dataContext['Stock No.']}"">${value}</a>`;
+		if (cell == 19) {
+			value = `<a class="grey" target="_blank" href="#Form/Vehicle Release/${dataContext['Stock No.']}""><b>${value}</b></a>`;
 			
 		}
 
