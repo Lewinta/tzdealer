@@ -2,7 +2,7 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('Vehicle Release', {
-	setup: function(frm) {
+	setup: frm => {
 		frm.set_query("vehicle", event => {
 			return {
 				"filters": {
@@ -13,16 +13,19 @@ frappe.ui.form.on('Vehicle Release', {
 		if(frm.is_new())
 			frm.trigger("load_checklist");
 	},
-	load_checklist: frm => {
-		frappe.db.get_list("Checklist Item").then(
-			items => {
-				$.map(items, item => {
-					frm.add_child("checklist", {"description": item.name})
-				});
-				frm.refresh_field("checklist");
-			}
-		);
+	type: frm => {
+		frm.call("get_items").then(() => refresh_field("checklist"));
 	}
+	// load_checklist: frm => {
+	// 	frappe.db.get_list("Checklist Item").then(
+	// 		items => {
+	// 			$.map(items, item => {
+	// 				frm.add_child("checklist", {"description": item.name})
+	// 			});
+	// 			frm.refresh_field("checklist");
+	// 		}
+	// 	);
+	// }
 });
 
 frappe.ui.form.on("Vehicle Checklist Item", {

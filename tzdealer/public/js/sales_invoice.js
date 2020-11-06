@@ -112,6 +112,8 @@ frappe.ui.form.on("Sales Invoice", {
 			return
 		let check = frm.doc.invoice_type != "Services" ? true : false;
 		frm.set_value("update_stock", check);
+
+		frm.toggle_reqd("sale_type", frm.doc.invoice_type == "Vehicles");
 	},
 	set_defaults: frm => {
 		const defaults = {

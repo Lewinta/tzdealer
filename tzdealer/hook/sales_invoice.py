@@ -41,6 +41,7 @@ def on_submit(doc, event):
 		item.db_update()
 
 	create_comission_invoice(doc)
+	create_vehicle_release(doc)
 
 def on_cancel(doc, event):
 	if has_commission_invoice(doc.name):
@@ -136,6 +137,26 @@ def create_comission_invoice(doc):
 		A Commission invoice has been created for Sales Partner <b>{}</b><br>
 		<b><a href='/desk#Form/Purchase Invoice/{}'>{}</a></b>
 	""".format(doc.sales_partner, pinv.name, pinv.name))
+
+def create_vehicle_release(doc):
+	if doc.invoice_type != "Vehicles":
+		return
+	for row in doc.items:
+		if row.item_group != "Vehicles":
+			continue
+		if frappe.db.exists("Vehicle Release", row.item_code):
+			vehicle_release = frappe.get_doc("Vehicle Release", row.item_code)
+			vehicle_release.type = doc.sale_type
+		else:
+			vehicle_release = frappe.new_doc("Vehicle Release")
+			vehicle_release.update({
+				"type": doc.sale_type,
+				"vehicle": row.item_code,
+			})
+		
+		vehicle_release.get_items()
+		vehicle_release.save()
+
 
 
 

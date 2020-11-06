@@ -113,66 +113,41 @@ def get_data(filters):
 
 		results = frappe.db.sql("""
 			Select
-				{fields_1},
-				(Select Sum(actual_qty) from `tabStock Ledger Entry` where item_code = `tabPurchase Invoice Item`.item_code) as qty
+				{fields_1}
 			From
+				`tabItem`			
+			Left Join
+				`tabPurchase Invoice Item`
+			On
+				`tabItem`.item_code = `tabPurchase Invoice Item`.item_code
+			Left Join
 				`tabPurchase Invoice`
-			Inner Join
+			On
+				`tabPurchase Invoice`.name = `tabPurchase Invoice Item`.parent
+			And 
+				`tabPurchase Invoice`.is_return = 0
+			And 
+				`tabPurchase Invoice`.docstatus = 1
+			Left Join
 				`tabSupplier`
 			ON
 				`tabSupplier`.name = `tabPurchase Invoice`.supplier
-			Inner Join
-				`tabPurchase Invoice Item`
-				On
-					`tabPurchase Invoice`.name = `tabPurchase Invoice Item`.parent
-				And 
-					`tabPurchase Invoice`.is_return = 0
-				And 
-					`tabPurchase Invoice`.docstatus = 1
-			Inner Join
-				`tabItem`
-				On
-					`tabPurchase Invoice Item`.item_code = `tabItem`.item_code
-				And 
-					`tabItem`.item_type = 'Vehicles'
-				And
-					`tabItem`.item_code not in (
-						Select 
-							item_code 
-						From 
-							`tabSales Order Item` 
-						Where
-							`tabSales Order Item`.docstatus = 1
-					)
-			Inner Join
+			Left Join
 				`tabBin`
 				On
 					`tabItem`.item_code = `tabBin`.item_code
-			Inner Join
-				(
-					Select
-						`tabSingles`.value As margin_rate
-					From
-						`tabSingles`
-					Where
-						`tabSingles`.doctype = "Configuration"
-						And
-							`tabSingles`.field = "default_revenue_rate"
-				) As `tabSales Price`
 			Left Join
 				`tabAddress`
 			On
 				`tabItem`.location = `tabAddress`.name
 			Where
+				`tabItem`.item_type = 'Vehicles'
 				{cond_1}
-				Having 
-				qty > 0
 
 			UNION 
 			
 			Select
-				{fields_2},
-				0 as other_sum
+				{fields_2}
 			From
 				`tabSales Invoice`
 			Inner Join
@@ -220,15 +195,15 @@ def get_data(filters):
 				`tabItem`.location = `tabAddress`.name
 			
 			Where
-				`tabPurchase Invoice`.is_return = 0 AND
+				`tabPurchase Invoice`.is_return = 0
 				{cond_2}
 
 			""".format(
 				fields_1=fields_1,
 				fields_2=fields_2,
-				cond_1=cond_1 or "1 = 1",
-				cond_2=cond_2 or "1 = 1"
-			), debug=False)
+				cond_1= "AND {}".format(cond_1) if cond_1 else "",
+				cond_2= "AND {}".format(cond_2) if cond_2 else "",
+			), debug=True)
 
 	if filters.get("report_type") == "Stock Report":
 		results = frappe.db.sql("""
@@ -570,7 +545,7 @@ def get_fields(filters):
 			("Item", "kijiji_post"),
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
-			("Item", "item_code"),
+			("Item", "name"),
 			("Item", "vim_number"),
 			("Item", "model"),
 			("Item", "year"),
@@ -609,7 +584,7 @@ def get_fields(filters):
 			("Item", "kijiji_post"),
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
-			("Item", "item_code"),
+			("Item", "name"),
 			("Item", "vim_number"),
 			("Item", "model"),
 			("Item", "year"),
@@ -619,7 +594,18 @@ def get_fields(filters):
 			("Item", "trim"),
 			("Item", "drive_train"),
 			("Purchase Invoice Item", "landed_cost_voucher_amount"),
-			("Sales Invoice Item", "amount"),
+			("""
+				(
+					Select
+						(((`tabSingles`.value / 100) + 1) * (`tabBin`.valuation_rate + `tabPurchase Invoice`.total - `tabPurchase Invoice Item`.rate)) As p
+					From
+						`tabSingles`
+					Where
+						`tabSingles`.doctype = "Configuration"
+						And
+							`tabSingles`.field = "default_revenue_rate"
+				) As sales_price
+			"""),
 			("Purchase Invoice", "posting_date"),
 			("Purchase Invoice", "supplier"),
 			("Purchase Invoice", "name"),
@@ -638,7 +624,7 @@ def get_fields(filters):
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
 			("Vehicle Release", "status"),
-			("Item", "item_code"),
+			("Item", "name"),
 			("Item", "vim_number"),
 			("Item", "model"),
 			("Item", "year"),
@@ -681,7 +667,7 @@ def get_fields(filters):
 			("Item", "auto_trader_post"),
 			("Item", "website_post"),
 			("Vehicle Release", "status"),
-			("Item", "item_code"),
+			("Item", "name"),
 			("Sales Invoice", "posting_date"),
 			("Sales Invoice", "customer"),
 			("Item", "vim_number"),
@@ -722,7 +708,7 @@ def get_fields(filters):
 			("Item", "status"),
 			("Item", "company"),
 			("CONCAT(`tabItem`._default_supplier, ' - ', `tabAddress`.city, ', ', `tabAddress`.state) as location"),
-			("Item", "item_code"),
+			("Item", "name"),
 			("Sales Order", "transaction_date"),
 			("Sales Order", "customer"),
 			("Item", "vim_number"),

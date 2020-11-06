@@ -23,6 +23,7 @@ frappe.ui.form.on("Item", {
 	validate: frm => {
 		let events = ["item_type", "validate_suppliers", "create_item_name", "validate_warehouse"];
 		$.map(events, event => frm.trigger(event))
+		frm.set_value("item_code", frm.doc.name)
 	},
 	validate_suppliers: frm => {
 		const {item_type, trucking_supplier_price, loading_supplier_price} = frm.doc;
@@ -193,9 +194,6 @@ frappe.ui.form.on("Item", {
 			"link_doctype": "Supplier",
 			"link_name": frm.doc._default_supplier
 		}
-	},
-	vim_number: frm => {
-		frm.set_value("item_code", frm.doc.vim_number);
 	},
 	part: frm => {
 		frm.trigger("create_item_name");
