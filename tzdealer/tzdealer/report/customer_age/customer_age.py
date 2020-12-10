@@ -15,27 +15,27 @@ def get_columns():
 		("S. Location", "Data", 230),
 		("Stock No.", "Link/Item", 110),
 		("Item Type", "Data", 100),
+		("Customer", "Link/Customer", 130),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
 		# ("Model", "Data", 100),
 		# ("Year", "Data", 60),
 		# ("Color", "Data", 70),
-		("Due Date", "Date", 90),
+		# ("Due Date", "Date", 90),
 		("Inv. Date", "Date", 90),
-		("Customer", "Link/Customer", 130),
-		("Sale N/Total", "Currency", 100),
-		("GST", "Currency", 100),
-		("PST", "Currency", 100),
-		("Sale G/Total CAD", "Currency", 150),
-		("Sale G/Total USD", "Currency", 150),
+		# ("Sale N/Total", "Currency", 100),
+		# ("GST", "Currency", 100),
+		# ("PST", "Currency", 100),
+		("Total Sale", "Currency", 90),
+		# ("Sale G/Total USD", "Currency", 150),
 		("Pay Date", "Date", 90),
 		("Payment Type", "Data", 100),
 		("Breakdown", "Currency", 100),
-		("Total Paid", "Currency", 100),
+		("Total Paid", "Currency", 90),
 		("Outstanding", "Currency", 100),
 		("Payment Entry", "Link/Payment Entry", 100),
 		("Sales Inv.", "Link/Sales Invoice", 100),
-		("G Price", "Currency", 100),
+		# ("G Price", "Currency", 100),
 		("Checklist", "Data", 90),
 		("VEH Status", "Data", 100),
 		("Title Status", "Data", 100),
@@ -109,9 +109,9 @@ def get_data(filters):
 		On
 			`tabItem`.location = `tabAddress`.name
 		Left Join
-			`tabVehicle Release`
+			`tabDelivery Checklist`
 		On
-			`tabVehicle Release`.name = `tabItem`.name	
+			`tabDelivery Checklist`.name = `tabItem`.name	
 		Where
 			{conditions}
 		Group By 
@@ -151,16 +151,16 @@ def get_data(filters):
 					row.location,
 					row.item_code,
 					row.item_type,			#Item Type.
+					row.customer  if last_inv != row.sinv_name else '',
 					vim_number,
 					details,
-					row.due_date if last_inv != row.sinv_name else '',
+					# row.due_date if last_inv != row.sinv_name else '',
 					row.sinv_date if last_inv != row.sinv_name else '',
-					row.customer  if last_inv != row.sinv_name else '',
-					row.net_total if last_inv != row.sinv_name else '',
-					row.gst_total if last_inv != row.sinv_name else '',
-					row.pst_total if last_inv != row.sinv_name else '',
+					# row.net_total if last_inv != row.sinv_name else '',
+					# row.gst_total if last_inv != row.sinv_name else '',
+					# row.pst_total if last_inv != row.sinv_name else '',
 					row.base_grand_total if last_inv != row.sinv_name else .00,
-					row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00,
+					# row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00,
 					row.p_posting_date if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else '-',
 					row.mode_of_payment if entry != row.payment_entry or mode != row.mode_of_payment or pay_date != row.p_posting_date else ' ',
 					row.allocated_amount if last_inv != row.sinv_name  or entry != row.payment_entry else .00,
@@ -182,14 +182,14 @@ def get_data(filters):
 					"", # Location
 					"", # Stock No.
 					"", #Item Type
+					"", # Customer 
 					"", # Vim Number
 					"", # Details
-					"", # Due Date
+					# "", # Due Date
 					"", # Inv Date
-					"", # Customer 
-					"", # Sale N/ Total
-					"", # GST
-					"", # PST
+					# "", # Sale N/ Total
+					# "", # GST
+					# "", # PST
 					row.p_posting_date, # Pay Date
 					row.mode_of_payment, # Payment Type
 					row.allocated_amount, # Breakdown
@@ -198,7 +198,7 @@ def get_data(filters):
 					row.payment_entry, # Payment Entry
 					"", # Checklist
 					"", # Sales Inv.
-					"", #  GPrice
+					# "", #  GPrice
 				)
 			)
 		last_inv = row.sinv_name
@@ -291,7 +291,7 @@ def get_fields(filters):
 		("Item", "part_type"),
 		("Item", "year"),
 		("Item", "exterior_color"),
-		("Vehicle Release", "status", "checklist"),
+		("Delivery Checklist", "status", "checklist"),
 		("Sales Invoice Item", "vim_number", "cont_vim"),
 		("Sales Invoice Item", "item_name"),
 		("Sales Invoice", "due_date", "due_date"),
@@ -302,7 +302,7 @@ def get_fields(filters):
 		("""
 			SUM(
 				IF(
-					`tabSales Taxes and Charges`.account_head != 'PST/QST receivable - 9.975%% - EZ',
+					`tabSales Taxes and Charges`.account_head like 'GST receivable - 5%% -%%',
 					IFNULL(`tabSales Taxes and Charges`.tax_amount, 0), 0
 				)
 			) as gst_total
@@ -311,7 +311,7 @@ def get_fields(filters):
 		("""
 			SUM(
 				IF(
-					`tabSales Taxes and Charges`.account_head = 'PST/QST receivable - 9.975%% - EZ',
+					`tabSales Taxes and Charges`.account_head like 'PST/QST receivable - 9.975%% -%%',
 					IFNULL(`tabSales Taxes and Charges`.tax_amount, 0), 0
 				)
 			) as pst_total

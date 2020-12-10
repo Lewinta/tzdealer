@@ -1,8 +1,7 @@
 // Copyright (c) 2016, TZCODE SRL and contributors
 // For license information, please see license.txt
 /* eslint-disable */
-
-frappe.query_reports["Customer Age Summary"] = {
+frappe.query_reports["GST Sales Report"] = {
 	"filters": [
 		{
 			"label": __("Company"),
@@ -66,12 +65,12 @@ frappe.query_reports["Customer Age Summary"] = {
 			value = `<a class="grey" target="_blank" href="#Form/Supplier/${_name}"">${value}</a>`;
 		}
 
-		if (cell == 10) {
+		if (cell == 14) {
 			value = `<a class="grey" target="_blank" href="#List/Payment Entry/?reference_name=${dataContext["Sales Inv."]}&docstatus=1"><b>${value}</b></a>`;
 			
 		}
 		
-		if (cell == 13) {
+		if (cell == 18) {
 			value = `<a class="grey" target="_blank" href="#Form/Delivery Checklist/${dataContext['Stock No.']}"">${value}</a>`;
 			
 		}

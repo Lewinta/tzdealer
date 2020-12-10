@@ -59,7 +59,8 @@ frappe.ui.form.on("Sales Invoice", {
 					return
 
 				$.map(items, item => {
-					item.income_account = account;
+					if(item.idx == 1)
+						item.income_account = account;
 				});
 
 				frm.trigger("set_default_currency");
@@ -252,7 +253,9 @@ frappe.ui.form.on("Sales Invoice Item",  {
 				frappe.model.set_value(cdt, cdn, "warehouse", name);
 			});
 
-			frappe.model.set_value(cdt, cdn, "income_account", account);
+			if(row.idx == 1)
+				frappe.model.set_value(cdt, cdn, "income_account", account);
+			
 			frm.refresh_field("items");
 		}, 600);
 	},

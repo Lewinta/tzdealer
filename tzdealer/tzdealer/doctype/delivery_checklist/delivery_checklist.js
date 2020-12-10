@@ -1,7 +1,7 @@
 // Copyright (c) 2020, TZCODE SRL and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('Vehicle Release', {
+frappe.ui.form.on('Delivery Checklist', {
 	setup: frm => {
 		frm.set_query("vehicle", event => {
 			return {
@@ -16,19 +16,9 @@ frappe.ui.form.on('Vehicle Release', {
 	type: frm => {
 		frm.call("get_items").then(() => refresh_field("checklist"));
 	}
-	// load_checklist: frm => {
-	// 	frappe.db.get_list("Checklist Item").then(
-	// 		items => {
-	// 			$.map(items, item => {
-	// 				frm.add_child("checklist", {"description": item.name})
-	// 			});
-	// 			frm.refresh_field("checklist");
-	// 		}
-	// 	);
-	// }
 });
 
-frappe.ui.form.on("Vehicle Checklist Item", {
+frappe.ui.form.on("Delivery Checklist Item", {
 	done: (frm, cdt, cdn) => {
 		row = locals[cdt][cdn];
 		if (row.done == 1)

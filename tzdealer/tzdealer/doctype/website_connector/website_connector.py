@@ -94,8 +94,10 @@ class WebsiteConnector(Document):
 
 		try:
 			r = self.send(url, self.headers({'Authorization': "Bearer {}".format(self.token)}), cast_to_post(doc))
-			doc.website_id = r.id
+			if not doc.website_id:
+				doc.website_id = r.id
 			doc.db_update()
+			frappe.db.commit()
 
 		except Exception as e:
 			error = frappe.new_doc("Error Log")

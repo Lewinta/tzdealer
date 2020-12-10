@@ -32,7 +32,17 @@ def before_insert(doc, event):
 def validate(doc, event):
 	generate_description(doc, event)
 	update_exterior_color(doc)
-	enqueue(post_to_website, docname=doc.name)
+
+@frappe.whitelist()
+def post_to_website(docname):
+	doc = frappe.get_doc("Item", docname)
+	if doc.item_type != "Vehicles" or not doc.website_post:
+		return
+	wc = frappe.get_single("Website Connector")
+	wc.sync(doc.item_code)
+	# enqueue(post_to_website, docname=doc.name)
+
+
 
 def generate_description(doc, event):
 	desc = """<b>MAKE:&nbsp;</b>{make}<br>
@@ -60,15 +70,6 @@ def update_exterior_color(doc):
 		item.exterior_color = doc.exterior_color
 		item.db_update()
 
-def post_to_website(docname):
-	doc = frappe.get_doc("Item", docname)
-	if doc.item_type != "Vehicles" or not doc.website_post:
-		return
-	wc = frappe.get_single("Website Connector")
-	wc.sync(doc.item_code)
-
-	
-
 def get_sales_price(item_code):
 	revenue_rate   = frappe.db.get_single_value("Configuration", "default_revenue_rate") or .000
 	valuation_rate = frappe.db.get_value("Bin", {"item_code":item_code}, "valuation_rate") or .000
@@ -78,14 +79,16 @@ def get_sales_price(item_code):
 def cast_to_post(doc):
 	return json.dumps({
 	# _auto_color_int
-	"title": doc.item_name.split("-")[0],
-	"content": doc.item_name,
+	"title": "{}-{}".format(doc.item_name.split("-")[0], int(doc.name.split("-")[1])),
+	"content": doc.item_name.split("-")[0],
 	"status": "draft",
 	"type": "pixad-autos",
 	"_auto_condition": "Used",
+	"_custom_1": int(doc.name.split("-")[1]),
 	"_auto_doors": doc.doors,
+	"_auto_color": doc.exterior_color,
 	"_auto_engine": doc.engine,
-	"_auto_fuel": doc.fuel_type,
+	"_auto_fuel": doc.fuel_type.lower(),
 	"_auto_make": doc.make,
 	"_auto_mileage": doc.odometer_value,
 	"_auto_price": get_sales_price(doc.item_code),

@@ -40,7 +40,7 @@ frappe.query_reports["G Report"] = {
 			"fieldtype": "Select",
 			"fieldname": "payment_status",
 			"options": "All\nUnpaid Only\nPaid Only",
-			"default": "Unpaid Only",
+			"default": "All",
 			"reqd": 1,
 		},
 		
@@ -59,7 +59,7 @@ frappe.query_reports["G Report"] = {
 		}
 		
 		if (cell == 19) {
-			value = `<a class="grey" target="_blank" href="#Form/Vehicle Release/${dataContext['Stock No.']}""><b>${value}</b></a>`;
+			value = `<a class="grey" target="_blank" href="#Form/Delivery Checklist/${dataContext['Stock No.']}""><b>${value}</b></a>`;
 			
 		}
 

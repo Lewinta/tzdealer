@@ -66,7 +66,7 @@ frappe.query_reports["Customer Age"] = {
 		}
 
 		if (cell == 23) {
-			value = `<a class="grey" target="_blank" href="#Form/Vehicle Release/${dataContext['Stock No.']}"">${value}</a>`;
+			value = `<a class="grey" target="_blank" href="#Form/Delivery Checklist/${dataContext['Stock No.']}"">${value}</a>`;
 			
 		}
 

@@ -1,0 +1,22 @@
+{
+ "align_labels_right": 1, 
+ "creation": "2020-11-19 02:02:44.907537", 
+ "custom_format": 0, 
+ "disabled": 0, 
+ "doc_type": "Delivery Checklist", 
+ "docstatus": 0, 
+ "doctype": "Print Format", 
+ "font": "Default", 
+ "format_data": "[{\"fieldname\": \"print_heading_template\", \"fieldtype\": \"Custom HTML\", \"options\": \"<div class=\\\"print-heading\\\">\\t\\t\\t\\t<h2>Delivery Checklist<br><small>{{ doc.name }}</small>\\t\\t\\t\\t</h2></div>\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"type\", \"label\": \"Type\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"fieldname\": \"status\", \"label\": \"Status\"}, {\"fieldtype\": \"Section Break\", \"label\": \"\"}, {\"fieldtype\": \"Column Break\"}, {\"print_hide\": 0, \"options\": \"<table class=\\\"table table-condensed table-bordered\\\">\\n\\t{% set ns = namespace(category='-') %}   \\n\\n\\t{% for item in doc.checklist%}\\n\\t\\t{% if ns.category != item.category %}\\n\\t\\t\\t<tr>\\n\\t\\t\\t\\t<th class=\\\"text-center\\\" colspan=\\\"4\\\">{{item.category}}</th>\\n\\t\\t\\t</tr>\\n\\t\\t{% endif %}\\n\\t\\t{% set ns.category = item.category %}\\n\\t\\t<tr>\\n\\t\\t\\t<td>{{loop.index}}</td>\\n\\t\\t\\t<td>{{item.description}}</td>\\n\\t\\t\\t{% if item.done %}\\n\\t\\t\\t\\t<td class=\\\"text-center\\\">\\n\\t\\t\\t\\t\\t<span class=\\\"disp-area\\\"><i class=\\\"octicon octicon-check\\\" style=\\\"margin-right: 3px;\\\"></i></span>\\n\\t\\t\\t\\t</td>\\n\\t\\t\\t{%else%}\\n\\t\\t\\t\\t<td class=\\\"text-center\\\">\\n\\t\\t\\t\\t\\t<span class=\\\"disp-area\\\"><i class=\\\"fa fa-square disabled-check\\\"></i></span>\\n\\t\\t\\t\\t</td>\\n\\t\\t\\t{% endif %}\\n\\t\\t\\t<td>{{item.notes or \\\"\\\"}}</td>\\n\\t\\t</tr>\\n\\t{% endfor %}\\n</table>\", \"fieldname\": \"_custom_html\", \"fieldtype\": \"HTML\", \"label\": \"Custom HTML\"}]", 
+ "idx": 0, 
+ "line_breaks": 1, 
+ "modified": "2020-11-19 02:32:05.828658", 
+ "modified_by": "Administrator", 
+ "module": "TZDEALER", 
+ "name": "Delivery Checklist", 
+ "owner": "Administrator", 
+ "print_format_builder": 0, 
+ "print_format_type": "Server", 
+ "show_section_headings": 1, 
+ "standard": "Yes"
+}

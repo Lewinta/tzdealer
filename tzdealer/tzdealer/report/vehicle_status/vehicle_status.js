@@ -39,7 +39,7 @@ frappe.query_reports["Vehicle Status"] = {
 		
 		if (cell == 7 && value) {
 			_name = value.split('-')[0]
-			value = `<a class="grey" target="_blank" href="#Form/Vehicle Release/${dataContext['Stock No.']}"">${value}</a>`;
+			value = `<a class="grey" target="_blank" href="#Form/Delivery Checklist/${dataContext['Stock No.']}"">${value}</a>`;
 		}
 		return value;
 	}

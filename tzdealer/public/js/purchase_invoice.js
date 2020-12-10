@@ -112,7 +112,8 @@ frappe.ui.form.on("Purchase Invoice", {
 			return
 
 		$.map(items, item => {
-			item.expense_account = account;
+			if(item.idx == 1)
+				item.expense_account = account;
 		});
 
 	},
@@ -143,12 +144,14 @@ frappe.ui.form.on("Purchase Invoice", {
 frappe.ui.form.on("Purchase Invoice Item",  {
 	item_code: (frm, cdt, cdn) => {
 		let {account} = frm.doc;
-
+		let row = locals[cdt][cdn];
 		if (!account)
 			return
 
 		setTimeout(event =>{
-			frappe.model.set_value(cdt, cdn, "expense_account", account);
+			if (row.idx == 1)
+				frappe.model.set_value(cdt, cdn, "expense_account", account);
+			
 			frappe.model.set_value(cdt, cdn, "warehouse", frm.doc.default_warehouse);
 			frappe.model.set_value(cdt, cdn, "rejected_warehouse", frm.doc.default_warehouse);
 

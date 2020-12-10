@@ -15,9 +15,14 @@ def validate(doc, event):
 		"expenses_included_in_valuation"
 	)
 
+	cost_center = frappe.db.get_value("Company", doc.company, "cost_center")
+
 	for item in doc.items:
 		if not item.expense_account:
 			item.expense_account = expense_account
+
+		if item.cost_center != cost_center:
+			item.cost_center = cost_center
 
 def on_update_after_submit(doc, event):
 	if has_commission_invoice(doc.name):
@@ -41,7 +46,7 @@ def on_submit(doc, event):
 		item.db_update()
 
 	create_comission_invoice(doc)
-	create_vehicle_release(doc)
+	create_delivery_checklist(doc)
 
 def on_cancel(doc, event):
 	if has_commission_invoice(doc.name):
@@ -138,24 +143,24 @@ def create_comission_invoice(doc):
 		<b><a href='/desk#Form/Purchase Invoice/{}'>{}</a></b>
 	""".format(doc.sales_partner, pinv.name, pinv.name))
 
-def create_vehicle_release(doc):
+def create_delivery_checklist(doc):
 	if doc.invoice_type != "Vehicles":
 		return
 	for row in doc.items:
 		if row.item_group != "Vehicles":
 			continue
-		if frappe.db.exists("Vehicle Release", row.item_code):
-			vehicle_release = frappe.get_doc("Vehicle Release", row.item_code)
+		if frappe.db.exists("Delivery Checklist", row.item_code):
+			vehicle_release = frappe.get_doc("Delivery Checklist", row.item_code)
 			vehicle_release.type = doc.sale_type
 		else:
-			vehicle_release = frappe.new_doc("Vehicle Release")
+			vehicle_release = frappe.new_doc("Delivery Checklist")
 			vehicle_release.update({
 				"type": doc.sale_type,
 				"vehicle": row.item_code,
 			})
 		
 		vehicle_release.get_items()
-		vehicle_release.save()
+		vehicle_release.save(ignore_permissions=True)
 
 
 

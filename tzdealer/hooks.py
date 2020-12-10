@@ -43,6 +43,7 @@ doctype_js = {
 	"Contact" : "public/js/contact.js",
 	"Landed Cost Voucher" : "public/js/landed_cost_voucher.js",
 	"Address" : "public/js/address.js",
+	"Customer" : "public/js/customer.js",
 }
 
 # Fixtures
@@ -300,7 +301,7 @@ fixtures = [
 doc_events = {
 	"Item": {
 		"before_insert": "tzdealer.hook.item.before_insert",
-		"validate": "tzdealer.hook.item.validate",
+		"validate":  "tzdealer.hook.item.validate",
 	},
 	"Sales Invoice": {
 		"validate": "tzdealer.hook.sales_invoice.validate",
@@ -328,6 +329,12 @@ doc_events = {
 	},
 	"Sales Partner":{
 		"after_insert": "tzdealer.hook.sales_partner.after_insert",
+	},
+	"Customer":{
+		"on_update": "tzdealer.hook.customer.on_update",
+	},
+	"Supplier-company":{
+		"on_update": "tzdealer.hook.supplier.on_update",
 	},
 	"Address":{
 		"autoname": "tzdealer.hook.address.autoname",

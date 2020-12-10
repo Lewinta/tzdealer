@@ -6,7 +6,7 @@ from __future__ import unicode_literals
 import frappe
 from frappe.model.document import Document
 
-class VehicleRelease(Document):
+class DeliveryChecklist(Document):
 	def validate(self):
 		self.validate_items()
 
@@ -21,8 +21,22 @@ class VehicleRelease(Document):
 		if not self.type:
 			frappe.throw("Please select a Checklist Type!")
 
+		items = frappe.db.sql("""
+			SELECT 
+				`tabChecklist Item`.name as description,
+				`tabChecklist Item`.category 
+			FROM
+				`tabChecklist Item`
+			JOIN
+				`tabChecklist Type Item`
+			ON
+				`tabChecklist Item`.name = `tabChecklist Type Item`.parent
+			AND
+				`tabChecklist Type Item`.type = %s
+			ORDER BY 
+				`tabChecklist Item`.category, `tabChecklist Item`.name
+		""", self.type, as_dict=True)
+
 		filters = {"type": self.type}
-		for desc,  in frappe.get_list("Checklist Item", filters, as_list=True):
-			self.append("checklist", {
-				"description": desc
-			})
+		for row in items:
+			self.append("checklist", row)

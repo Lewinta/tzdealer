@@ -23,7 +23,7 @@ frappe.ui.form.on("Item", {
 	validate: frm => {
 		let events = ["item_type", "validate_suppliers", "create_item_name", "validate_warehouse"];
 		$.map(events, event => frm.trigger(event))
-		frm.set_value("item_code", frm.doc.name)
+		// frm.set_value("item_code", frm.doc.name)
 	},
 	validate_suppliers: frm => {
 		const {item_type, trucking_supplier_price, loading_supplier_price} = frm.doc;
@@ -144,11 +144,54 @@ frappe.ui.form.on("Item", {
 	},
 	add_custom_buttons: frm => {
 		frm.add_custom_button(__("Item Details"), event => {
-			frm.trigger("view_item_details"); }, __("View"));
+			frm.trigger("view_item_details"); 
+		}, __("View"));
+		
+		if (frm.doc.item_type == "Vehicles" && frm.doc.website_post){
+			let btn = frm.add_custom_button(__("Post to Website"), event => {
+				frm.trigger("post_to_website");
+			});
+			btn.addClass("btn-primary");
+		}
+	},
+	post_to_website: frm => {
+
+		let {docname} = frm;
+
+		if(frm.is_dirty())
+			frappe.run_serially([
+				() => frappe.dom.freeze("please wait..."),
+				() => frm.save_or_update(),
+				() => frappe.call("tzdealer.hook.item.post_to_website", {docname}).then(
+					() => frappe.dom.unfreeze(),
+					() => frm.reload_doc(),
+				).catch(
+					() => frappe.msgprint("Something Went Wrong")
+				),
+				() => frappe.dom.unfreeze()
+			])
+		else
+			frappe.run_serially([
+				() => frappe.dom.freeze("please wait..."),
+				() => frappe.call("tzdealer.hook.item.post_to_website", {docname}).then(
+					() => frappe.dom.unfreeze(),
+					() => frm.reload_doc(),
+				).catch(
+					() => frappe.msgprint("Something Went Wrong")
+				),
+				() => frappe.dom.unfreeze()
+			])
+	},
+	_item_name: frm => {
+		frm.set_value("_item_name", frm.doc._item_name.toUpperCase());
+		frm.set_value("item_name", frm.doc._item_name.toUpperCase());
+		
+		if (["Services", "Third Party Services", "Vehicle Parts"].includes(frm.doc.item_type))
+			frm.set_value("item_code", frm.doc._item_name.toUpperCase());
 	},
 	item_name: frm => {
 		frm.set_value("item_name", frm.doc.item_name.toUpperCase());
-		if (["Services", "Third Party Services"].includes(frm.doc.item_type))
+		if (["Services", "Third Party Services","Vehicle Parts"].includes(frm.doc.item_type))
 			frm.set_value("item_code", frm.doc.item_name.toUpperCase());
 	},
 	item_type: frm => {
@@ -190,10 +233,12 @@ frappe.ui.form.on("Item", {
 		// we need to add an address
 		if (!frm.doc._default_supplier)
 			return
-		frappe.route_history[frappe.route_history.length - 1][3] = {
-			"link_doctype": "Supplier",
-			"link_name": frm.doc._default_supplier
-		}
+		
+		if (frappe.route_history[frappe.route_history.length - 1])
+			frappe.route_history[frappe.route_history.length - 1][3] = {
+				"link_doctype": "Supplier",
+				"link_name": frm.doc._default_supplier
+			}
 	},
 	part: frm => {
 		frm.trigger("create_item_name");
@@ -306,8 +351,8 @@ frappe.ui.form.on("Item", {
 		let reqd = {
 			"vehicles" : ["make", "model", "year", "vim_number", "exterior_color", "purchase_date", "default_supplier", "_default_supplier", "location"],
 			"vehicle_parts" : ["part_type", "purchase_date"],
-			"third_party_services" : ["item_code"],
-			"services" : ["item_code"],
+			"third_party_services" : ["item_code", "_item_name"],
+			"services" : ["item_code", "_item_name"],
 			"containers" : [
 				"booking_no", "purchase_date", "eta", "booking_supplier",
 				"booking_supplier_price", "trucking_supplier", "trucking_supplier_price", "loading_supplier",
@@ -316,11 +361,11 @@ frappe.ui.form.on("Item", {
 			],
 		}
 		let disable = {
-			"vehicles" : ["item_name", "item_code"],
-			"containers" : ["item_name", "item_code"],
+			"vehicles" : ["_item_name", "item_code"],
+			"containers" : ["_item_name", "item_code"],
 			"vehicle_parts" : ["item_code", "barcode", ],
 			"services" : [],
-			"third_party_servicese" : [],
+			"third_party_services" : [],
 		}
 		//Let's combine all custom mandatory fields
 		$.each(reqd, (key, val) => {
@@ -344,7 +389,7 @@ frappe.ui.form.on("Item", {
 		if(disable[selection])
 			frm.toggle_enable(disable[selection], false);
 
-		frm.toggle_display("item_code", selection == "vehicle_parts");
+		frm.toggle_display("item_code", ["vehicle_parts", "services", "third_party_services"].includes(selection));
 		frm.toggle_display("purchase_date", selection != "services");
 	}
 });

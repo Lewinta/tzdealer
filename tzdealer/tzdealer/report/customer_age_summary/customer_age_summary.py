@@ -21,24 +21,24 @@ def get_columns():
 		("S. Location", "Data", 230),
 		("Stock No.", "Link/Item", 110),
 		("Item Type", "Data", 100),
+		("Customer", "Link/Customer", 160),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
 		# ("Due Date", "Date", 90),
 		("Inv. Date", "Date", 90),
-		("Customer", "Link/Customer", 160),
 		# ("G Price", "Currency", 100),
-		("Net Sale", "Currency", 100),
-		("GST", "Currency", 100),
-		("PST", "Currency", 100),
-		("Total Sale", "Currency", 120),
-		("Total Sale USD", "Currency", 110),
+		# ("Net Sale", "Currency", 100),
+		# ("GST", "Currency", 100),
+		# ("PST", "Currency", 100),
+		("Total Sale", "Currency", 100),
+		# ("Total Sale USD", "Currency", 110),
 		# (mop_1, "Currency", len(mop_1) * 8),
 		# ("CASH CAD", "Currency", len("CASH CAD") * 10),
 		# (mop_2, "Currency", len(mop_2) * 9),
 		# (mop_3, "Currency", len(mop_3) * 9),
 		# (mop_5, "Currency", len(mop_5) * 9),
-		("Total Paid CAD", "Currency", 100),
-		("Total Paid USD", "Currency", 100),
+		("Total Paid", "Currency", 90),
+		# ("Total Paid USD", "Currency", 100),
 		("Outstanding", "Currency", 100),
 		("Sales Inv.", "Link/Sales Invoice", 100),
 		("Checklist", "Data", 90),
@@ -96,6 +96,8 @@ def get_data(filters):
 			`tabItem`
 		On
 			`tabSales Invoice Item`.item_code = `tabItem`.item_code
+		and 
+			`tabSales Invoice Item`.idx = 1
 
 		Left Join
 			`tabSales Taxes and Charges`
@@ -121,9 +123,9 @@ def get_data(filters):
 		On
 			`tabItem`.location = `tabAddress`.name
 		Left Join
-			`tabVehicle Release`
+			`tabDelivery Checklist`
 		On
-			`tabVehicle Release`.name = `tabItem`.name	
+			`tabDelivery Checklist`.name = `tabItem`.name	
 		Where
 			{conditions}
 		Group By 
@@ -165,24 +167,24 @@ def get_data(filters):
 					row.location,			#S.Location
 					row.item_code,			#Stock No.
 					row.item_type,			#Item Type.
+					row.customer  if last_inv != row.sinv_name else '',		#Customer
 					vim_number,				#Vim Number
 					details,				#Details
 					# row.due_date if last_inv != row.sinv_name else '', 		#Due Date
 					row.sinv_date if last_inv != row.sinv_name else '',		#Inv Date
-					row.customer  if last_inv != row.sinv_name else '',		#Customer
 					# row.gprice,				#G Price
-					row.net_total if last_inv != row.sinv_name else '',		#Net Sale
-					row.gst_total,											#GST
-					row.pst_total ,											#PST
+					# row.net_total if last_inv != row.sinv_name else '',		#Net Sale
+					# row.gst_total,											#GST
+					# row.pst_total ,											#PST
 					row.base_grand_total if last_inv != row.sinv_name else .00, 	#Total Sale 
-					row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00, 		#Total Sale USD
+					# row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00, 		#Total Sale USD
 					# row.mop_1 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP1	
 					# row.mop_4 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP4
 					# row.mop_2 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP2
 					# row.mop_3 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP3
 					# row.mop_5 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP5
 					row.total_paid_cad,																		#Total Paid CAD
-					row.total_paid_usd,																		#Total Paid USD
+					# row.total_paid_usd,																		#Total Paid USD
 					row.outstanding_amount if last_inv != row.sinv_name else .00, 							#Outstanding
 					row.sinv_name if last_inv != row.sinv_name else '',										#Sales Inv.
 					row.vehicle_release,	#VEH Status
@@ -202,23 +204,23 @@ def get_data(filters):
 					row.location,			#S.Location
 					row.item_code,			#Stock No.
 					row.item_type,			#Item Type.
+					row.customer  if last_inv != row.sinv_name else '',		#Customer
 					vim_number,				#Vim Number
 					details,				#Details
 					# row.due_date if last_inv != row.sinv_name else '', 		#Due Date
 					row.sinv_date if last_inv != row.sinv_name else '',		#Inv Date
-					row.customer  if last_inv != row.sinv_name else '',		#Customer
-					row.net_total if last_inv != row.sinv_name else '',		#Net Sale
-					row.gst_total,											#GST
-					row.pst_total ,											#PST
+					# row.net_total if last_inv != row.sinv_name else '',		#Net Sale
+					# row.gst_total,											#GST
+					# row.pst_total ,											#PST
 					row.base_grand_total if last_inv != row.sinv_name else .00, 	#Total Sale 
-					row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00, 		#Total Sale USD
+					# row.grand_total if last_inv != row.sinv_name  and row.currency == "USD" else .00, 		#Total Sale USD
 					# row.mop_1 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP1	
 					# row.mop_4 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP4
 					# row.mop_2 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP2
 					# row.mop_3 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP3
 					# row.mop_5 if last_inv != row.sinv_name  or entry != row.payment_entry else .00,			#MOP5
 					row.total_paid_cad,																		#Total Paid CAD
-					row.total_paid_usd,																		#Total Paid USD
+					# row.total_paid_usd,																		#Total Paid USD
 					row.outstanding_amount if last_inv != row.sinv_name else .00, 							#Outstanding
 					row.sinv_name if last_inv != row.sinv_name else '',										#Sales Inv.
 					row.vehicle_release	,	#VEH Release
@@ -323,7 +325,7 @@ def get_fields(filters):
 		("Item", "part_type"),
 		("Item", "year"),
 		("Item", "exterior_color"),
-		("Vehicle Release", "status", "vehicle_release"),
+		("Delivery Checklist", "status", "vehicle_release"),
 		("Sales Invoice Item", "vim_number", "cont_vim"),
 		("Sales Invoice Item", "item_name"),
 		# ("Sales Invoice", "due_date", "due_date"),
@@ -335,16 +337,10 @@ def get_fields(filters):
 		("Sales Invoice", "base_paid_amount"), 
 		("""SUM(
 				IF(
-					`tabPayment Entry`.paid_to_account_currency = 'CAD',
+					`tabPayment Entry Reference`.allocated_amount > 0,
 					IFNULL(`tabPayment Entry Reference`.allocated_amount, 0), 0
 				)
-			) as total_paid_cad,
-			SUM(
-				IF(
-					`tabPayment Entry`.paid_to_account_currency = 'USD',
-					IFNULL(`tabPayment Entry Reference`.allocated_amount / `tabPayment Entry`.target_exchange_rate, 0), 0
-				)
-			) as total_paid_usd
+			) as total_paid_cad
 		"""
 		),
 		("""(SELECT SUM(IFNULL(tax_amount, 0)) FROM `tabSales Taxes and Charges` WHERE tax_type = 'GST' AND parent = `tabSales Invoice`.name AND docstatus = 1 ) as gst_total"""),
