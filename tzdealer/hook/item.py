@@ -33,6 +33,9 @@ def validate(doc, event):
 	generate_description(doc, event)
 	update_exterior_color(doc)
 
+def after_insert(doc, event):
+	post_to_website(doc.name)
+
 @frappe.whitelist()
 def post_to_website(docname):
 	doc = frappe.get_doc("Item", docname)
@@ -40,6 +43,13 @@ def post_to_website(docname):
 		return
 	wc = frappe.get_single("Website Connector")
 	wc.sync(doc.item_code)
+	frappe.publish_realtime(
+		event="reload_vehicle", 
+		doctype=doc.doctype,
+		docname=doc.name,
+		user=doc.owner
+	)
+	frappe.db.commit()
 	# enqueue(post_to_website, docname=doc.name)
 
 

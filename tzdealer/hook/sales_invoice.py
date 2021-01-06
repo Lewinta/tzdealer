@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import frappe
+from frappe.model.naming import make_autoname
 from erpnext.controllers.accounts_controller import get_taxes_and_charges
-from frappe.utils import add_days
+from frappe.utils import add_days, flt
 import json
 
+def autoname(doc, event):
+	abbr = frappe.get_value("Company", doc.company, "abbr")
+	new_name = make_autoname("_{}-.########".format(abbr))
+	doc.contract_no = new_name[1:]
+	
 def validate(doc, event):
 	if doc.customer != doc.title:
 		doc.title = doc.customer
@@ -16,13 +22,48 @@ def validate(doc, event):
 	)
 
 	cost_center = frappe.db.get_value("Company", doc.company, "cost_center")
-
+	doc.taxes = []
+	abbr = frappe.get_value("Company", doc.company, "abbr")
+	taxes_obj = {
+		'GST receivable - 5% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
+		'H2 receivable - 14% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
+		'HE receivable - 5% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
+		'HST receivable - 13% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
+		'HST receivable - 15% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
+		'PST/QST receivable - 9.975% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
+	}
 	for item in doc.items:
 		if not item.expense_account:
 			item.expense_account = expense_account
 
 		if item.cost_center != cost_center:
 			item.cost_center = cost_center
+
+		if item.tax:
+			filters = {"parent": item.tax}
+			fields  = ["charge_type", "account_head", "rate", "tax_type"]
+			for tc in frappe.get_list("Sales Taxes and Charges", filters, fields):
+				taxes_obj[tc.account_head].update({
+					"amount": (flt(item.amount) * flt(tc.rate) / 100.0) + flt(taxes_obj[tc.account_head]["amount"]),
+					"g_amount": (flt(item.gprice) * flt(tc.rate) / 100.0) + flt(taxes_obj[tc.account_head]["g_amount"]),
+					"tax_type": tc.tax_type
+				})
+
+	for account_head, v in taxes_obj.items():
+		if not v["amount"]:
+			continue
+		doc.append("taxes", {
+			"charge_type": "Actual",
+			"account_head": account_head,
+			"tax_type": v["tax_type"],
+			"description": account_head,
+			"tax_amount": v["amount"],
+			"g_tax": v["g_amount"]
+		})
+	doc.calculate_taxes_and_totals()
+	calculate_g_taxes_and_totals(doc)
+	doc.total_g_taxes_and_charges = sum([x.g_tax for x in doc.taxes])
+
 
 def on_update_after_submit(doc, event):
 	if has_commission_invoice(doc.name):
@@ -161,6 +202,15 @@ def create_delivery_checklist(doc):
 		
 		vehicle_release.get_items()
 		vehicle_release.save(ignore_permissions=True)
+
+def calculate_g_taxes_and_totals(doc):
+	last_g_amount = .000
+	for row in doc.taxes:
+		if row.idx == 1:
+			row.g_amount = doc.total_g + row.g_tax
+		else:
+			row.g_amount = last_g_amount + row.g_tax
+		last_g_amount = row.g_amount
 
 
 

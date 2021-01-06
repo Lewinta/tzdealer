@@ -300,10 +300,12 @@ fixtures = [
 
 doc_events = {
 	"Item": {
-		"before_insert": "tzdealer.hook.item.before_insert",
 		"validate":  "tzdealer.hook.item.validate",
+		"before_insert": "tzdealer.hook.item.before_insert",
+		"after_insert": "tzdealer.hook.item.after_insert",
 	},
 	"Sales Invoice": {
+		"autoname": "tzdealer.hook.sales_invoice.autoname",
 		"validate": "tzdealer.hook.sales_invoice.validate",
 		"on_submit": "tzdealer.hook.sales_invoice.on_submit",
 		"on_cancel": "tzdealer.hook.sales_invoice.on_cancel",

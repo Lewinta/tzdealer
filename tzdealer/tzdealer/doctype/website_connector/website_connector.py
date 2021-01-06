@@ -108,7 +108,7 @@ class WebsiteConnector(Document):
 				),
 				'method': "sync",
 			})
-			error.save()
+			error.save(ignore_permissions=True)
 
 	def sync_images(self, item):
 		url = "/wp-json/wp/v2/media"
@@ -135,7 +135,7 @@ class WebsiteConnector(Document):
 					),
 					'method': "sync",
 				})
-				error.save()
+				error.save(ignore_permissions=True)
 
 	def sync_single_image(self, img_name):
 		url = "/wp-json/wp/v2/media"
@@ -165,7 +165,7 @@ class WebsiteConnector(Document):
 				),
 				'method': "sync",
 			})
-			error.save()
+			error.save(ignore_permissions=True)
 	
 	def update_vehicle(self, doc):
 		url = "/wp-json/wp/v2/vehicles/{}".format()

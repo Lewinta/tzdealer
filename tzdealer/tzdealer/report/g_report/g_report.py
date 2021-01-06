@@ -149,15 +149,17 @@ def get_data(filters):
 		total_costs = flt(row.pinv_price) + flt(row.fee) + flt(row.transport) + \
 			flt(row.delivery) + flt(row.parts) + flt(row.repair) + flt(row.others)
 		vim_number = row.cont_vim.split('-')[0] if row.cont_vim and '-' in row.cont_vim else row.vim_number
+
 		details = "-" 
-		if row.invoice_type == "Vehicles":
-			details = "{} {} {} {}".format(row.make, row.model, row.exterior_color, row.year)
-		if row.invoice_type == "Containers":
+		if row.item_type == "Vehicles":
+			details = "{} {} {} {}".format(row.make or "", row.model or "", row.exterior_color or "", row.year or "")
+		if row.item_type == "Containers":
 			details = "{} {}".format(row.booking_no or "", row.container_no or "")
-		# if row.cont_vim:
-		# 	details = row.cont_vim.split("-")[1]
-		if row.invoice_type == "Parts":
+		if row.item_type == "Parts":
 			details = row.part_type
+		if row.item_type == "Services":
+			details = row.item_type
+
 		
 		paid_arr = [flt(x.allocated_amount) for x in filter(lambda x, n=row.sinv_name : x.get('sinv_name') == n, data)]
 		total_paid = sum(paid_arr) if paid_arr else .00

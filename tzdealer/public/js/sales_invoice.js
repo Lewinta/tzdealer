@@ -1,6 +1,27 @@
 frappe.ui.form.on("Sales Invoice", {
 	refresh: frm => {
 		$.map(["set_queries", "has_commission_invoice"], event => frm.trigger(event));
+		frm.set_df_property("tax_amount", "label", `Tax Amount(${frm.doc.currency})`, frm.docname, "items");
+		frm.set_df_property("base_tax_amount", "label", `Tax Amount(CAD)`, frm.docname, "items");
+		frm.trigger("update_tax_labels");
+
+	},
+	validate: frm => {
+		const {account, items} = frm.doc;
+		frappe.run_serially([
+			frm.trigger("invoice_type"),
+			frm.trigger("transaction_group"),
+			// () => setTimeout( event => {
+			// 	$.map(items, item => {
+			// 		if(!account)
+			// 			return
+			// 		if(item.income_account != account){
+			// 			frappe.msgprint("Please refresh Transaction Group " + item.idx);
+			// 			validated = fale;
+			// 		}
+			// 	})
+			// },400)
+		]);
 
 	},
 	date: frm => {
@@ -19,14 +40,22 @@ frappe.ui.form.on("Sales Invoice", {
 	},
 	set_queries: frm => {
 
-			frm.set_query("item_code", "items", () => {
-				return{
-					filters:{
-						"company": frm.doc.company,
-						"is_sales_item": 1,
-					}
+		frm.set_query("item_code", "items", () => {
+			return{
+				filters:{
+					"company": frm.doc.company,
+					"is_sales_item": 1,
 				}
-			});
+			}
+		});
+
+		frm.set_query("tax", "items", () => {
+			return{
+				filters:{
+					"company": frm.doc.company,
+				}
+			}
+		});
 
 		frm.set_query("transaction_group",  event => {
 			return{
@@ -67,24 +96,6 @@ frappe.ui.form.on("Sales Invoice", {
 				
 			}
 		)
-
-	},
-	validate: frm => {
-		const {account, items} = frm.doc;
-		frappe.run_serially([
-			frm.trigger("invoice_type"),
-			frm.trigger("transaction_group"),
-			// () => setTimeout( event => {
-			// 	$.map(items, item => {
-			// 		if(!account)
-			// 			return
-			// 		if(item.income_account != account){
-			// 			frappe.msgprint("Please refresh Transaction Group " + item.idx);
-			// 			validated = fale;
-			// 		}
-			// 	})
-			// },400)
-		]);
 
 	},
 	has_commission_invoice: frm => {
@@ -150,6 +161,24 @@ frappe.ui.form.on("Sales Invoice", {
 
 		frm.fields_dict.total_g.df.label = "Total G (" + currency + ")";
 		refresh_field("total_g");
+		frm.trigger("update_tax_labels")
+	},
+	update_tax_labels: frm => {
+		frm.set_df_property(
+			"base_tax_amount",
+			"label",
+			`Tax Amount (${frm.doc.currency})`,
+			frm.docname,
+			"items"
+		);
+		frm.set_df_property(
+			"base_tax_amount",
+			"hidden",
+			frm.doc.currency != "CAD",
+			frm.docname,
+			"items"
+		);
+		frm.refresh_field("items");
 	},
 	refresh_gprice: frm => {
 		let total_g = 0.00;
@@ -206,7 +235,60 @@ frappe.ui.form.on("Sales Invoice", {
 			});
 			frm.trigger("refresh_g_taxes");
 		}, 500);
+	}, 
+	warranty_a: frm => {
+		let {warranty_a, warranty_b, warranty_c, warranty_d} = frm.doc;
+		let cond = warranty_a || warranty_b || warranty_c || warranty_d;
+		frm.set_value("warranty_e", !cond);
+		frm.trigger("check_warranty");
+	},
+	warranty_b: frm => {
+		let {warranty_a, warranty_b, warranty_c, warranty_d} = frm.doc;
+		let cond = warranty_a || warranty_b || warranty_c || warranty_d;
+		frm.set_value("warranty_e", !cond);
+		frm.trigger("check_warranty");
+	},
+	warranty_c: frm => {
+		let {warranty_a, warranty_b, warranty_c, warranty_d} = frm.doc;
+		let cond = warranty_a || warranty_b || warranty_c || warranty_d;
+		frm.set_value("warranty_e", !cond);
+		frm.trigger("check_warranty");
+	},
+	warranty_d: frm => {
+		let {warranty_a, warranty_b, warranty_c, warranty_d} = frm.doc;
+		let cond = warranty_a || warranty_b || warranty_c || warranty_d;
+		frm.set_value("warranty_e", !cond);
+		frm.trigger("check_warranty");
+	},
+	warranty_e: frm => {
+		frm.trigger("check_warranty");
+	},
+	check_warranty: frm => {
+		if (!!frm.doc.warranty_e){
+			$.map(['warranty_a', 'warranty_b', 'warranty_c', 'warranty_d'], field => {
+				frm.set_value(field, 0);
+			});
+		}
+	},
+	set_total_taxes: frm => {
+		let tax_obj = {};
+		$.map(frm.doc.items, item => {
+			if(item.tax)
+				tax_obj[item.tax] = flt(tax_obj[item.tax]) + flt(item.tax_amount);
+		});
+
+		frm.clear_table("taxes");
+		
+		$.each(tax_obj, (account_head, tax_amount) => {
+			let charge_type = "Actual";
+			let description = account_head;
+			row = { charge_type, account_head, tax_amount, description }
+			frm.add_child("taxes", row);
+		})
+		frm.refresh_field("taxes");
 	}
+
+
 });
 
 frappe.ui.form.on("Sales Invoice Item",  {
@@ -262,6 +344,7 @@ frappe.ui.form.on("Sales Invoice Item",  {
 	gprice: (frm, cdt, cdn) => {
 		frm.trigger("refresh_gprice");
 	},
+	
 });
 
 

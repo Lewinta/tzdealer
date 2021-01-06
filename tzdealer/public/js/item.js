@@ -13,6 +13,10 @@ frappe.ui.form.on("Item", {
 		});
 		frm.trigger("set_df_fields");
 		frm.trigger("add_supplier_to_history");
+
+		frappe.realtime.on("reload_vehicle", () => { 
+			frm.reload_doc(); 
+		})
 		
 	},
 	onload_post_render: frm => {
@@ -69,6 +73,21 @@ frappe.ui.form.on("Item", {
 			return {
 				filters: {
 					"company": frm.doc.company
+				}
+			}
+		});
+		frm.set_query("tax_type", "taxes", function () {
+			return {
+				filters: {
+					"company": frm.doc.company
+				}
+			}
+		});
+		frm.set_query("tax", "items", function () {
+			return {
+				filters: {
+					"company": frm.doc.company,
+					"account_type": "Tax",
 				}
 			}
 		});
@@ -147,12 +166,12 @@ frappe.ui.form.on("Item", {
 			frm.trigger("view_item_details"); 
 		}, __("View"));
 		
-		if (frm.doc.item_type == "Vehicles" && frm.doc.website_post){
-			let btn = frm.add_custom_button(__("Post to Website"), event => {
-				frm.trigger("post_to_website");
-			});
-			btn.addClass("btn-primary");
-		}
+		// if (frm.doc.item_type == "Vehicles" && frm.doc.website_post){
+		// 	let btn = frm.add_custom_button(__("Post to Website"), event => {
+		// 		frm.trigger("post_to_website");
+		// 	});
+		// 	btn.addClass("btn-primary");
+		// }
 	},
 	post_to_website: frm => {
 
