@@ -304,7 +304,7 @@ def get_fields(filters):
 		("Sales Invoice", "net_total"),
 		("""(SELECT SUM(IFNULL(tax_amount, 0)) FROM `tabSales Taxes and Charges` WHERE tax_type = 'GST' AND parent = `tabSales Invoice`.name AND docstatus = 1 ) as gst_total"""),
 		("""(SELECT SUM(IFNULL(tax_amount, 0)) FROM `tabSales Taxes and Charges` WHERE tax_type = 'PST' AND parent = `tabSales Invoice`.name AND docstatus = 1 ) as pst_total"""),
-		("""(SELECT SUM(IFNULL(g_tax, 0)) FROM `tabSales Taxes and Charges` WHERE tax_type = 'GST' AND parent = `tabSales Invoice`.name AND docstatus = 1 ) as g_gst_total"""), ("""(SELECT SUM(IFNULL(g_tax, 0)) FROM `tabSales Taxes and Charges` WHERE tax_type = 'PST' AND parent = `tabSales Invoice`.name AND docstatus = 1 ) as g_pst_total"""),
+		("""(SELECT SUM(IFNULL(g_tax, 0)) FROM `tabSales Taxes and Charges` WHERE tax_type = 'GST' AND parent = `tabSales Invoice`.name AND docstatus = 1 ) as g_gst_total"""), 
 		("Sales Invoice", "currency"),
 		("Sales Invoice", "base_grand_total"),
 		("Sales Invoice", "grand_total"),
@@ -331,7 +331,7 @@ def get_fields(filters):
 		("Sales Invoice Item", "gprice"),
 		("Item", "status"),
 		("Item", "title_status"),
-		("(SELECT valuation_rate from `tabBin` where `tabBin`.item_code = `tabItem`.item_code AND `tabBin`.warehouse = `tabSales Invoice Item`.warehouse) as net_cost")
+		("(SELECT `view_vehicle_g_cost`.purchase_cost + view_vehicle_g_cost.lcv from `view_vehicle_g_cost` where `view_vehicle_g_cost`.item_code = `tabItem`.item_code) as net_cost")
 	)
 
 	sql_fields = []
