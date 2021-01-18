@@ -14,7 +14,9 @@ def autoname(doc, event):
 def validate(doc, event):
 	if doc.customer != doc.title:
 		doc.title = doc.customer
+	update_g_taxes(doc)
 
+def update_g_taxes(doc):
 	expense_account = frappe.db.get_value(
 		"Company",
 		doc.company,
@@ -25,12 +27,12 @@ def validate(doc, event):
 	doc.taxes = []
 	abbr = frappe.get_value("Company", doc.company, "abbr")
 	taxes_obj = {
-		'GST receivable - 5% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
-		'H2 receivable - 14% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
-		'HE receivable - 5% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
-		'HST receivable - 13% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
-		'HST receivable - 15% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
-		'PST/QST receivable - 9.975% - {}'.format(abbr): {'amount': .000, 'g_amount': .00},
+		'H2 receivable - 14% - AC': {'amount': .000, 'g_amount': .00},
+		'HE receivable - 5% - AC': {'amount': .000, 'g_amount': .00},
+		'HST receivable - 13% - AC': {'amount': .000, 'g_amount': .00},
+		'HST receivable - 15% - AC': {'amount': .000, 'g_amount': .00},
+		'PST/QST receivable - 9.975% - AC': {'amount': .000, 'g_amount': .00},
+		'GST receivable - 5% - AC': {'amount': .000, 'g_amount': .00},
 	}
 	for item in doc.items:
 		if not item.expense_account:
@@ -42,14 +44,14 @@ def validate(doc, event):
 		if item.tax:
 			filters = {"parent": item.tax}
 			fields  = ["charge_type", "account_head", "rate", "tax_type"]
+			if not frappe.db.exists("Sales Taxes and Charges", filters):
+				continue
 			for tc in frappe.get_list("Sales Taxes and Charges", filters, fields):
 				taxes_obj[tc.account_head].update({
-					"amount": (flt(item.amount) * flt(tc.rate) / 100.0) + flt(taxes_obj[tc.account_head]["amount"]),
-					"g_amount": (flt(item.gprice) * flt(tc.rate) / 100.0) + flt(taxes_obj[tc.account_head]["g_amount"]),
+					"amount": (flt(item.gprice) * flt(tc.rate) / 100.0) + flt(taxes_obj[tc.account_head]["amount"]),
 					"tax_type": tc.tax_type
 				})
-
-	for account_head, v in taxes_obj.items():
+	for account_head, v in sorted(taxes_obj.items()):
 		if not v["amount"]:
 			continue
 		doc.append("taxes", {
@@ -58,12 +60,13 @@ def validate(doc, event):
 			"tax_type": v["tax_type"],
 			"description": account_head,
 			"tax_amount": v["amount"],
-			"g_tax": v["g_amount"]
+			# "g_tax": v["g_amount"]
 		})
 	doc.calculate_taxes_and_totals()
 	calculate_g_taxes_and_totals(doc)
-	doc.total_g_taxes_and_charges = sum([x.g_tax for x in doc.taxes])
-
+	total_g_price = sum([x.tax_amount for x in doc.taxes])
+	doc.total_g_taxes_and_charges = total_g_price
+	doc.grand_g_total = doc.total_g + doc.total_taxes_and_charges
 
 def on_update_after_submit(doc, event):
 	if has_commission_invoice(doc.name):
@@ -73,6 +76,8 @@ def on_update_after_submit(doc, event):
 		)
 	else:
 		create_comission_invoice(doc)
+
+	update_g_taxes(doc)
 
 def on_submit(doc, event):
 	# When submitting an invoice we need to update the last sold price

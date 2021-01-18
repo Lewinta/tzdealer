@@ -22,6 +22,7 @@ frappe.ui.form.on("Sales Invoice", {
 			// 	})
 			// },400)
 		]);
+		frm.trigger("calcualte_grand_g_total");
 
 	},
 	date: frm => {
@@ -191,16 +192,16 @@ frappe.ui.form.on("Sales Invoice", {
 	},
 	total_g: frm =>{
 		frm.trigger("calcualte_grand_g_total");
-		frm.trigger("calculate_g_taxes_item");
+		// frm.trigger("calculate_g_taxes_item");
 	},
 	calcualte_grand_g_total: frm => {
-		const {total_g, total_g_taxes_and_charges} = frm.doc;
-		const total = flt(total_g, 4) + flt(total_g_taxes_and_charges, 4);
-
+		const {total_g, total_taxes_and_charges} = frm.doc;
+		const total = flt(total_g, 4) + flt(total_taxes_and_charges, 4);
 		frm.set_value("grand_g_total", total);
+
 	},
 	taxes_and_charges: frm => {
-		frm.trigger("calculate_g_taxes_item");
+		// frm.trigger("calculate_g_taxes_item");
 	},
 	total_g_taxes_and_charges: frm => {
 		frm.trigger("calcualte_grand_g_total");
@@ -214,28 +215,28 @@ frappe.ui.form.on("Sales Invoice", {
 		})
 		frm.set_value("total_g_taxes_and_charges", flt(total_g_tax, 4));
 	},
-	calculate_g_taxes_item: frm => {
-		setTimeout(event => {
-			$.map(frm.doc.taxes, ({doctype, name, charge_type, rate, tax_amount}) => {
-				let tax = 0.00;
-				let g_amount = 0.00;
+	// calculate_g_taxes_item: frm => {
+	// 	setTimeout(event => {
+	// 		$.map(frm.doc.taxes, ({doctype, name, charge_type, rate, tax_amount}) => {
+	// 			let tax = 0.00;
+	// 			let g_amount = 0.00;
 
-				if (charge_type == "On Net Total"){
-					tax = flt(frm.doc.total_g * rate / 100.00, 4);
-					g_amount = flt(frm.doc.total_g * (1 + rate / 100.0), 4);
-				}
+	// 			if (charge_type == "On Net Total"){
+	// 				tax = flt(frm.doc.total_g * rate / 100.00, 4);
+	// 				g_amount = flt(frm.doc.total_g * (1 + rate / 100.0), 4);
+	// 			}
 
-				if (charge_type == "Actual"){
-					tax = tax_amount;
-					g_amount = frm.doc.total_g + tax_amount;
-				}
+	// 			if (charge_type == "Actual"){
+	// 				tax = tax_amount;
+	// 				g_amount = frm.doc.total_g + tax_amount;
+	// 			}
 
-				frappe.model.set_value(doctype, name, "g_amount", g_amount);
-				frappe.model.set_value(doctype, name, "g_tax", tax);
-			});
-			frm.trigger("refresh_g_taxes");
-		}, 500);
-	}, 
+	// 			frappe.model.set_value(doctype, name, "g_amount", g_amount);
+	// 			frappe.model.set_value(doctype, name, "g_tax", tax);
+	// 		});
+	// 		frm.trigger("refresh_g_taxes");
+	// 	}, 500);
+	// }, 
 	warranty_a: frm => {
 		let {warranty_a, warranty_b, warranty_c, warranty_d} = frm.doc;
 		let cond = warranty_a || warranty_b || warranty_c || warranty_d;
@@ -342,6 +343,10 @@ frappe.ui.form.on("Sales Invoice Item",  {
 		}, 600);
 	},
 	gprice: (frm, cdt, cdn) => {
+		frm.trigger("refresh_gprice");
+		frm.trigger("calcualte_grand_g_total");
+	},
+	items_remove:(frm, cdt, cdn) => {
 		frm.trigger("refresh_gprice");
 	},
 	

@@ -20,12 +20,12 @@ def get_columns():
 		("Company", "Data", 120),
 		("S. Location", "Data", 230),
 		("Stock No.", "Link/Item", 110),
-		("Item Type", "Data", 100),
+		("Item Type", "Data", 80),
+		("Inv. Date", "Date", 90),
 		("Customer", "Link/Customer", 160),
 		("Vim Number", "Data", 150),
 		("Details", "Data", 250),
 		# ("Due Date", "Date", 90),
-		("Inv. Date", "Date", 90),
 		# ("G Price", "Currency", 100),
 		# ("Net Sale", "Currency", 100),
 		# ("GST", "Currency", 100),
@@ -169,11 +169,11 @@ def get_data(filters):
 					row.location,			#S.Location
 					row.item_code,			#Stock No.
 					row.item_type,			#Item Type.
+					row.sinv_date if last_inv != row.sinv_name else '',		#Inv Date
 					row.customer  if last_inv != row.sinv_name else '',		#Customer
 					vim_number,				#Vim Number
 					details,				#Details
 					# row.due_date if last_inv != row.sinv_name else '', 		#Due Date
-					row.sinv_date if last_inv != row.sinv_name else '',		#Inv Date
 					# row.gprice,				#G Price
 					# row.net_total if last_inv != row.sinv_name else '',		#Net Sale
 					# row.gst_total,											#GST
