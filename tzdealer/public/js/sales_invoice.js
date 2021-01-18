@@ -287,9 +287,17 @@ frappe.ui.form.on("Sales Invoice", {
 			frm.add_child("taxes", row);
 		})
 		frm.refresh_field("taxes");
+	},
+	calculate_g_taxes_and_totals: frm => {
+		let args = { doc: frm.doc }
+		let fields = ["taxes", "total_taxes_and_charges", "total_g"];
+		let _cb = ({ message }) => frappe.model.sync(message) && frm.refresh_fields(fields);
+		frappe.call(
+			"tzdealer.hook.sales_invoice.update_g_taxes",
+			args,
+			_cb
+		)
 	}
-
-
 });
 
 frappe.ui.form.on("Sales Invoice Item",  {
@@ -343,15 +351,16 @@ frappe.ui.form.on("Sales Invoice Item",  {
 		}, 600);
 	},
 	gprice: (frm, cdt, cdn) => {
-		frm.trigger("refresh_gprice");
-		frm.trigger("calcualte_grand_g_total");
+		frm.trigger('calculate_g_taxes_and_totals');
 	},
 	items_remove:(frm, cdt, cdn) => {
-		frm.trigger("refresh_gprice");
+		frm.trigger('calculate_g_taxes_and_totals');
 	},
+	tax: (frm, cdt, cdn) => {
+		frm.trigger('calculate_g_taxes_and_totals');
+	}
 	
 });
-
 
 frappe.ui.form.on("Sales Taxes and Charges",  {
 	taxes_add: (frm, cdt, cdn) => {
@@ -363,5 +372,4 @@ frappe.ui.form.on("Sales Taxes and Charges",  {
 	tax_amount: (frm, cdt, cdn) => {
 		frm.trigger("calculate_g_taxes_item");
 	}
-
 });

@@ -16,7 +16,50 @@ def validate(doc, event):
 		doc.title = doc.customer
 	update_g_taxes(doc)
 
+def on_update_after_submit(doc, event):
+	if has_commission_invoice(doc.name):
+		inv = frappe.get_doc("Purchase Invoice", {"bill_no": doc.name})
+		frappe.msgprint("""This invoice already has commision invoice 
+			<b><a href='/Form/Purchase Invoice/{0}'>{0}</a></b>""".format(inv)
+		)
+	else:
+		create_comission_invoice(doc)
+
+	update_g_taxes(doc)
+
+def on_submit(doc, event):
+	# When submitting an invoice we need to update the last sold price
+	# to each Item.
+
+	for sinv_item in doc.items:
+		if not sinv_item.item_code or not frappe.db.exists("Item", sinv_item.item_code):
+			continue
+		
+		item = frappe.get_doc("Item", sinv_item.item_code)
+		item.last_sold_price = sinv_item.rate
+		item.db_update()
+
+	create_comission_invoice(doc)
+	create_delivery_checklist(doc)
+
+def on_cancel(doc, event):
+	if has_commission_invoice(doc.name):
+		pinv = frappe.get_doc("Purchase Invoice", {"bill_no": doc.name})
+		if pinv.docstatus == 1 and pinv.paid_amount == 0:
+			pinv.cancel()
+			
+		else:
+			frappe.throw("""
+				You cannot cancel this invoice because it has a commission invoice associated <b>
+				<a href='/desk#Form/Purchase Invoice/{name}'>{name}</a></b>.<br>
+				and has payments, 
+			""".format(**pinv.as_dict()))
+
+@frappe.whitelist()
 def update_g_taxes(doc):
+	if type(doc) == unicode:
+		doc = frappe.get_doc(json.loads(doc))
+	
 	expense_account = frappe.db.get_value(
 		"Company",
 		doc.company,
@@ -65,47 +108,11 @@ def update_g_taxes(doc):
 	doc.calculate_taxes_and_totals()
 	calculate_g_taxes_and_totals(doc)
 	total_g_price = sum([x.tax_amount for x in doc.taxes])
+	doc.total_g = sum([x.gprice for x in doc.items])
 	doc.total_g_taxes_and_charges = total_g_price
 	doc.grand_g_total = doc.total_g + doc.total_taxes_and_charges
-
-def on_update_after_submit(doc, event):
-	if has_commission_invoice(doc.name):
-		inv = frappe.get_doc("Purchase Invoice", {"bill_no": doc.name})
-		frappe.msgprint("""This invoice already has commision invoice 
-			<b><a href='/Form/Purchase Invoice/{0}'>{0}</a></b>""".format(inv)
-		)
-	else:
-		create_comission_invoice(doc)
-
-	update_g_taxes(doc)
-
-def on_submit(doc, event):
-	# When submitting an invoice we need to update the last sold price
-	# to each Item.
-
-	for sinv_item in doc.items:
-		if not sinv_item.item_code or not frappe.db.exists("Item", sinv_item.item_code):
-			continue
-		
-		item = frappe.get_doc("Item", sinv_item.item_code)
-		item.last_sold_price = sinv_item.rate
-		item.db_update()
-
-	create_comission_invoice(doc)
-	create_delivery_checklist(doc)
-
-def on_cancel(doc, event):
-	if has_commission_invoice(doc.name):
-		pinv = frappe.get_doc("Purchase Invoice", {"bill_no": doc.name})
-		if pinv.docstatus == 1 and pinv.paid_amount == 0:
-			pinv.cancel()
-			
-		else:
-			frappe.throw("""
-				You cannot cancel this invoice because it has a commission invoice associated <b>
-				<a href='/desk#Form/Purchase Invoice/{name}'>{name}</a></b>.<br>
-				and has payments, 
-			""".format(**pinv.as_dict()))
+	
+	return doc
 
 @frappe.whitelist()
 def has_commission_invoice(sinv_name):
